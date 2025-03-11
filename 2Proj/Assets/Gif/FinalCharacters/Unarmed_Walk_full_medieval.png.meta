@@ -722,7 +722,31 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Unarmed_Walk_full_medieval_0: -5754065300966010327
+      Unarmed_Walk_full_medieval_1: 6988859281872998309
+      Unarmed_Walk_full_medieval_10: -5228748187073348734
+      Unarmed_Walk_full_medieval_11: 7118772414141140580
+      Unarmed_Walk_full_medieval_12: 4064424851790550350
+      Unarmed_Walk_full_medieval_13: 3768577644393006567
+      Unarmed_Walk_full_medieval_14: 6631503500935715089
+      Unarmed_Walk_full_medieval_15: -7052600956686541519
+      Unarmed_Walk_full_medieval_16: 79411711575742814
+      Unarmed_Walk_full_medieval_17: 2111506764567040979
+      Unarmed_Walk_full_medieval_18: -4918699746493835178
+      Unarmed_Walk_full_medieval_19: 5037936976536644184
+      Unarmed_Walk_full_medieval_2: -2704852453524794845
+      Unarmed_Walk_full_medieval_20: -3242786022698711392
+      Unarmed_Walk_full_medieval_21: 1017668726283912170
+      Unarmed_Walk_full_medieval_22: 6785023353515688356
+      Unarmed_Walk_full_medieval_23: -4920778070341794030
+      Unarmed_Walk_full_medieval_3: -2690351427681292126
+      Unarmed_Walk_full_medieval_4: 1696368472225890212
+      Unarmed_Walk_full_medieval_5: -3326711135632724020
+      Unarmed_Walk_full_medieval_6: -214736279722933409
+      Unarmed_Walk_full_medieval_7: 7761719945708604240
+      Unarmed_Walk_full_medieval_8: 8628892224431321552
+      Unarmed_Walk_full_medieval_9: -3794382408559077762
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
