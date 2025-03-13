@@ -14,7 +14,7 @@ public class OpenPanelButton : MonoBehaviour
 
     void Start()
     {
-        controller = FindObjectOfType<MenuController>();
+        controller = Object.FindFirstObjectByType<MenuController>();
         inputs = controller.GetComponent<MenuInputs>();
     }
 

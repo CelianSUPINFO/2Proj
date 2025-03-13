@@ -16,7 +16,7 @@ namespace Ruccho
         void Start()
         {
             rigidBody2DRef = GetComponent<Rigidbody2D>();
-            rigidBody2DRef.isKinematic = true;
+            rigidBody2DRef.bodyType = RigidbodyType2D.Dynamic;
 
             transform.position = new Vector2(Mathf.FloorToInt(transform.position.x) + 0.5f, Mathf.FloorToInt(transform.position.y) + 0.5f);
             currentPos = transform.position;
