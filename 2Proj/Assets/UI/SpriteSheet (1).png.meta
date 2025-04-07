@@ -505,6 +505,32 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: iOS
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
@@ -3447,7 +3473,140 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      SpriteSheet (1)_0: -7196127794083022825
+      SpriteSheet (1)_1: 53281172512365675
+      SpriteSheet (1)_10: 6932101093371666861
+      SpriteSheet (1)_100: -9115264860864713232
+      SpriteSheet (1)_101: 8943590669242958772
+      SpriteSheet (1)_102: 5304700964435567291
+      SpriteSheet (1)_103: -281974802809900955
+      SpriteSheet (1)_104: 9065985219123620952
+      SpriteSheet (1)_105: -3430147663652008712
+      SpriteSheet (1)_106: -4184151985797914128
+      SpriteSheet (1)_107: -1210603089140333369
+      SpriteSheet (1)_108: -7916190094874575992
+      SpriteSheet (1)_109: -6664678357891824764
+      SpriteSheet (1)_11: 5826038877481536496
+      SpriteSheet (1)_110: 4601022790116078262
+      SpriteSheet (1)_111: -2108949934277205575
+      SpriteSheet (1)_112: -8028435512467120409
+      SpriteSheet (1)_113: -2690215413982792842
+      SpriteSheet (1)_114: -5187595520832996421
+      SpriteSheet (1)_115: 5289674112423580272
+      SpriteSheet (1)_116: 5021195889123380758
+      SpriteSheet (1)_117: 1389067731456600358
+      SpriteSheet (1)_118: -1446033187640162134
+      SpriteSheet (1)_119: 1750506147679196745
+      SpriteSheet (1)_12: 3745313236416417148
+      SpriteSheet (1)_120: 1893364869316759487
+      SpriteSheet (1)_121: -2328624829428723711
+      SpriteSheet (1)_122: -5350296247358641637
+      SpriteSheet (1)_123: 12478023616771204
+      SpriteSheet (1)_124: 4168731147508531433
+      SpriteSheet (1)_125: 8392366898894621513
+      SpriteSheet (1)_126: -2992103093436767371
+      SpriteSheet (1)_127: 7946803727973193954
+      SpriteSheet (1)_128: 7253394233274047895
+      SpriteSheet (1)_129: -7312189415278295412
+      SpriteSheet (1)_13: 7063732253662367524
+      SpriteSheet (1)_130: 13686994384101737
+      SpriteSheet (1)_131: 7688708796694737731
+      SpriteSheet (1)_132: -2489869896218459551
+      SpriteSheet (1)_14: -7419945008464183579
+      SpriteSheet (1)_15: 4476995007012666270
+      SpriteSheet (1)_16: -823375454070725652
+      SpriteSheet (1)_17: -1656501940781041294
+      SpriteSheet (1)_18: 1583016544766219568
+      SpriteSheet (1)_19: -2417600476583364339
+      SpriteSheet (1)_2: -9052007091504146450
+      SpriteSheet (1)_20: 1599468770594898990
+      SpriteSheet (1)_21: -3444267688264134321
+      SpriteSheet (1)_22: 4973546116405093250
+      SpriteSheet (1)_23: 8327525897087684236
+      SpriteSheet (1)_24: 4746116855969654810
+      SpriteSheet (1)_25: -3928573886288734853
+      SpriteSheet (1)_26: 3203736492495701262
+      SpriteSheet (1)_27: -1662890921831513510
+      SpriteSheet (1)_28: -7414176967285326435
+      SpriteSheet (1)_29: -8409001638851653577
+      SpriteSheet (1)_3: -3969095921099730899
+      SpriteSheet (1)_30: 5588753882465601466
+      SpriteSheet (1)_31: 3830743924535056572
+      SpriteSheet (1)_32: 5824945544989425438
+      SpriteSheet (1)_33: -2502163017841669280
+      SpriteSheet (1)_34: 1881499019572046495
+      SpriteSheet (1)_35: -2759421254988137039
+      SpriteSheet (1)_36: 1700463499026434384
+      SpriteSheet (1)_37: -5562211433624336177
+      SpriteSheet (1)_38: -8628008909633054542
+      SpriteSheet (1)_39: -229713697788913219
+      SpriteSheet (1)_4: -7495093794140026017
+      SpriteSheet (1)_40: -4901275118412535079
+      SpriteSheet (1)_41: -726731176685455111
+      SpriteSheet (1)_42: 6100237716843801132
+      SpriteSheet (1)_43: 9205167042848001705
+      SpriteSheet (1)_44: 3859847162918234380
+      SpriteSheet (1)_45: -2773134412532626542
+      SpriteSheet (1)_46: 5403329781851753401
+      SpriteSheet (1)_47: 4176285230968302765
+      SpriteSheet (1)_48: 4464998045911451135
+      SpriteSheet (1)_49: -8247702468558968803
+      SpriteSheet (1)_5: 9185108902629020243
+      SpriteSheet (1)_50: 5894521303141385707
+      SpriteSheet (1)_51: 7750322227909710128
+      SpriteSheet (1)_52: -5721637212510173190
+      SpriteSheet (1)_53: -6444227476983036242
+      SpriteSheet (1)_54: 1104393071090605823
+      SpriteSheet (1)_55: -1534271284855075862
+      SpriteSheet (1)_56: 6651490765480137272
+      SpriteSheet (1)_57: -3509035897934461070
+      SpriteSheet (1)_58: 5924254164385428264
+      SpriteSheet (1)_59: -375158025974713774
+      SpriteSheet (1)_6: -8907212534642076251
+      SpriteSheet (1)_60: -4834614287124073287
+      SpriteSheet (1)_61: -1167365355726647192
+      SpriteSheet (1)_62: -921807381406824518
+      SpriteSheet (1)_63: -2317527805184987818
+      SpriteSheet (1)_64: 1126204360748974095
+      SpriteSheet (1)_65: -1346707751004270562
+      SpriteSheet (1)_66: -7021333347626544578
+      SpriteSheet (1)_67: 3355852847829142999
+      SpriteSheet (1)_68: -299790229381682360
+      SpriteSheet (1)_69: 6881866409678815639
+      SpriteSheet (1)_7: 2398728147136787373
+      SpriteSheet (1)_70: 3350730532511389837
+      SpriteSheet (1)_71: 5153251772939581555
+      SpriteSheet (1)_72: -3304514394670089005
+      SpriteSheet (1)_73: 7080825505867884333
+      SpriteSheet (1)_74: -8782636340798805990
+      SpriteSheet (1)_75: 1775923332692732132
+      SpriteSheet (1)_76: -3487326577316434108
+      SpriteSheet (1)_77: -8511217283033471624
+      SpriteSheet (1)_78: -5125796129074988793
+      SpriteSheet (1)_79: -372463596752278974
+      SpriteSheet (1)_8: -1771577198114432999
+      SpriteSheet (1)_80: -4062693630494276818
+      SpriteSheet (1)_81: 5305885342045336089
+      SpriteSheet (1)_82: 874152301990947985
+      SpriteSheet (1)_83: -9138839573505141812
+      SpriteSheet (1)_84: 8522078586656899763
+      SpriteSheet (1)_85: -309183624416202548
+      SpriteSheet (1)_86: -1675058914577566791
+      SpriteSheet (1)_87: -2058881563452107730
+      SpriteSheet (1)_88: 7007606639236660700
+      SpriteSheet (1)_89: -4687911996685113154
+      SpriteSheet (1)_9: 1829640592322619580
+      SpriteSheet (1)_90: -1278327750047769925
+      SpriteSheet (1)_91: -5685494958491937591
+      SpriteSheet (1)_92: 6123741336767666433
+      SpriteSheet (1)_93: 1958129731256456844
+      SpriteSheet (1)_94: 7341971396014274179
+      SpriteSheet (1)_95: -258269362315249437
+      SpriteSheet (1)_96: 5085341288155191632
+      SpriteSheet (1)_97: 3892241381788572286
+      SpriteSheet (1)_98: 7963644435934553680
+      SpriteSheet (1)_99: -775059784486784375
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
