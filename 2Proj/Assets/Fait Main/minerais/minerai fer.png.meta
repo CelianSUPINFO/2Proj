@@ -147,7 +147,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      minerai fer_0: 7333430116699475900
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -147,7 +147,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      minerai quartz_0: -840159915856624475
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

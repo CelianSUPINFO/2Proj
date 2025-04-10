@@ -147,7 +147,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      minerai cuivre_0: 4398560218187002741
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

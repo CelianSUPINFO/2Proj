@@ -147,7 +147,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      minerai charbon_0: 1086543171067203181
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
