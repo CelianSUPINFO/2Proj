@@ -46,3 +46,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   buildingPrefabs:
   - {fileID: 5165711096306083629, guid: e9dfd7c423cf253459e5a6fcc9b0043f, type: 3}
+  placementObstaclesLayer:
+    serializedVersion: 2
+    m_Bits: 1

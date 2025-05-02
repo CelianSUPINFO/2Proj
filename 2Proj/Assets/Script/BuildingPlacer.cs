@@ -1,86 +1,153 @@
 using UnityEngine;
-using UnityEngine.EventSystems;
 
-public class BuildingPlacer : MonoBehaviour
+public class SimpleBuildingPlacer : MonoBehaviour
 {
-    public GameObject[] buildingPrefabs;  // Liste des bâtiments disponibles
-    private GameObject buildingToPlace;   // Bâtiment actuellement sélectionné
-    private GameObject previewBuilding;   // Bâtiment en prévisualisation
-    
+    [Header("Références")]
+    public GameObject[] buildingPrefabs; // 💡 Liste des bâtiments disponibles
+
+    [Header("Paramètres de placement")]
+    public LayerMask placementObstaclesLayer;
+
+    private GameObject buildingPrefab;
+    private GameObject previewBuilding;
+    private bool isPlacing = false;
+
     void Update()
     {
-        if (buildingToPlace != null)
+        if (isPlacing && previewBuilding != null)
         {
-            MovePreviewToMouse();
-            
-            if (Input.GetMouseButtonDown(0) && !IsPointerOverUI())
+            FollowMouse();
+
+            // 🖱️ Clic gauche = placer
+            if (Input.GetMouseButtonDown(0))
             {
-                PlaceBuilding();
+                if (CanPlace())
+                {
+                    PlaceBuilding();
+                }
+                else
+                {
+                    Debug.Log("❌ Impossible de placer ici !");
+                }
+            }
+
+            // 🖱️ Clic droit = annuler
+            if (Input.GetMouseButtonDown(1))
+            {
+                CancelPlacement();
             }
         }
     }
 
+    // 🏗️ Choisir un bâtiment via UI ou autre
     public void SelectBuilding(int index)
     {
-            // Vérifie si buildingPrefabs est bien initialisé
-        if (buildingPrefabs == null)
+        if (index < 0 || index >= buildingPrefabs.Length)
         {
-            Debug.LogError("buildingPrefabs est null !");
+            Debug.LogError("❌ Index de bâtiment invalide !");
             return;
         }
 
-        // Vérifie si l'index est valide
-        Debug.Log(buildingPrefabs.Length);
-        
-
-        // Affiche tous les éléments du tableau buildingPrefabs
-        for (int i = 0; i < buildingPrefabs.Length; i++)
-        {
-            Debug.Log($"buildingPrefabs[{i}] : {buildingPrefabs[i]?.name ?? "NULL"}");
-        }
-        if (previewBuilding != null)
-            Destroy(previewBuilding);
-
-        
-        buildingToPlace = buildingPrefabs[index];  
-        previewBuilding = Instantiate(buildingToPlace);
-        Collider collider = previewBuilding.GetComponent<Collider>();
-        if (collider != null)
-        {
-            collider.enabled = false; // Désactiver la collision
-        }
-        else
-        {
-            Debug.LogWarning($"⚠️ Aucun Collider trouvé sur {previewBuilding.name} !");
-        }
-        
-        previewBuilding.GetComponent<Renderer>().material.color = new Color(1, 1, 1, 0.5f); // Semi-transparent
+        buildingPrefab = buildingPrefabs[index];
+        StartPlacing();
     }
 
-    void MovePreviewToMouse(){
-    Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-    if (Physics.Raycast(ray, out RaycastHit hit))
+    public void StartPlacing()
     {
-        previewBuilding.transform.position = hit.point;
+        if (buildingPrefab == null)
+        {
+            Debug.LogError("❌ Aucun prefab assigné !");
+            return;
+        }
 
-        // Vérifie si la zone est libre
-        bool canPlace = !Physics.CheckSphere(hit.point, 1f); 
+        if (previewBuilding != null)
+        {
+            Destroy(previewBuilding);
+        }
 
-        Color color = canPlace ? new Color(0, 1, 0, 0.5f) : new Color(1, 0, 0, 0.5f);
-        previewBuilding.GetComponent<Renderer>().material.color = color;
+        previewBuilding = Instantiate(buildingPrefab);
+
+        Collider2D col = previewBuilding.GetComponent<Collider2D>();
+        if (col != null)
+        {
+            col.enabled = false;
+        }
+
+        previewBuilding.layer = LayerMask.NameToLayer("Default");
+
+        SpriteRenderer sr = previewBuilding.GetComponent<SpriteRenderer>();
+        if (sr != null)
+        {
+            sr.color = new Color(0f, 1f, 0f, 0.5f);
+        }
+
+        isPlacing = true;
     }
-}
 
+    void FollowMouse()
+    {
+        Vector3 mouseScreenPos = Input.mousePosition;
+        mouseScreenPos.z = 10f;
+        Vector3 worldPos = Camera.main.ScreenToWorldPoint(mouseScreenPos);
+        Vector3 snappedPos = new Vector3(Mathf.Round(worldPos.x), Mathf.Round(worldPos.y), 0f);
+
+        previewBuilding.transform.position = snappedPos;
+
+        UpdatePreviewColor();
+    }
+
+    void UpdatePreviewColor()
+    {
+        SpriteRenderer sr = previewBuilding.GetComponent<SpriteRenderer>();
+        if (sr == null) return;
+
+        sr.color = CanPlace()
+            ? new Color(0f, 1f, 0f, 0.5f)
+            : new Color(1f, 0f, 0f, 0.5f);
+    }
+
+    bool CanPlace()
+    {
+        Vector2 centerPos = previewBuilding.transform.position;
+        Vector2 boxCenter = new Vector2(centerPos.x, centerPos.y + 1f);
+        Vector2 boxSize = new Vector2(3f, 3f);
+
+        Collider2D hit = Physics2D.OverlapBox(boxCenter, boxSize, 0f, placementObstaclesLayer);
+        return hit == null;
+    }
 
     void PlaceBuilding()
     {
-        Instantiate(buildingToPlace, previewBuilding.transform.position, Quaternion.identity);
+        GameObject placed = Instantiate(buildingPrefab, previewBuilding.transform.position, Quaternion.identity);
+
+        // ✅ Activer le collider
+        Collider2D col = placed.GetComponent<Collider2D>();
+        if (col != null)
+        {
+            col.enabled = true;
+        }
+
+        // ✅ Changer la Layer sur "Obstacles"
+        placed.layer = LayerMask.NameToLayer("Obstacles");
+
         Destroy(previewBuilding);
-        buildingToPlace = null;
+        previewBuilding = null;
+        isPlacing = false;
+
+        Debug.Log("✅ Bâtiment placé sur la layer Obstacles !");
     }
 
-    bool IsPointerOverUI()
+    void CancelPlacement()
     {
-        return EventSystem.current.IsPointerOverGameObject();
+        if (previewBuilding != null)
+        {
+            Destroy(previewBuilding);
+            previewBuilding = null;
+            isPlacing = false;
+
+            Debug.Log("❌ Placement annulé !");
+        }
     }
+
+    
 }
