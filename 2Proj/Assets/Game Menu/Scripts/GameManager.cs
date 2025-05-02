@@ -1,5 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
+using System .Collections;
+using System .Collections .Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -13,19 +14,19 @@ public class GameManager : MonoBehaviour
         {
             Destroy(this);
             return;
-        }
+        } 
 
         instance = this;
         DontDestroyOnLoad(this.gameObject);
     }
-
-    public void ChangeScene(string _sceneName)
+ public void ChangeScene(string sceneName)
     {
-        SceneManager.LoadScene(_sceneName);
+        SceneManager.LoadScene(sceneName);
     }
-
-    public void Quit()
+    
+    public void QuitGame()
     {
         Application.Quit();
+        Debug.Log("Game is quitting");
     }
 }
