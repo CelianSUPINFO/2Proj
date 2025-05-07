@@ -4,6 +4,7 @@ public class SimpleBuildingPlacer : MonoBehaviour
 {
     [Header("Références")]
     public GameObject[] buildingPrefabs; // 💡 Liste des bâtiments disponibles
+    public BuildingEraser eraser; // Référence à ton BuildingEraser
 
     [Header("Paramètres de placement")]
     public LayerMask placementObstaclesLayer;
@@ -16,6 +17,10 @@ public class SimpleBuildingPlacer : MonoBehaviour
     {
         if (isPlacing && previewBuilding != null)
         {
+            if (eraser != null && eraser.IsEraseModeActive()== true){
+                return; // On bloque la pose si on est en mode suppression
+            }
+
             FollowMouse();
 
             // 🖱️ Clic gauche = placer
@@ -41,7 +46,10 @@ public class SimpleBuildingPlacer : MonoBehaviour
 
     // 🏗️ Choisir un bâtiment via UI ou autre
     public void SelectBuilding(int index)
-    {
+    {   
+        if (eraser.IsEraseModeActive()== true){
+                return; // On bloque la pose si on est en mode suppression
+            }
         if (index < 0 || index >= buildingPrefabs.Length)
         {
             Debug.LogError("❌ Index de bâtiment invalide !");
@@ -128,13 +136,13 @@ public class SimpleBuildingPlacer : MonoBehaviour
         }
 
         // ✅ Changer la Layer sur "Obstacles"
-        placed.layer = LayerMask.NameToLayer("Obstacles");
+        placed.layer = LayerMask.NameToLayer("Buildings");
 
         Destroy(previewBuilding);
         previewBuilding = null;
         isPlacing = false;
 
-        Debug.Log("✅ Bâtiment placé sur la layer Obstacles !");
+        Debug.Log("✅ Bâtiment placé sur la layer Buildings !");
     }
 
     void CancelPlacement()
