@@ -11,8 +11,8 @@ TagManager:
   - 
   - Water
   - UI
-  - 
-  - 
+  - Obstacles
+  - Buildings
   - 
   - 
   - 
@@ -41,10 +41,11 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: New Layer 1
+    uniqueID: 1042385193
+    locked: 0
   - name: Terrain
-    uniqueID: 3436853545
+    uniqueID: 531665513
     locked: 0
   m_RenderingLayers:
   - Default
-  - Trees
-  - Rocks
