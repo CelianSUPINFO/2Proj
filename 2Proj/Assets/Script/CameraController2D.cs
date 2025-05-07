@@ -3,12 +3,12 @@ using UnityEngine;
 public class CameraController2D : MonoBehaviour
 {
     [Header("Zoom")]
-    public float zoomSpeed = 5f;
+    public float zoomSpeed = 8f;
     public float minZoom = 3f;
-    public float maxZoom = 15f;
+    public float maxZoom = 50f;
 
     [Header("Déplacement")]
-    public float panSpeed = 0.5f;
+    public float panSpeed = 1f;
     private Vector3 lastMousePosition;
 
     void Update()
