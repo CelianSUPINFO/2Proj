@@ -3,7 +3,8 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 3
-  tags: []
+  tags:
+  - Building
   layers:
   - Default
   - TransparentFX
@@ -46,6 +47,9 @@ TagManager:
     locked: 0
   - name: Terrain
     uniqueID: 531665513
+    locked: 0
+  - name: cloud
+    uniqueID: 738502427
     locked: 0
   m_RenderingLayers:
   - Default

@@ -147,7 +147,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      minerai argile_0: -2898872484193711886
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
