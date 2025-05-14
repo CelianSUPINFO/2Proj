@@ -5,18 +5,24 @@ public enum ResourceType
 {
     Wood,
     Stone,
-    Iron,
-    Clay,
-    Gold,
-    Food,
+    Food,         // Baies, puis blé, poisson, viande → unifié si pas besoin de distinction
     Water,
-    Leather,
+    Clay,
+    Wheat,
+    Fish,
     Plank,
+    Flour,
+    Bread,
+    Meat,
+    Leather,
     Brick,
-    IronIngot,
-    GoldIngot,
+    Iron,
+    Tools,
+    Cloth,
+    Gold,
     Population
 }
+
 
 public class ResourceManager : MonoBehaviour
 {
@@ -48,6 +54,7 @@ public class ResourceManager : MonoBehaviour
 
         
         resources[ResourceType.Wood] = 100;
+        resources[ResourceType.Stone] = 100;
         resources[ResourceType.Food] = 50;
         resources[ResourceType.Population] = 10;
     }
@@ -92,4 +99,27 @@ public class ResourceManager : MonoBehaviour
     {
         return new Dictionary<ResourceType, int>(resources);
     }
+
+    public bool HasEnough(BuildingCost cost)
+    {
+        foreach (var res in cost.resourceCosts)
+        {
+            if (!HasEnough(res.type, res.amount))
+                return false;
+        }
+        return true;
+    }
+
+    public bool Spend(BuildingCost cost)
+    {
+        if (!HasEnough(cost)) return false;
+
+        foreach (var res in cost.resourceCosts)
+        {
+            Spend(res.type, res.amount);
+        }
+        return true;
+    }
+
 }
+

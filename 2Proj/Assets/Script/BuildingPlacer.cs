@@ -12,18 +12,17 @@ public class SimpleBuildingPlacer : MonoBehaviour
     private GameObject buildingPrefab;
     private GameObject previewBuilding;
     private bool isPlacing = false;
+    private BuildingData selectedBuildingData;
 
     void Update()
     {
         if (isPlacing && previewBuilding != null)
         {
-            if (eraser != null && eraser.IsEraseModeActive()== true){
-                return; 
-            }
+            if (eraser != null && eraser.IsEraseModeActive())
+                return;
 
             FollowMouse();
 
-            
             if (Input.GetMouseButtonDown(0))
             {
                 if (CanPlace())
@@ -36,7 +35,6 @@ public class SimpleBuildingPlacer : MonoBehaviour
                 }
             }
 
-        
             if (Input.GetMouseButtonDown(1))
             {
                 CancelPlacement();
@@ -44,12 +42,11 @@ public class SimpleBuildingPlacer : MonoBehaviour
         }
     }
 
-    
     public void SelectBuilding(int index)
     {   
-        if (eraser.IsEraseModeActive()== true){
-                return; 
-            }
+        if (eraser != null && eraser.IsEraseModeActive())
+            return;
+
         if (index < 0 || index >= buildingPrefabs.Length)
         {
             Debug.LogError("Index de bâtiment invalide !");
@@ -57,6 +54,22 @@ public class SimpleBuildingPlacer : MonoBehaviour
         }
 
         buildingPrefab = buildingPrefabs[index];
+        StartPlacing();
+    }
+
+    public void SelectBuildingByData(BuildingData data)
+    {
+        if (eraser != null && eraser.IsEraseModeActive())
+            return;
+
+        if (!ResourceManager.Instance.HasEnough(data.cost))
+        {
+            Debug.LogWarning("Pas assez de ressources pour ce bâtiment !");
+            return;
+        }
+
+        buildingPrefab = data.prefab;
+        selectedBuildingData = data;
         StartPlacing();
     }
 
@@ -100,7 +113,6 @@ public class SimpleBuildingPlacer : MonoBehaviour
         Vector3 snappedPos = new Vector3(Mathf.Round(worldPos.x), Mathf.Round(worldPos.y), 0f);
 
         previewBuilding.transform.position = snappedPos;
-
         UpdatePreviewColor();
     }
 
@@ -117,7 +129,7 @@ public class SimpleBuildingPlacer : MonoBehaviour
     bool CanPlace()
     {
         Vector2 centerPos = previewBuilding.transform.position;
-        Vector2 boxCenter = new Vector2(centerPos.x, centerPos.y + 1f);
+        Vector2 boxCenter = new Vector2(centerPos.x, centerPos.y - 0.5f);
         Vector2 boxSize = new Vector2(3f, 3f);
 
         Collider2D hit = Physics2D.OverlapBox(boxCenter, boxSize, 0f, placementObstaclesLayer);
@@ -126,23 +138,34 @@ public class SimpleBuildingPlacer : MonoBehaviour
 
     void PlaceBuilding()
     {
+        if (!ResourceManager.Instance.Spend(selectedBuildingData.cost))
+        {
+            Debug.LogWarning("Ressources insuffisantes pour finaliser la construction !");
+            return;
+        }
+
         GameObject placed = Instantiate(buildingPrefab, previewBuilding.transform.position, Quaternion.identity);
 
-        
         Collider2D col = placed.GetComponent<Collider2D>();
         if (col != null)
         {
             col.enabled = true;
         }
 
-        
         placed.layer = LayerMask.NameToLayer("Buildings");
+
+        // Lien entre prefab et données
+        Building buildingComponent = placed.GetComponent<Building>();
+        if (buildingComponent != null)
+        {
+            buildingComponent.data = selectedBuildingData;
+        }
 
         Destroy(previewBuilding);
         previewBuilding = null;
         isPlacing = false;
 
-        Debug.Log("Bâtiment placé sur la layer Buildings !");
+        Debug.Log("Bâtiment placé avec succès !");
     }
 
     void CancelPlacement()
@@ -156,11 +179,4 @@ public class SimpleBuildingPlacer : MonoBehaviour
             Debug.Log("Placement annulé !");
         }
     }
-
-    public void SelectBuildingByData(BuildingData data)
-    {
-        buildingPrefab = data.prefab;
-        StartPlacing();
-    }
-
 }

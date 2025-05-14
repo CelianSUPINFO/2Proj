@@ -16,11 +16,8 @@ MonoBehaviour:
   prefab: {fileID: 0}
   unlockAge: 0
   icon: {fileID: 0}
+  function: 0
   cost:
-    wood: 0
-    stone: 0
-    iron: 0
-    clay: 0
-    gold: 0
-    population: 0
+    resourceCosts: []
+  capacity: 0
   description: 

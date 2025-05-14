@@ -7,7 +7,9 @@ public class BuildingData : ScriptableObject
     public GameObject prefab;
     public GameAge unlockAge;
     public Sprite icon;
+    public BuildingFunction function;
     public BuildingCost cost;
+    public int capacity; 
     [TextArea]
     public string description;
 }

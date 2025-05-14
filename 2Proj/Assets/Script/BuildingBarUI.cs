@@ -40,7 +40,7 @@ public class BuildingBarUI : MonoBehaviour
             {
                 button.onClick.AddListener(() =>
                 {
-                    FindObjectOfType<SimpleBuildingPlacer>().SelectBuildingByData(building);
+                    FindFirstObjectByType<SimpleBuildingPlacer>().SelectBuildingByData(building);
                 });
             }
 

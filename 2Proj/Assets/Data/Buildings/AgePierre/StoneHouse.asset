@@ -12,15 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2bc76cb91bdb8bf4e934a0be13a71ece, type: 3}
   m_Name: StoneHouse
   m_EditorClassIdentifier: 
-  buildingName: House
+  buildingName: CabanePierre
   prefab: {fileID: 5165711096306083629, guid: 7f416ede69c619448ac4a67b37e050e0, type: 3}
   unlockAge: 0
   icon: {fileID: 21300000, guid: 66bead69a227a4d409df58213b5093af, type: 3}
+  function: 0
   cost:
-    wood: 10
-    stone: 0
-    iron: 0
-    clay: 0
-    gold: 0
-    population: 0
+    resourceCosts:
+    - type: 1
+      amount: 10
+  capacity: 2
   description: 
