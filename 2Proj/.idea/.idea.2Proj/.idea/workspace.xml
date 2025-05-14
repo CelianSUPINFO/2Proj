@@ -5,25 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="32726f8d-8211-4212-b69b-aa23c44961bd" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.2Proj/.idea/projectSettingsUpdater.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.2Proj/.idea/projectSettingsUpdater.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.2Proj/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.2Proj/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Game Menu/4Z_2101.w017.n001.354B.p15.354-removebg-preview.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Game Menu/4Z_2101.w017.n001.354B.p15.354-removebg-preview.png.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Game Menu/UiCozyFree.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Game Menu/UiCozyFree.png.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scenes/Menu.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/Menu.unity" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Script/GameManager.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Script/GameManager.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Script/MenuController.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Script/MenuController.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Script/MenuInputs.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Script/MenuInputs.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Script/MenuPanel.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Script/MenuPanel.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Script/OpenPanelButton.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Script/OpenPanelButton.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/TextMesh Pro/Resources/Fonts &amp; Materials/LiberationSans SDF - Fallback.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/TextMesh Pro/Resources/Fonts &amp; Materials/LiberationSans SDF - Fallback.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ProjectSettings/EditorBuildSettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/EditorBuildSettings.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Fait Main/minerais/minerai argile.png.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Fait Main/minerais/minerai argile.png.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Game Menu/Scripts/MenuController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Game Menu/Scripts/MenuController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Game Menu/Scripts/MenuPanel.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Game Menu/Scripts/MenuPanel.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -136,7 +121,10 @@
       <workItem from="1745505092224" duration="4119000" />
       <workItem from="1746170366640" duration="130000" />
       <workItem from="1746175370537" duration="595000" />
-      <workItem from="1746176004617" duration="6033000" />
+      <workItem from="1746176004617" duration="7874000" />
+      <workItem from="1746840370448" duration="32000" />
+      <workItem from="1747135785796" duration="1697000" />
+      <workItem from="1747225093040" duration="2823000" />
     </task>
     <servers />
   </component>
