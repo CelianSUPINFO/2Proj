@@ -24,6 +24,9 @@ public class ResourceManager : MonoBehaviour
 
     private Dictionary<ResourceType, int> resources = new Dictionary<ResourceType, int>();
 
+    public delegate void OnResourceChanged();
+    public event OnResourceChanged onResourceChanged;
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -33,7 +36,6 @@ public class ResourceManager : MonoBehaviour
         }
 
         Instance = this;
-
         InitializeResources();
     }
 
@@ -44,7 +46,7 @@ public class ResourceManager : MonoBehaviour
             resources[type] = 0;
         }
 
-        // Ressources de départ
+        
         resources[ResourceType.Wood] = 100;
         resources[ResourceType.Food] = 50;
         resources[ResourceType.Population] = 10;
@@ -62,6 +64,8 @@ public class ResourceManager : MonoBehaviour
 
         resources[type] += amount;
         Debug.Log($"[+]{type} : {amount} → total: {resources[type]}");
+
+        onResourceChanged?.Invoke(); 
     }
 
     public bool Spend(ResourceType type, int amount)
@@ -70,6 +74,8 @@ public class ResourceManager : MonoBehaviour
         {
             resources[type] -= amount;
             Debug.Log($"[-]{type} : {amount} → total: {resources[type]}");
+
+            onResourceChanged?.Invoke(); 
             return true;
         }
 

@@ -3,8 +3,8 @@ using UnityEngine;
 public class SimpleBuildingPlacer : MonoBehaviour
 {
     [Header("Références")]
-    public GameObject[] buildingPrefabs; // 💡 Liste des bâtiments disponibles
-    public BuildingEraser eraser; // Référence à ton BuildingEraser
+    public GameObject[] buildingPrefabs; 
+    public BuildingEraser eraser;
 
     [Header("Paramètres de placement")]
     public LayerMask placementObstaclesLayer;
@@ -18,12 +18,12 @@ public class SimpleBuildingPlacer : MonoBehaviour
         if (isPlacing && previewBuilding != null)
         {
             if (eraser != null && eraser.IsEraseModeActive()== true){
-                return; // On bloque la pose si on est en mode suppression
+                return; 
             }
 
             FollowMouse();
 
-            // 🖱️ Clic gauche = placer
+            
             if (Input.GetMouseButtonDown(0))
             {
                 if (CanPlace())
@@ -32,11 +32,11 @@ public class SimpleBuildingPlacer : MonoBehaviour
                 }
                 else
                 {
-                    Debug.Log("❌ Impossible de placer ici !");
+                    Debug.Log("Impossible de placer ici !");
                 }
             }
 
-            // 🖱️ Clic droit = annuler
+        
             if (Input.GetMouseButtonDown(1))
             {
                 CancelPlacement();
@@ -44,15 +44,15 @@ public class SimpleBuildingPlacer : MonoBehaviour
         }
     }
 
-    // 🏗️ Choisir un bâtiment via UI ou autre
+    
     public void SelectBuilding(int index)
     {   
         if (eraser.IsEraseModeActive()== true){
-                return; // On bloque la pose si on est en mode suppression
+                return; 
             }
         if (index < 0 || index >= buildingPrefabs.Length)
         {
-            Debug.LogError("❌ Index de bâtiment invalide !");
+            Debug.LogError("Index de bâtiment invalide !");
             return;
         }
 
@@ -64,7 +64,7 @@ public class SimpleBuildingPlacer : MonoBehaviour
     {
         if (buildingPrefab == null)
         {
-            Debug.LogError("❌ Aucun prefab assigné !");
+            Debug.LogError("Aucun prefab assigné !");
             return;
         }
 
@@ -128,21 +128,21 @@ public class SimpleBuildingPlacer : MonoBehaviour
     {
         GameObject placed = Instantiate(buildingPrefab, previewBuilding.transform.position, Quaternion.identity);
 
-        // ✅ Activer le collider
+        
         Collider2D col = placed.GetComponent<Collider2D>();
         if (col != null)
         {
             col.enabled = true;
         }
 
-        // ✅ Changer la Layer sur "Obstacles"
+        
         placed.layer = LayerMask.NameToLayer("Buildings");
 
         Destroy(previewBuilding);
         previewBuilding = null;
         isPlacing = false;
 
-        Debug.Log("✅ Bâtiment placé sur la layer Buildings !");
+        Debug.Log("Bâtiment placé sur la layer Buildings !");
     }
 
     void CancelPlacement()
@@ -153,9 +153,14 @@ public class SimpleBuildingPlacer : MonoBehaviour
             previewBuilding = null;
             isPlacing = false;
 
-            Debug.Log("❌ Placement annulé !");
+            Debug.Log("Placement annulé !");
         }
     }
 
-    
+    public void SelectBuildingByData(BuildingData data)
+    {
+        buildingPrefab = data.prefab;
+        StartPlacing();
+    }
+
 }

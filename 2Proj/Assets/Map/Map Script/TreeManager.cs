@@ -19,7 +19,7 @@ public class TreePlacerEditor : EditorWindow
 
     void OnGUI()
     {
-        GUILayout.Label("🌲 Tree Placer Tool", EditorStyles.boldLabel);
+        GUILayout.Label("Tree Placer Tool", EditorStyles.boldLabel);
 
         tilemap = (Tilemap)EditorGUILayout.ObjectField("Tilemap", tilemap, typeof(Tilemap), true);
         tilemapRenderer = (TilemapRenderer)EditorGUILayout.ObjectField("Tilemap Renderer", tilemapRenderer, typeof(TilemapRenderer), true);
@@ -46,7 +46,7 @@ public class TreePlacerEditor : EditorWindow
 
         Undo.RegisterFullObjectHierarchyUndo(tilemap.gameObject, "Place Trees");
 
-        // 🔁 Créer ou trouver le parent "Trees"
+       
         GameObject parent = GameObject.Find("Trees");
         if (parent == null)
         {
@@ -72,14 +72,14 @@ public class TreePlacerEditor : EditorWindow
                         Vector3 worldPos = tilemap.CellToWorld(cellPos) + new Vector3(0.5f, 0.5f, 0);
                         GameObject go = (GameObject)PrefabUtility.InstantiatePrefab(prefabs[i]);
                         go.transform.position = worldPos;
-                        go.transform.SetParent(parent.transform); // 👈 Ajouter dans le groupe
+                        go.transform.SetParent(parent.transform); 
                         Undo.RegisterCreatedObjectUndo(go, "Place Tree");
 
-                        // Appliquer Sorting Layer + tri Y dynamique
+                     
                         foreach (var renderer in go.GetComponentsInChildren<SpriteRenderer>())
                         {
                             renderer.sortingLayerID = tilemapRenderer.sortingLayerID;
-                            renderer.sortingOrder = -(cellPos.y * 10); // Plus bas = devant
+                            renderer.sortingOrder = -(cellPos.y * 10); 
                         }
 
                         break;
@@ -89,6 +89,6 @@ public class TreePlacerEditor : EditorWindow
         }
 
         tilemap.ClearAllTiles();
-        Debug.Log("🌳 Tous les arbres ont été placés sous le GameObject 'Trees'.");
+        Debug.Log("Tous les arbres ont été placés sous le GameObject 'Trees'.");
     }
 }

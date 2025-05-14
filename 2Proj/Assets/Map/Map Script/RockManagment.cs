@@ -19,7 +19,7 @@ public class RockPlacerEditor : EditorWindow
 
     void OnGUI()
     {
-        GUILayout.Label("🪨 Rock Placer Tool", EditorStyles.boldLabel);
+        GUILayout.Label("Rock Placer Tool", EditorStyles.boldLabel);
 
         tilemap = (Tilemap)EditorGUILayout.ObjectField("Tilemap", tilemap, typeof(Tilemap), true);
         tilemapRenderer = (TilemapRenderer)EditorGUILayout.ObjectField("Tilemap Renderer", tilemapRenderer, typeof(TilemapRenderer), true);
@@ -46,7 +46,7 @@ public class RockPlacerEditor : EditorWindow
 
         Undo.RegisterFullObjectHierarchyUndo(tilemap.gameObject, "Place Rocks");
 
-        // 🔁 Créer ou trouver le parent "Rocks"
+       
         GameObject parent = GameObject.Find("Rocks");
         if (parent == null)
         {
@@ -72,13 +72,13 @@ public class RockPlacerEditor : EditorWindow
                         Vector3 worldPos = tilemap.CellToWorld(cellPos) + new Vector3(0.5f, 0.5f, 0);
                         GameObject go = (GameObject)PrefabUtility.InstantiatePrefab(prefabs[i]);
                         go.transform.position = worldPos;
-                        go.transform.SetParent(parent.transform); // Parent = "Rocks"
+                        go.transform.SetParent(parent.transform); 
                         Undo.RegisterCreatedObjectUndo(go, "Place Rock");
 
                         foreach (var renderer in go.GetComponentsInChildren<SpriteRenderer>())
                         {
                             renderer.sortingLayerID = tilemapRenderer.sortingLayerID;
-                            renderer.sortingOrder = -(cellPos.y * 10); // Tri visuel correct
+                            renderer.sortingOrder = -(cellPos.y * 10); 
                         }
 
                         break;
@@ -88,6 +88,6 @@ public class RockPlacerEditor : EditorWindow
         }
 
         tilemap.ClearAllTiles();
-        Debug.Log("🪨 Rochers placés avec succès !");
+        Debug.Log("Rochers placés avec succès !");
     }
 }
