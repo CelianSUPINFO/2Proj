@@ -33,13 +33,13 @@ public class BuildingBarUI : MonoBehaviour
         }
     }
 
-    void RefreshBar(GameAge selectedAge)
+    public void RefreshBar(GameAge selectedAge)
     {
         foreach (GameObject btn in currentButtons)
             Destroy(btn);
         currentButtons.Clear();
 
-        List<BuildingData> buildings = allBuildings.FindAll(b => b.unlockAge == selectedAge);
+        List<BuildingData> buildings = allBuildings.FindAll(b => b.unlockAge == selectedAge && !b.locked);
         Debug.Log("Bâtiments trouvés : " + buildings.Count + " pour l'âge " + selectedAge);
 
         foreach (BuildingData building in buildings)

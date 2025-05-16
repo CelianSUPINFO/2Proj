@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ba99a3a8450000b499ce58dbb14453b0, type: 3}
+  m_Name: New Tech Tree Data
+  m_EditorClassIdentifier: 
+  techNodes:
+  - id: 0
+    displayName: Bonus Bois
+    icon: {fileID: 710880484447216776, guid: 26d435702dedb784694895af12418eff, type: 3}
+    cost: 10
+    prerequisiteIds: []
+    unlocked: 0
+  - id: 1
+    displayName: Puit
+    icon: {fileID: 5497521524888897136, guid: afda4cedd10beb942a0a9fcb40a307b0, type: 3}
+    cost: 10
+    prerequisiteIds:
+    - 0
+    unlocked: 0
+  - id: 2
+    displayName: Pythagore ?
+    icon: {fileID: -4954164978722355842, guid: 26d435702dedb784694895af12418eff, type: 3}
+    cost: 10
+    prerequisiteIds:
+    - 0
+    unlocked: 0

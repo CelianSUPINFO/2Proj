@@ -55,8 +55,15 @@ public class BuildingEraser : MonoBehaviour
 
         if (hit != null)
         {
+            Building building = hit.GetComponent<Building>();
+            if (building != null && building.data != null)
+            {
+                RefundHalfCost(building.data);
+            }
+
             Destroy(hit.gameObject);
-            Debug.Log("Bâtiment supprimé !");
+            Debug.Log("Bâtiment supprimé avec remboursement.");
+
         }
         else
         {
@@ -78,4 +85,14 @@ public class BuildingEraser : MonoBehaviour
             }
         }
     }
+    void RefundHalfCost(BuildingData data)
+    {
+        foreach (var res in data.cost.resourceCosts)
+        {
+            int refund = Mathf.FloorToInt(res.amount * 0.5f);
+            ResourceManager.Instance.Add(res.type, refund);
+            Debug.Log($"🔁 Remboursement : {refund} x {res.type}");
+        }
+    }
+
 }

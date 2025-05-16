@@ -6,6 +6,7 @@ public class BuildingData : ScriptableObject
     public string buildingName;
     public GameObject prefab;
     public GameAge unlockAge;
+    public bool locked;
     public Sprite icon;
     public BuildingFunction function;
     public BuildingCost cost;

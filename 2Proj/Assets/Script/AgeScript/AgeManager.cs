@@ -5,7 +5,7 @@ public class AgeManager : MonoBehaviour
 {
     public static AgeManager Instance { get; private set; }
 
-    [SerializeField] private GameAge currentAge = GameAge.StoneAge;
+    [SerializeField] public GameAge currentAge = GameAge.StoneAge;
     [SerializeField] private TMP_Text ageDisplayText; // assigné depuis l’inspecteur
 
     private void Awake()
@@ -42,7 +42,7 @@ public class AgeManager : MonoBehaviour
     private void UpdateAgeDisplay()
     {
         if (ageDisplayText != null)
-            ageDisplayText.text = $"Âge actuel : {GetDisplayName(currentAge)}";
+            ageDisplayText.text = $"{GetDisplayName(currentAge)}";
     }
 
     private string GetDisplayName(GameAge age)
