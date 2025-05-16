@@ -1,0 +1,754 @@
+fileFormatVersion: 2
+guid: 219a98ac2963adb42af7b124a5fb08a0
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -6359730927791006950
+    second: "perso \xE2ge de pierre-2 1_0"
+  - first:
+      213: 6052856504784268965
+    second: "perso \xE2ge de pierre-2 1_1"
+  - first:
+      213: 2358436321222243462
+    second: "perso \xE2ge de pierre-2 1_2"
+  - first:
+      213: 2634299342702427640
+    second: "perso \xE2ge de pierre-2 1_3"
+  - first:
+      213: 6887944894238478820
+    second: "perso \xE2ge de pierre-2 1_4"
+  - first:
+      213: 72092675614835621
+    second: "perso \xE2ge de pierre-2 1_5"
+  - first:
+      213: 4354479194423268071
+    second: "perso \xE2ge de pierre-2 1_6"
+  - first:
+      213: 3407911361871933647
+    second: "perso \xE2ge de pierre-2 1_7"
+  - first:
+      213: 9187841728889393478
+    second: "perso \xE2ge de pierre-2 1_8"
+  - first:
+      213: -2161506145468404247
+    second: "perso \xE2ge de pierre-2 1_9"
+  - first:
+      213: 7328478315395780771
+    second: "perso \xE2ge de pierre-2 1_10"
+  - first:
+      213: 32707238388941944
+    second: "perso \xE2ge de pierre-2 1_11"
+  - first:
+      213: 3456200347336260506
+    second: "perso \xE2ge de pierre-2 1_12"
+  - first:
+      213: -4503698140828989934
+    second: "perso \xE2ge de pierre-2 1_13"
+  - first:
+      213: -890843763360493879
+    second: "perso \xE2ge de pierre-2 1_14"
+  - first:
+      213: -1213012838554178643
+    second: "perso \xE2ge de pierre-2 1_15"
+  - first:
+      213: -2699056846774956565
+    second: "perso \xE2ge de pierre-2 1_16"
+  - first:
+      213: -7545457733737715284
+    second: "perso \xE2ge de pierre-2 1_17"
+  - first:
+      213: 4623951223019923154
+    second: "perso \xE2ge de pierre-2 1_18"
+  - first:
+      213: -5870605527080667875
+    second: "perso \xE2ge de pierre-2 1_19"
+  - first:
+      213: -4121896062138441962
+    second: "perso \xE2ge de pierre-2 1_20"
+  - first:
+      213: -7373859445900698840
+    second: "perso \xE2ge de pierre-2 1_21"
+  - first:
+      213: -667678374519529741
+    second: "perso \xE2ge de pierre-2 1_22"
+  - first:
+      213: 3794397082379076805
+    second: "perso \xE2ge de pierre-2 1_23"
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: "perso \xE2ge de pierre-2 1_0"
+      rect:
+        serializedVersion: 2
+        x: 209
+        y: 2119
+        width: 132
+        height: 212
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a1b93fd9a62bdb7a0800000000000000
+      internalID: -6359730927791006950
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: "perso \xE2ge de pierre-2 1_1"
+      rect:
+        serializedVersion: 2
+        x: 849
+        y: 2119
+        width: 132
+        height: 232
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5ae2414fbe0100450800000000000000
+      internalID: 6052856504784268965
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: "perso \xE2ge de pierre-2 1_2"
+      rect:
+        serializedVersion: 2
+        x: 1489
+        y: 2119
+        width: 132
+        height: 222
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 684b4dfa659dab020800000000000000
+      internalID: 2358436321222243462
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: "perso \xE2ge de pierre-2 1_3"
+      rect:
+        serializedVersion: 2
+        x: 2139
+        y: 2119
+        width: 132
+        height: 212
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8fdb2d98b49ee8420800000000000000
+      internalID: 2634299342702427640
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: "perso \xE2ge de pierre-2 1_4"
+      rect:
+        serializedVersion: 2
+        x: 2779
+        y: 2119
+        width: 132
+        height: 232
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4e1dc8d2365e69f50800000000000000
+      internalID: 6887944894238478820
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: "perso \xE2ge de pierre-2 1_5"
+      rect:
+        serializedVersion: 2
+        x: 3419
+        y: 2119
+        width: 132
+        height: 222
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5a30ee018ef100100800000000000000
+      internalID: 72092675614835621
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: "perso \xE2ge de pierre-2 1_6"
+      rect:
+        serializedVersion: 2
+        x: 219
+        y: 1479
+        width: 122
+        height: 222
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7e29d6d91c73e6c30800000000000000
+      internalID: 4354479194423268071
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: "perso \xE2ge de pierre-2 1_7"
+      rect:
+        serializedVersion: 2
+        x: 859
+        y: 1479
+        width: 122
+        height: 242
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fc0f466e3555b4f20800000000000000
+      internalID: 3407911361871933647
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: "perso \xE2ge de pierre-2 1_8"
+      rect:
+        serializedVersion: 2
+        x: 1499
+        y: 1479
+        width: 122
+        height: 232
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 64196f68f55c18f70800000000000000
+      internalID: 9187841728889393478
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: "perso \xE2ge de pierre-2 1_9"
+      rect:
+        serializedVersion: 2
+        x: 2139
+        y: 1479
+        width: 122
+        height: 222
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9ed2883ec99c002e0800000000000000
+      internalID: -2161506145468404247
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: "perso \xE2ge de pierre-2 1_10"
+      rect:
+        serializedVersion: 2
+        x: 2779
+        y: 1479
+        width: 122
+        height: 232
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3a0915d233cf3b560800000000000000
+      internalID: 7328478315395780771
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: "perso \xE2ge de pierre-2 1_11"
+      rect:
+        serializedVersion: 2
+        x: 3419
+        y: 1479
+        width: 122
+        height: 242
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 874c1cd5f03347000800000000000000
+      internalID: 32707238388941944
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: "perso \xE2ge de pierre-2 1_12"
+      rect:
+        serializedVersion: 2
+        x: 199
+        y: 789
+        width: 122
+        height: 242
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a9b3f8777e3e6ff20800000000000000
+      internalID: 3456200347336260506
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: "perso \xE2ge de pierre-2 1_13"
+      rect:
+        serializedVersion: 2
+        x: 839
+        y: 789
+        width: 122
+        height: 232
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2160d4c0766af71c0800000000000000
+      internalID: -4503698140828989934
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: "perso \xE2ge de pierre-2 1_14"
+      rect:
+        serializedVersion: 2
+        x: 1479
+        y: 789
+        width: 122
+        height: 222
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9ce868e215613a3f0800000000000000
+      internalID: -890843763360493879
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: "perso \xE2ge de pierre-2 1_15"
+      rect:
+        serializedVersion: 2
+        x: 2119
+        y: 789
+        width: 122
+        height: 232
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dab6df900438a2fe0800000000000000
+      internalID: -1213012838554178643
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: "perso \xE2ge de pierre-2 1_16"
+      rect:
+        serializedVersion: 2
+        x: 2759
+        y: 789
+        width: 122
+        height: 242
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bed846b19160b8ad0800000000000000
+      internalID: -2699056846774956565
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: "perso \xE2ge de pierre-2 1_17"
+      rect:
+        serializedVersion: 2
+        x: 3399
+        y: 789
+        width: 122
+        height: 222
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ca9e6d03b26294790800000000000000
+      internalID: -7545457733737715284
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: "perso \xE2ge de pierre-2 1_18"
+      rect:
+        serializedVersion: 2
+        x: 209
+        y: 199
+        width: 132
+        height: 222
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2d6e5da73239b2040800000000000000
+      internalID: 4623951223019923154
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: "perso \xE2ge de pierre-2 1_19"
+      rect:
+        serializedVersion: 2
+        x: 849
+        y: 199
+        width: 132
+        height: 242
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d1579ed706b678ea0800000000000000
+      internalID: -5870605527080667875
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: "perso \xE2ge de pierre-2 1_20"
+      rect:
+        serializedVersion: 2
+        x: 1489
+        y: 199
+        width: 132
+        height: 232
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 61f1827ce551cc6c0800000000000000
+      internalID: -4121896062138441962
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: "perso \xE2ge de pierre-2 1_21"
+      rect:
+        serializedVersion: 2
+        x: 2139
+        y: 199
+        width: 132
+        height: 222
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 82b1e6ff6e9caa990800000000000000
+      internalID: -7373859445900698840
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: "perso \xE2ge de pierre-2 1_22"
+      rect:
+        serializedVersion: 2
+        x: 2779
+        y: 199
+        width: 132
+        height: 242
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3fe9d8e4e0eebb6f0800000000000000
+      internalID: -667678374519529741
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: "perso \xE2ge de pierre-2 1_23"
+      rect:
+        serializedVersion: 2
+        x: 3419
+        y: 199
+        width: 132
+        height: 232
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5c4cbf7fa0868a430800000000000000
+      internalID: 3794397082379076805
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      "perso \xE2ge de pierre-2 1_0": -6359730927791006950
+      "perso \xE2ge de pierre-2 1_1": 6052856504784268965
+      "perso \xE2ge de pierre-2 1_10": 7328478315395780771
+      "perso \xE2ge de pierre-2 1_11": 32707238388941944
+      "perso \xE2ge de pierre-2 1_12": 3456200347336260506
+      "perso \xE2ge de pierre-2 1_13": -4503698140828989934
+      "perso \xE2ge de pierre-2 1_14": -890843763360493879
+      "perso \xE2ge de pierre-2 1_15": -1213012838554178643
+      "perso \xE2ge de pierre-2 1_16": -2699056846774956565
+      "perso \xE2ge de pierre-2 1_17": -7545457733737715284
+      "perso \xE2ge de pierre-2 1_18": 4623951223019923154
+      "perso \xE2ge de pierre-2 1_19": -5870605527080667875
+      "perso \xE2ge de pierre-2 1_2": 2358436321222243462
+      "perso \xE2ge de pierre-2 1_20": -4121896062138441962
+      "perso \xE2ge de pierre-2 1_21": -7373859445900698840
+      "perso \xE2ge de pierre-2 1_22": -667678374519529741
+      "perso \xE2ge de pierre-2 1_23": 3794397082379076805
+      "perso \xE2ge de pierre-2 1_3": 2634299342702427640
+      "perso \xE2ge de pierre-2 1_4": 6887944894238478820
+      "perso \xE2ge de pierre-2 1_5": 72092675614835621
+      "perso \xE2ge de pierre-2 1_6": 4354479194423268071
+      "perso \xE2ge de pierre-2 1_7": 3407911361871933647
+      "perso \xE2ge de pierre-2 1_8": 9187841728889393478
+      "perso \xE2ge de pierre-2 1_9": -2161506145468404247
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
