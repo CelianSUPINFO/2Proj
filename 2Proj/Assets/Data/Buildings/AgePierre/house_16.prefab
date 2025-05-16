@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 1833568943503611214}
   - component: {fileID: 6562747393136815597}
   - component: {fileID: 5466193143219955648}
+  - component: {fileID: -2871968895940883444}
   m_Layer: 0
   m_Name: house_16
   m_TagString: Untagged
@@ -125,3 +126,16 @@ CapsuleCollider2D:
   m_Offset: {x: 0.014204912, y: -0.574506}
   m_Size: {x: 2.805192, y: 1.6211238}
   m_Direction: 1
+--- !u!114 &-2871968895940883444
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5165711096306083629}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b4fe10620fe983b4d9e12a15d73cd6e1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  data: {fileID: 11400000, guid: 09bbd0a0c729e2f4ba3ab108b1d0d3dc, type: 2}

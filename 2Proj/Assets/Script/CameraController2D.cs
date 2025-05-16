@@ -11,6 +11,10 @@ public class CameraController2D : MonoBehaviour
     public float panSpeed = 1f;
     private Vector3 lastMousePosition;
 
+    [Header("Limites de déplacement")]
+    public Vector2 minBounds; // coin bas gauche
+    public Vector2 maxBounds; // coin haut droit
+
     void Update()
     {
         HandleZoom();
@@ -29,7 +33,6 @@ public class CameraController2D : MonoBehaviour
 
     void HandlePanning()
     {
-        // Bouton du milieu ou clic droit (button 2 ou 1)
         if (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1))
         {
             lastMousePosition = Input.mousePosition;
@@ -40,7 +43,24 @@ public class CameraController2D : MonoBehaviour
             Vector3 delta = Input.mousePosition - lastMousePosition;
             Vector3 move = new Vector3(-delta.x, -delta.y, 0f) * panSpeed * Time.deltaTime;
             Camera.main.transform.Translate(move);
+            ClampCameraPosition(); // ← empêche de sortir
             lastMousePosition = Input.mousePosition;
         }
+    }
+
+    void ClampCameraPosition()
+    {
+        float camHeight = Camera.main.orthographicSize;
+        float camWidth = camHeight * Camera.main.aspect;
+
+        float minX = minBounds.x + camWidth;
+        float maxX = maxBounds.x - camWidth;
+        float minY = minBounds.y + camHeight;
+        float maxY = maxBounds.y - camHeight;
+
+        Vector3 clamped = Camera.main.transform.position;
+        clamped.x = Mathf.Clamp(clamped.x, minX, maxX);
+        clamped.y = Mathf.Clamp(clamped.y, minY, maxY);
+        Camera.main.transform.position = clamped;
     }
 }
