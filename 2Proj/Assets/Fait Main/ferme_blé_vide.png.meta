@@ -1,13 +1,13 @@
 fileFormatVersion: 2
-guid: 74cdb6080dfeb0541b648e9e91531536
+guid: a1979c8d6b2ed494dad49e63ba898a4a
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -3958463070074077975
-    second: "Cabane_b\xFBcheron_0"
+      213: 3272919803032888843
+    second: ferme_vide_0
   - first:
-      213: -5675027998332077444
-    second: "Cabane_b\xFBcheron_1"
+      213: -7825325747467080120
+    second: ferme_vide_1
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -116,13 +116,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: "Cabane_b\xFBcheron_0"
+      name: ferme_vide_0
       rect:
         serializedVersion: 2
-        x: 24
-        y: 12
-        width: 106
-        height: 101
+        x: 6
+        y: 3
+        width: 99
+        height: 73
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -131,18 +131,18 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 9ec7bb38fc6b019c0800000000000000
-      internalID: -3958463070074077975
+      spriteID: b06ed1e583fbb6d20800000000000000
+      internalID: 3272919803032888843
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: "Cabane_b\xFBcheron_1"
+      name: ferme_vide_1
       rect:
         serializedVersion: 2
-        x: 63
-        y: 79
+        x: 51
+        y: 49
         width: 34
         height: 35
       alignment: 0
@@ -153,8 +153,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: c7a35056a104e31b0800000000000000
-      internalID: -5675027998332077444
+      spriteID: 84ea18a61bbd66390800000000000000
+      internalID: -7825325747467080120
       vertices: []
       indices: 
       edges: []
@@ -172,7 +172,9 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      ferme_vide_0: 3272919803032888843
+      ferme_vide_1: -7825325747467080120
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
