@@ -48,6 +48,12 @@ TagManager:
   - name: Terrain
     uniqueID: 531665513
     locked: 0
+  - name: Tree
+    uniqueID: 1385467331
+    locked: 0
+  - name: Rocks
+    uniqueID: 2272283715
+    locked: 0
   - name: cloud
     uniqueID: 738502427
     locked: 0

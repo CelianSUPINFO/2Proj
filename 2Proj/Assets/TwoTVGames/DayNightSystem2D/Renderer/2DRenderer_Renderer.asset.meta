@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 77a40f3df0e9c454f916bac9ca4b49b3
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 174620
+  packageName: Day and Night 2D System
+  packageVersion: 1.0
+  assetPath: Assets/TwoTVGames/DayNightSystem2D/Renderer/2DRenderer_Renderer.asset
+  uploadId: 378783

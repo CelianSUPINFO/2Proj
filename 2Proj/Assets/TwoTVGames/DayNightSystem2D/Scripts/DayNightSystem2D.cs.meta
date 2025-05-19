@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 477690a6e78cf19448191ac8f9aa2f5c
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 174620
+  packageName: Day and Night 2D System
+  packageVersion: 1.0
+  assetPath: Assets/TwoTVGames/DayNightSystem2D/Scripts/DayNightSystem2D.cs
+  uploadId: 378783

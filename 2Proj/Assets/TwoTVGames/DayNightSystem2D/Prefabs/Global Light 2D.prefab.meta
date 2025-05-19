@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: d3df0e495d55e204bbb7c18cd77807fc
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 174620
+  packageName: Day and Night 2D System
+  packageVersion: 1.0
+  assetPath: Assets/TwoTVGames/DayNightSystem2D/Prefabs/Global Light 2D.prefab
+  uploadId: 378783
