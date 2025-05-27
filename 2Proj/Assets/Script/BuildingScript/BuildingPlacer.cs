@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class SimpleBuildingPlacer : MonoBehaviour
 {
@@ -126,14 +127,29 @@ public class SimpleBuildingPlacer : MonoBehaviour
             : new Color(1f, 0f, 0f, 0.5f);
     }
 
-    bool CanPlace()
+   bool CanPlace()
     {
+        // 1. Empêche si curseur sur l'UI
+        if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
+            return false;
+
+        // 2. Calcul des positions pour la box
         Vector2 centerPos = previewBuilding.transform.position;
         Vector2 boxCenter = new Vector2(centerPos.x, centerPos.y - 0.5f);
         Vector2 boxSize = new Vector2(3f, 3f);
 
-        Collider2D hit = Physics2D.OverlapBox(boxCenter, boxSize, 0f, placementObstaclesLayer);
-        return hit == null;
+        // 3. Vérifie s’il y a un obstacle (eau, falaise, etc.)
+        Collider2D obstacleHit = Physics2D.OverlapBox(boxCenter, boxSize, 0f, placementObstaclesLayer);
+        if (obstacleHit != null)
+            return false;
+
+        // 4. Vérifie si on est bien sur du sol (Layer Ground)
+        Collider2D groundHit = Physics2D.OverlapBox(boxCenter, boxSize, 0f, LayerMask.GetMask("Ground"));
+        if (groundHit == null)
+            return false;
+
+        // 5. Autorisé !
+        return true;
     }
 
     void PlaceBuilding()

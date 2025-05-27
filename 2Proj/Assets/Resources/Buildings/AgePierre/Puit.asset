@@ -15,7 +15,7 @@ MonoBehaviour:
   buildingName: Puit
   prefab: {fileID: 4118709031373689438, guid: 95d76a642a6271c41aca5148dc5a3f8f, type: 3}
   unlockAge: 0
-  locked: 1
+  locked: 0
   icon: {fileID: 5497521524888897136, guid: afda4cedd10beb942a0a9fcb40a307b0, type: 3}
   function: 2
   cost:
@@ -25,4 +25,5 @@ MonoBehaviour:
     - type: 1
       amount: 10
   capacity: 0
-  description: 
+  description: "Un puit qui vous servira \xE0 produire de l'eau. Utile pour \xE9viter
+    de mourir de d\xE9shydratation."

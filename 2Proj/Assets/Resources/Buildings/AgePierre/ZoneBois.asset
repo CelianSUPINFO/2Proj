@@ -10,14 +10,19 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2bc76cb91bdb8bf4e934a0be13a71ece, type: 3}
-  m_Name: NewBuilding
+  m_Name: ZoneBois
   m_EditorClassIdentifier: 
-  buildingName: 
-  prefab: {fileID: 0}
+  buildingName: Zone de bois
+  prefab: {fileID: 9032798326439436642, guid: c23f90e4a2dbd4a4e8c6c3163587b5d6, type: 3}
   unlockAge: 0
-  icon: {fileID: 0}
-  function: 0
+  locked: 0
+  icon: {fileID: -3958463070074077975, guid: 74cdb6080dfeb0541b648e9e91531536, type: 3}
+  function: 4
   cost:
-    resourceCosts: []
+    resourceCosts:
+    - type: 0
+      amount: 10
+    - type: 1
+      amount: 5
   capacity: 0
-  description: 
+  description: "Une zone d\xE9di\xE9 \xE0 la d\xE9coupe et ressource de bois"

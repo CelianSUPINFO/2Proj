@@ -1,33 +1,25 @@
 using UnityEngine;
+using System.Collections.Generic;
 
-public class PersonnageSpawner : MonoBehaviour
+public class SpawnManager : MonoBehaviour
 {
-    public GameObject[] personnagesPrefabParAge; // 1 prefab par époque
-    public Transform spawnZone;
-    public float spawnInterval = 60f;
+    public GameObject personnagePrefab;
+    public List<Vector3> positionsDeSpawn = new List<Vector3>();
+    public LayerMask layerSol;
 
-    private float timer = 0f;
-
-    void Update()
+    void Start()
     {
-        timer += Time.deltaTime;
-
-        if (timer >= spawnInterval)
+        foreach (Vector3 pos in positionsDeSpawn)
         {
-            timer = 0f;
-            SpawnPersonnage();
+            // Vérifie que le sol est bien là
+            if (Physics2D.OverlapCircle(pos, 0.1f, layerSol))
+            {
+                Instantiate(personnagePrefab, pos, Quaternion.identity);
+            }
+            else
+            {
+                Debug.LogWarning($"❌ Pas de sol à la position {pos}, aucun perso généré ici.");
+            }
         }
-    }
-
-    void SpawnPersonnage()
-    {
-        GameAge currentAge = AgeManager.Instance.GetCurrentAge();
-        GameObject prefab = personnagesPrefabParAge[(int)currentAge];
-
-        Vector3 pos = spawnZone != null 
-            ? spawnZone.position + new Vector3(Random.Range(-1f, 1f), Random.Range(-1f, 1f), 0)
-            : Vector3.zero;
-
-        Instantiate(prefab, pos, Quaternion.identity);
     }
 }

@@ -6015,7 +6015,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   buildingPrefabs: []
-  eraser: {fileID: 0}
+  eraser: {fileID: 1987988079}
   placementObstaclesLayer:
     serializedVersion: 2
     m_Bits: 224
