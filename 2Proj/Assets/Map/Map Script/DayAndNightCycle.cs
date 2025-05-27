@@ -3,29 +3,29 @@ using UnityEngine.UI;
 
 public class DayNightCycle : MonoBehaviour
 {
-    public Image overlayImage;
-    public float cycleDuration = 60f;
+    public Image overlayImage;  // Référence à l’image UI
+    public float cycleDuration = 60f;  // Durée complète du cycle (en secondes)
+    public AnimationCurve alphaCurve;  // Courbe d’alpha (opacité)
+    public Gradient colorGradient;  // Couleurs du cycle
 
-    [Tooltip("Courbe personnalisée pour la luminosité")]
-    public AnimationCurve lightCurve = AnimationCurve.EaseInOut(0, 0.05f, 1, 0.05f);
+    private float timer = 0f;
 
-    [Tooltip("Couleur de base de la nuit")]
-    public Color nightColor = new Color32(40, 50, 80, 255);
-
-    [Tooltip("Couleur chaude pour l’aube/crépuscule")]
-    public Gradient colorGradient;
-
-    private float time;
+    void Start()
+    {
+        if (overlayImage == null)
+            Debug.LogError("Overlay Image non assignée !");
+    }
 
     void Update()
     {
-        time += Time.deltaTime;
-        float cycleTime = (time % cycleDuration) / cycleDuration;
+        timer += Time.deltaTime;
+        float cycleTime = (timer % cycleDuration) / cycleDuration;
 
-        float alpha = lightCurve.Evaluate(cycleTime);
-        Color dynamicColor = colorGradient.Evaluate(cycleTime);
-        dynamicColor.a = alpha;
+        // Alpha et couleur
+        float alpha = alphaCurve.Evaluate(cycleTime);
+        Color color = colorGradient.Evaluate(cycleTime);
+        color.a = alpha;
 
-        overlayImage.color = dynamicColor;
+        overlayImage.color = color;
     }
 }
