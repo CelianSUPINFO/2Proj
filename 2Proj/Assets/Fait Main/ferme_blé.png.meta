@@ -147,7 +147,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      "ferme_bl\xE9_0": -265111326421770853
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

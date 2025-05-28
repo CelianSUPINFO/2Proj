@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 5466193143219955648}
   - component: {fileID: -2871968895940883444}
   - component: {fileID: 2373132219869926220}
+  - component: {fileID: -8020625644780191646}
   m_Layer: 7
   m_Name: house_16
   m_TagString: Untagged
@@ -155,4 +156,27 @@ MonoBehaviour:
   capaciteMax: 2
   regenereBesoin: 1
   typeBesoin: 1
+  estUnStockage: 0
+  maxTypes: 4
+  maxParType: 20
   aFonctionPersonnalisee: 0
+--- !u!114 &-8020625644780191646
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5165711096306083629}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d583988269fe3d449bbbda31cf56260e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  personnagePrefab: {fileID: 6804187913004491529, guid: 98f92bcfcfc85ef428ec1b4f5f63440c, type: 3}
+  nombrePersonnagesMax: 2
+  delaiRespawn: 30
+  rayonSpawn: 1.5
+  layerSol:
+    serializedVersion: 2
+    m_Bits: 512
+  afficherDebug: 1

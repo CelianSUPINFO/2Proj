@@ -116,10 +116,12 @@ MonoBehaviour:
   layerSol:
     serializedVersion: 2
     m_Bits: 512
-  cibleObjet: {fileID: 0}
-  layerObstacle:
+  layerBatiments:
     serializedVersion: 2
     m_Bits: 128
+  rayonDetection: 2
+  forceContournement: 3
+  cibleObjet: {fileID: 0}
 --- !u!58 &6179287654171230429
 CircleCollider2D:
   m_ObjectHideFlags: 0

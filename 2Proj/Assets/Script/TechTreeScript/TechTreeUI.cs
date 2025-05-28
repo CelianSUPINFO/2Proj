@@ -95,9 +95,9 @@ public class TechTreeUI : MonoBehaviour
         foreach (Transform child in nodesParent) Destroy(child.gameObject);
         nodeButtons.Clear();
 
-        arrowContainer = new GameObject("ArrowLines");
-        arrowContainer.transform.SetParent(nodesParent, false);
-
+        // Créer le conteneur de flèches APRÈS les nœuds (pour qu'il soit devant)
+        if (arrowContainer != null) Destroy(arrowContainer);
+        
         var graph = BuildTreeGraph();
 
         // Trouver racines (sans prerequisite)
@@ -109,11 +109,20 @@ public class TechTreeUI : MonoBehaviour
         foreach (var root in roots)
             startX = LayoutTree(root, startX);
 
-        // Générer boutons
+        // Générer boutons D'ABORD
         foreach (var node in graph.Values)
             InstantiateTreeNode(node);
 
-        // Générer flèches
+        // Créer le conteneur de flèches APRÈS les nœuds
+        arrowContainer = new GameObject("ArrowLines");
+        arrowContainer.transform.SetParent(nodesParent, false);
+        
+        // Ajouter un Canvas Group pour contrôler l'ordre de rendu
+        CanvasGroup arrowCanvasGroup = arrowContainer.AddComponent<CanvasGroup>();
+        arrowCanvasGroup.interactable = false;
+        arrowCanvasGroup.blocksRaycasts = false;
+
+        // Générer flèches APRÈS (pour avoir les positions correctes)
         foreach (var node in graph.Values)
         {
             foreach (var child in node.children)
@@ -169,8 +178,22 @@ public class TechTreeUI : MonoBehaviour
 
     void DrawArrow(GameObject fromBtn, GameObject toBtn)
     {
+        // Vérification du prefab
+        if (arrowPrefab == null)
+        {
+            Debug.LogError("ArrowPrefab n'est pas assigné !");
+            CreateSimpleArrow(fromBtn, toBtn); // Fallback
+            return;
+        }
+
         GameObject arrow = Instantiate(arrowPrefab, arrowContainer.transform);
         RectTransform arrowRect = arrow.GetComponent<RectTransform>();
+
+        if (arrowRect == null)
+        {
+            Debug.LogError("Le prefab de flèche n'a pas de RectTransform !");
+            return;
+        }
 
         Vector2 start = fromBtn.GetComponent<RectTransform>().anchoredPosition;
         Vector2 end = toBtn.GetComponent<RectTransform>().anchoredPosition;
@@ -178,10 +201,75 @@ public class TechTreeUI : MonoBehaviour
         Vector2 direction = end - start;
         float distance = direction.magnitude;
 
-        arrowRect.sizeDelta = new Vector2(distance, 3f);
+        // Configuration pour remplir toute la zone
+        arrowRect.anchorMin = Vector2.zero;
+        arrowRect.anchorMax = Vector2.one;
+        arrowRect.offsetMin = Vector2.zero;
+        arrowRect.offsetMax = Vector2.zero;
+        
+        // Taille correcte pour la distance
+        arrowRect.sizeDelta = new Vector2(distance, 8f);
         arrowRect.anchoredPosition = start + direction / 2;
+        
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
         arrowRect.rotation = Quaternion.Euler(0, 0, angle);
+
+        // S'assurer que la flèche est visible au premier plan
+        Image arrowImage = arrow.GetComponent<Image>();
+        if (arrowImage != null)
+        {
+            // Forcer un sprite visible si celui du prefab ne fonctionne pas
+            if (arrowImage.sprite == null)
+            {
+                // Utiliser le sprite par défaut d'Unity (carré blanc)
+                arrowImage.sprite = Resources.GetBuiltinResource<Sprite>("UI/Skin/Knob.psd");
+            }
+            
+            arrowImage.color = Color.red; // Rouge pour être bien visible
+            arrowImage.raycastTarget = false; // Évite d'intercepter les clics
+            arrowImage.type = Image.Type.Sliced; // Pour bien s'étirer
+        }
+
+        // Mettre la flèche au premier plan
+        arrow.transform.SetAsLastSibling();
+
+        Debug.Log($"Flèche créée de {fromBtn.name} vers {toBtn.name} - Distance: {distance}");
+    }
+
+    // Méthode fallback pour créer une flèche simple si le prefab manque
+    void CreateSimpleArrow(GameObject fromBtn, GameObject toBtn)
+    {
+        GameObject arrow = new GameObject("SimpleArrow");
+        arrow.transform.SetParent(arrowContainer.transform, false);
+        
+        Image arrowImage = arrow.AddComponent<Image>();
+        arrowImage.color = Color.yellow; // Couleur visible pour debug
+        arrowImage.raycastTarget = false;
+        
+        RectTransform arrowRect = arrow.GetComponent<RectTransform>();
+        
+        Vector2 start = fromBtn.GetComponent<RectTransform>().anchoredPosition;
+        Vector2 end = toBtn.GetComponent<RectTransform>().anchoredPosition;
+
+        Vector2 direction = end - start;
+        float distance = direction.magnitude;
+
+        // Configuration pour remplir la zone correctement
+        arrowRect.anchorMin = Vector2.zero;
+        arrowRect.anchorMax = Vector2.one;
+        arrowRect.offsetMin = Vector2.zero;
+        arrowRect.offsetMax = Vector2.zero;
+        
+        arrowRect.sizeDelta = new Vector2(distance, 10f); // Plus épais pour être visible
+        arrowRect.anchoredPosition = start + direction / 2;
+        
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        arrowRect.rotation = Quaternion.Euler(0, 0, angle);
+        
+        // Mettre au premier plan
+        arrow.transform.SetAsLastSibling();
+        
+        Debug.Log($"Flèche simple créée de {fromBtn.name} vers {toBtn.name}");
     }
 
     // --- Logique techs ---
@@ -226,9 +314,11 @@ public class TechTreeUI : MonoBehaviour
         }
     }
 
-
     bool ArePrerequisitesMet(TechNode node)
     {
+        if (node.prerequisiteIds == null || node.prerequisiteIds.Count == 0)
+            return true;
+            
         return node.prerequisiteIds.All(id =>
             techTreeData.techNodes.Find(n => n.id == id)?.unlocked == true);
     }

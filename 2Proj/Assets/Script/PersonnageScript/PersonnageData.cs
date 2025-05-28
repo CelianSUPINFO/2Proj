@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Linq;
 using System.Collections.Generic;
+using System;
 
 public enum JobType
 {
@@ -12,8 +13,6 @@ public enum JobType
     Constructeur,
     Transporteur
 }
-
-
 
 [System.Serializable]
 public class Backpack
@@ -115,25 +114,16 @@ public class Backpack
         return aRetirer;
     }
 
-    /// <summary>
-    /// 🔥 NOUVELLE MÉTHODE : Obtenir l'espace libre dans le sac
-    /// </summary>
     public int GetEspaceLibre()
     {
         return capaciteMax - quantite;
     }
 
-    /// <summary>
-    /// 🔥 NOUVELLE MÉTHODE : Vérifier si le sac est plein
-    /// </summary>
     public bool EstPlein()
     {
         return quantite >= capaciteMax;
     }
 
-    /// <summary>
-    /// 🔥 NOUVELLE MÉTHODE : Vérifier si le sac est vide
-    /// </summary>
     public bool EstVide()
     {
         return quantite <= 0 || string.IsNullOrEmpty(ressourceActuelle);
@@ -160,10 +150,21 @@ public class PersonnageData : MonoBehaviour
     [Header("Déplacement")]
     public float vitesse = 1.5f;
     public LayerMask layerSol;
+    
+    [Header("Contournement")]
+    public LayerMask layerBatiments ;
+    public float rayonDetection = 1.2f;
+    public float forceContournement = 2f;
 
     private Vector3 cible;
     private float timer;
     public GameObject cibleObjet;
+    public static event Action<PersonnageData> OnPersonnageMort;
+
+    // 🔥 NOUVEAU : Variables pour le système de contournement
+    private Vector3 directionContournement = Vector3.zero;
+    private float timerContournement = 0f;
+    private bool enContournement = false;
 
     private enum EtatPerso
     {
@@ -178,11 +179,9 @@ public class PersonnageData : MonoBehaviour
     private GameObject cibleRessource;
     private float timerCollecte;
 
-
-    // À ajouter dans la méthode Start() de PersonnageData :
-
     private void Start()
     {
+        layerBatiments = LayerMask.GetMask("Buildings");
         // 🔥 NOUVEAU : Initialiser le propriétaire du sac à dos
         sacADos.SetProprietaire(this);
         
@@ -191,10 +190,6 @@ public class PersonnageData : MonoBehaviour
         ChoisirNouvelleCible();
     }
 
-    // 🔥 NOUVELLE MÉTHODE : À ajouter dans PersonnageData pour la cohérence
-    /// <summary>
-    /// Méthode utilitaire pour notifier le ResourceManager quand ce personnage change
-    /// </summary>
     public void NotifyResourceChanged()
     {
         if (ResourceManager.Instance != null)
@@ -216,6 +211,7 @@ public class PersonnageData : MonoBehaviour
         if (vie <= 0 || faim <= 0 || soif <= 0 || fatigue <= 0)
         {
             Debug.Log($"{name} est mort.");
+            OnPersonnageMort?.Invoke(this);
             Destroy(gameObject);
             return;
         }
@@ -223,9 +219,60 @@ public class PersonnageData : MonoBehaviour
         EvaluerBesoinsUrgents();
 
         timer -= Time.deltaTime;
-        Vector3 direction = (cible - transform.position).normalized;
-        Vector3 nextPos = transform.position + direction * vitesse * Time.deltaTime;
+        
+        // 🔥 NOUVEAU : Système de déplacement avec contournement
+        DeplacementAvecContournement();
 
+        // Comportement pour les personnages sans métier
+        if (metier == JobType.Aucun && !enRegeneration)
+        {
+            GérerLogiqueSansMetier();
+        }
+    }
+
+    /// <summary>
+    /// 🔥 NOUVELLE MÉTHODE : Gère le déplacement avec contournement automatique des bâtiments
+    /// </summary>
+    private void DeplacementAvecContournement()
+    {
+        Vector3 directionPrincipale = (cible - transform.position).normalized;
+        Vector3 directionFinale = directionPrincipale;
+
+        // Détection des bâtiments devant le personnage
+        GameObject batimentDevant = DetecterBatimentDevant(directionPrincipale);
+        
+        if (batimentDevant != null && batimentDevant != cibleObjet)
+        {
+            // Si on détecte un bâtiment et qu'on n'est pas déjà en contournement
+            if (!enContournement)
+            {
+                directionContournement = CalculerDirectionContournement(batimentDevant, directionPrincipale);
+                enContournement = true;
+                timerContournement = 2f; // Durée du contournement
+            }
+        }
+
+        // Si on est en contournement
+        if (enContournement)
+        {
+            timerContournement -= Time.deltaTime;
+            
+            // Mélange la direction de contournement avec la direction principale
+            float ratioContournement = Mathf.Clamp01(timerContournement / 2f);
+            directionFinale = Vector3.Lerp(directionPrincipale, directionContournement, ratioContournement * forceContournement);
+            
+            // Arrêter le contournement si on a contourné assez longtemps ou si on n'a plus d'obstacle
+            if (timerContournement <= 0f || DetecterBatimentDevant(directionPrincipale) == null)
+            {
+                enContournement = false;
+                timerContournement = 0f;
+            }
+        }
+
+        // Calcul de la prochaine position
+        Vector3 nextPos = transform.position + directionFinale.normalized * vitesse * Time.deltaTime;
+
+        // Vérification que la prochaine position est sur le sol
         if (Physics2D.OverlapCircle(nextPos, 0.1f, layerSol))
         {
             transform.position = nextPos;
@@ -234,15 +281,53 @@ public class PersonnageData : MonoBehaviour
         {
             ChoisirNouvelleCible();
         }
-        // Comportement pour les personnages sans métier
-        if (metier == JobType.Aucun && !enRegeneration)
-        {
-            GérerLogiqueSansMetier();
-        }
-
     }
 
+    /// <summary>
+    /// 🔥 NOUVELLE MÉTHODE : Détecte s'il y a un bâtiment devant le personnage
+    /// </summary>
+    private GameObject DetecterBatimentDevant(Vector3 direction)
+    {
+        // Lancer un raycast pour détecter les bâtiments
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, direction, rayonDetection, layerBatiments);
+        
+        if (hit.collider != null)
+        {
+            return hit.collider.gameObject;
+        }
 
+        // Également vérifier avec un cercle pour une détection plus large
+        Collider2D[] batiments = Physics2D.OverlapCircleAll(transform.position + direction * (rayonDetection * 0.7f), 0.5f, layerBatiments);
+        
+        if (batiments.Length > 0)
+        {
+            return batiments[0].gameObject;
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// 🔥 NOUVELLE MÉTHODE : Calcule la direction pour contourner un bâtiment
+    /// </summary>
+    private Vector3 CalculerDirectionContournement(GameObject batiment, Vector3 directionOriginale)
+    {
+        Vector3 versBatiment = (batiment.transform.position - transform.position).normalized;
+        Vector3 versCible = (cible - transform.position).normalized;
+        
+        // Calculer deux directions perpendiculaires
+        Vector3 droite = new Vector3(-versBatiment.y, versBatiment.x, 0);
+        Vector3 gauche = new Vector3(versBatiment.y, -versBatiment.x, 0);
+        
+        // Choisir la direction qui nous rapproche le plus de la cible
+        float dotDroite = Vector3.Dot(droite, versCible);
+        float dotGauche = Vector3.Dot(gauche, versCible);
+        
+        Vector3 directionContournement = (dotDroite > dotGauche) ? droite : gauche;
+        
+        // Mélanger avec la direction originale pour un mouvement plus fluide
+        return Vector3.Lerp(directionContournement, directionOriginale, 0.3f).normalized;
+    }
 
     bool EvaluerBesoinsUrgents()
     {
@@ -280,13 +365,16 @@ public class PersonnageData : MonoBehaviour
         }
         
         return false;
-
     }
 
     void DeplacerVers(Vector3 destination)
     {
         cible = destination;
-        timer = Random.Range(2f, 4f);
+        timer = UnityEngine.Random.Range(2f, 4f);
+        
+        // 🔥 NOUVEAU : Réinitialiser le système de contournement lors d'un nouveau déplacement
+        enContournement = false;
+        timerContournement = 0f;
     }
 
     void ChoisirNouvelleCible()
@@ -295,14 +383,18 @@ public class PersonnageData : MonoBehaviour
 
         while (tentatives-- > 0)
         {
-            Vector2 direction = Random.insideUnitCircle.normalized;
-            Vector3 tentative = transform.position + (Vector3)(direction * Random.Range(1f, 2f));
+            Vector2 direction = UnityEngine.Random.insideUnitCircle.normalized;
+            Vector3 tentative = transform.position + (Vector3)(direction * UnityEngine.Random.Range(1f, 2f));
             tentative.z = 0;
 
             if (Physics2D.OverlapCircle(tentative, 0.1f, layerSol))
             {
                 cible = tentative;
-                timer = Random.Range(2f, 4f);
+                timer = UnityEngine.Random.Range(2f, 4f);
+                
+                // 🔥 NOUVEAU : Réinitialiser le contournement
+                enContournement = false;
+                timerContournement = 0f;
                 return;
             }
         }
@@ -317,7 +409,7 @@ public class PersonnageData : MonoBehaviour
 
         for (int i = 0; i < essais; i++)
         {
-            Vector2 direction = Random.insideUnitCircle.normalized;
+            Vector2 direction = UnityEngine.Random.insideUnitCircle.normalized;
             Vector3 testPos = transform.position + (Vector3)(direction * rayon);
 
             if (Physics2D.OverlapCircle(testPos, 0.1f, layerSol))
@@ -464,6 +556,7 @@ public class PersonnageData : MonoBehaviour
             .OrderBy(obj => Vector3.Distance(transform.position, obj.transform.position))
             .FirstOrDefault();
     }
+    
     GameObject TrouverPlusProcheParTag(params string[] tags)
     {
         GameObject plusProche = null;
@@ -486,4 +579,28 @@ public class PersonnageData : MonoBehaviour
         return plusProche;
     }
 
+    /// <summary>
+    /// 🔥 NOUVELLE MÉTHODE : Pour débugger le système de contournement (optionnel)
+    /// </summary>
+    private void OnDrawGizmos()
+    {
+        if (Application.isPlaying)
+        {
+            // Dessiner la direction vers la cible
+            Gizmos.color = Color.blue;
+            Gizmos.DrawLine(transform.position, cible);
+            
+            // Dessiner la zone de détection des bâtiments
+            Gizmos.color = Color.yellow;
+            Vector3 direction = (cible - transform.position).normalized;
+            Gizmos.DrawWireSphere(transform.position + direction * rayonDetection, 0.3f);
+            
+            // Dessiner la direction de contournement si active
+            if (enContournement)
+            {
+                Gizmos.color = Color.red;
+                Gizmos.DrawRay(transform.position, directionContournement * 1.5f);
+            }
+        }
+    }
 }
