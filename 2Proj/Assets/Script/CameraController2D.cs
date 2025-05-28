@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class CameraController2D : MonoBehaviour
 {
@@ -17,6 +18,9 @@ public class CameraController2D : MonoBehaviour
 
     void Update()
     {
+        if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
+        return;
+
         HandleZoom();
         HandlePanning();
     }
@@ -41,7 +45,7 @@ public class CameraController2D : MonoBehaviour
         if (Input.GetMouseButton(0) || Input.GetMouseButton(1))
         {
             Vector3 delta = Input.mousePosition - lastMousePosition;
-            Vector3 move = new Vector3(-delta.x, -delta.y, 0f) * panSpeed * Time.deltaTime;
+            Vector3 move = new Vector3(-delta.x, -delta.y, 0f) * panSpeed * Time.unscaledDeltaTime;
             Camera.main.transform.Translate(move);
             ClampCameraPosition(); // ← empêche de sortir
             lastMousePosition = Input.mousePosition;

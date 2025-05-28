@@ -197,7 +197,10 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Charpentier_0: -1852536930614124811
+      Charpentier_1: -6494100207429324375
+      Charpentier_2: 2464966911932608909
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

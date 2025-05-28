@@ -5,6 +5,9 @@ TagManager:
   serializedVersion: 3
   tags:
   - Building
+  - Arbre
+  - Pierre
+  - Stockage
   layers:
   - Default
   - TransparentFX
@@ -14,9 +17,9 @@ TagManager:
   - UI
   - Obstacles
   - Buildings
-  - 
-  - 
-  - 
+  - Day&Night
+  - Ground
+  - Mountain
   - 
   - 
   - 

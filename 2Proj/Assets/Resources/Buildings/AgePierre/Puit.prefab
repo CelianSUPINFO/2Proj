@@ -12,7 +12,8 @@ GameObject:
   - component: {fileID: 3747788283151802218}
   - component: {fileID: 2857194763441165093}
   - component: {fileID: 5262902577504359396}
-  m_Layer: 0
+  - component: {fileID: -1688607695663950409}
+  m_Layer: 7
   m_Name: Puit
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -77,7 +78,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 4
+  m_SortingOrder: 8
   m_Sprite: {fileID: 5497521524888897136, guid: afda4cedd10beb942a0a9fcb40a307b0, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -119,7 +120,7 @@ CapsuleCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
@@ -139,3 +140,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   data: {fileID: 11400000, guid: eea4a2e36236b114480efde2c73630b3, type: 2}
+--- !u!114 &-1688607695663950409
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4118709031373689438}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c1058c33c14f5c4fa50eaa16f778292, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  capaciteMax: 2
+  regenereBesoin: 1
+  typeBesoin: 3
+  aFonctionPersonnalisee: 0

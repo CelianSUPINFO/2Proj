@@ -172,7 +172,9 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      "Biblioth\xE8que_0": 393364619172556430
+      "Biblioth\xE8que_1": 2001847022783492516
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

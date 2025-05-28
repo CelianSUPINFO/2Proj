@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.Collections;
+using UnityEngine.EventSystems;
 
 
 public class BuildingBarUI : MonoBehaviour
@@ -17,6 +18,14 @@ public class BuildingBarUI : MonoBehaviour
     private List<GameObject> currentButtons = new();
 
     private Coroutine errorCoroutine;
+
+
+    void Start()
+    {
+        GameAge currentAge = AgeManager.Instance.GetCurrentAge();
+        RefreshBar(currentAge);
+    }
+
 
     public void SelectAge(int ageIndex)
     {
@@ -59,8 +68,31 @@ public class BuildingBarUI : MonoBehaviour
                 });
             }
 
+            // ✅ Tooltip : ajouter EventTrigger
+            EventTrigger trigger = btn.AddComponent<EventTrigger>();
+
+            // PointerEnter → Affiche le tooltip
+            EventTrigger.Entry enterEntry = new EventTrigger.Entry();
+            enterEntry.eventID = EventTriggerType.PointerEnter;
+            enterEntry.callback.AddListener((_) =>
+            {
+                Vector3 mousePos = Input.mousePosition;
+                BuildingTooltipUI.Instance.ShowTooltip(building);
+            });
+            trigger.triggers.Add(enterEntry);
+
+            // PointerExit → Cache le tooltip
+            EventTrigger.Entry exitEntry = new EventTrigger.Entry();
+            exitEntry.eventID = EventTriggerType.PointerExit;
+            exitEntry.callback.AddListener((_) =>
+            {
+                BuildingTooltipUI.Instance.HideTooltip();
+            });
+            trigger.triggers.Add(exitEntry);
+
             currentButtons.Add(btn);
         }
+
     }
 
     void ShowErrorMessage(string message)

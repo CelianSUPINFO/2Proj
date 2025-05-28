@@ -147,7 +147,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Ferme_baie_0: 8713119064123441593
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

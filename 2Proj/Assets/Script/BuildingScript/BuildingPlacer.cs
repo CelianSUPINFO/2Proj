@@ -1,10 +1,15 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class SimpleBuildingPlacer : MonoBehaviour
 {
     [Header("Références")]
     public GameObject[] buildingPrefabs; 
     public BuildingEraser eraser;
+    
+    [Header("Spawn de personnages pour les maisons")]
+    public GameObject personnagePrefab; // Prefab du personnage à spawner
+    public LayerMask layerSol; // Layer du sol
 
     [Header("Paramètres de placement")]
     public LayerMask placementObstaclesLayer;
@@ -126,14 +131,29 @@ public class SimpleBuildingPlacer : MonoBehaviour
             : new Color(1f, 0f, 0f, 0.5f);
     }
 
-    bool CanPlace()
+   bool CanPlace()
     {
+        // 1. Empêche si curseur sur l'UI
+        if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
+            return false;
+
+        // 2. Calcul des positions pour la box
         Vector2 centerPos = previewBuilding.transform.position;
         Vector2 boxCenter = new Vector2(centerPos.x, centerPos.y - 0.5f);
         Vector2 boxSize = new Vector2(3f, 3f);
 
-        Collider2D hit = Physics2D.OverlapBox(boxCenter, boxSize, 0f, placementObstaclesLayer);
-        return hit == null;
+        // 3. Vérifie s'il y a un obstacle (eau, falaise, etc.)
+        Collider2D obstacleHit = Physics2D.OverlapBox(boxCenter, boxSize, 0f, placementObstaclesLayer);
+        if (obstacleHit != null)
+            return false;
+
+        // 4. Vérifie si on est bien sur du sol (Layer Ground)
+        Collider2D groundHit = Physics2D.OverlapBox(boxCenter, boxSize, 0f, LayerMask.GetMask("Ground"));
+        if (groundHit == null)
+            return false;
+
+        // 5. Autorisé !
+        return true;
     }
 
     void PlaceBuilding()
@@ -161,11 +181,73 @@ public class SimpleBuildingPlacer : MonoBehaviour
             buildingComponent.data = selectedBuildingData;
         }
 
+        // 🔥 NOUVEAU : Vérifier si c'est une maison et configurer le spawner
+        ConfigurerMaisonSiNecessaire(placed);
+
         Destroy(previewBuilding);
         previewBuilding = null;
         isPlacing = false;
 
         Debug.Log("Bâtiment placé avec succès !");
+    }
+
+    /// <summary>
+    /// 🔥 NOUVELLE MÉTHODE : Configure le spawner si le bâtiment est une maison
+    /// </summary>
+    private void ConfigurerMaisonSiNecessaire(GameObject batiment)
+    {
+        // Méthode 1 : Vérifier par le nom du bâtiment
+        bool estUneMaison = false;
+        
+        if (selectedBuildingData != null)
+        {
+            string nomBatiment = selectedBuildingData.buildingName.ToLower();
+            estUneMaison = nomBatiment.Contains("maison") || 
+                          nomBatiment.Contains("house") || 
+                          nomBatiment.Contains("habitation") ||
+                          nomBatiment.Contains("cabane") ||
+                          nomBatiment.Contains("logement");
+        }
+        
+        // Méthode 2 : Vérifier par le tag (si vous utilisez des tags)
+        if (!estUneMaison && batiment.CompareTag("Maison"))
+        {
+            estUneMaison = true;
+        }
+        
+        // Méthode 3 : Vérifier si le bâtiment a déjà un HouseSpawner (au cas où il serait préconfiguré)
+        HouseSpawner spawnerExistant = batiment.GetComponent<HouseSpawner>();
+        if (spawnerExistant != null)
+        {
+            estUneMaison = true;
+        }
+        
+        // Si c'est une maison, ajouter/configurer le spawner
+        if (estUneMaison)
+        {
+            HouseSpawner spawner = spawnerExistant;
+
+            if (spawner == null)
+            {
+                spawner = batiment.AddComponent<HouseSpawner>();
+            }
+
+            // Configurer les paramètres
+            if (personnagePrefab != null)
+            {
+                var field = typeof(HouseSpawner).GetField("personnagePrefab");
+                if (field != null) field.SetValue(spawner, personnagePrefab);
+            }
+
+            var layerField = typeof(HouseSpawner).GetField("layerSol");
+            if (layerField != null) layerField.SetValue(spawner, layerSol);
+
+            // ✅ Active le système de spawn maintenant que le bâtiment est placé
+            spawner.Activer();
+
+            Debug.Log($"✅ Maison activée : {selectedBuildingData?.buildingName ?? batiment.name}");
+        }
+
     }
 
     void CancelPlacement()

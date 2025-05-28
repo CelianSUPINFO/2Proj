@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2bc76cb91bdb8bf4e934a0be13a71ece, type: 3}
+  m_Name: FermeBaie
+  m_EditorClassIdentifier: 
+  buildingName: Ferme de Baie
+  prefab: {fileID: 9032798326439436642, guid: 43be10e0d5c16ca44aa46e9aab2ec080, type: 3}
+  unlockAge: 0
+  locked: 0
+  icon: {fileID: 8713119064123441593, guid: 4bc3edcaaeac67948a8d4570d5cc0cdc, type: 3}
+  function: 1
+  cost:
+    resourceCosts:
+    - type: 0
+      amount: 15
+    - type: 1
+      amount: 5
+  capacity: 0
+  description: "Une ferme de petite baie qui permettra \xE0 vos habitants de se nourir."

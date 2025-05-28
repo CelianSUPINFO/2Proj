@@ -46,6 +46,7 @@ public class ResourceDisplay : MonoBehaviour
             ResourceType.Cloth => "Tissu",
             ResourceType.Gold => "Or",
             ResourceType.Population => "Population",
+            ResourceType.Search => "Recherche",
             _ => type.ToString()
         };
     }
