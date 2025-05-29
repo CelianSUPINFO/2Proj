@@ -14,6 +14,9 @@ public class SimpleBuildingPlacer : MonoBehaviour
     [Header("Paramètres de placement")]
     public LayerMask placementObstaclesLayer;
 
+    [Header("🔬 Récompenses de recherche")]
+    public int pointsRechercheParBatiment = 5; // Points gagnés par bâtiment placé
+
     private GameObject buildingPrefab;
     private GameObject previewBuilding;
     private bool isPlacing = false;
@@ -184,10 +187,17 @@ public class SimpleBuildingPlacer : MonoBehaviour
         // 🔥 NOUVEAU : Vérifier si c'est une maison et configurer le spawner
         ConfigurerMaisonSiNecessaire(placed);
 
+        // 🔬 NOUVEAU : Gagner des points de recherche pour avoir placé un bâtiment
+        if (ResourceManager.Instance != null)
+        {
+            ResourceManager.Instance.Add(ResourceType.Search, pointsRechercheParBatiment);
+            Debug.Log($" +{pointsRechercheParBatiment} points de recherche pour construction de {selectedBuildingData?.buildingName ?? "bâtiment"}");
+        }
+
         Destroy(previewBuilding);
         previewBuilding = null;
         isPlacing = false;
-
+        
         Debug.Log("Bâtiment placé avec succès !");
     }
 

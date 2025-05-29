@@ -147,7 +147,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      mine_de_fer_0: -4729462048328783126
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

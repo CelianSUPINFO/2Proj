@@ -2,17 +2,24 @@ using UnityEngine;
 using System.Linq;
 using System.Collections.Generic;
 using System;
+using System.Collections;
 
 public enum JobType
 {
     Aucun,
     Bucheron,
-    Fermier,
+    CarrierPierre,
+    CarrierFer,
+    CarrierOr,
+    FermierAnimaux,
+    FermierBle,
     Chercheur,
     Boulanger,
-    Constructeur,
-    Transporteur
+    Scieur,
+    Pecheur
 }
+
+
 
 [System.Serializable]
 public class Backpack
@@ -132,6 +139,8 @@ public class Backpack
 
 public class PersonnageData : MonoBehaviour
 {
+    public BatimentInteractif batimentAssigné;
+
     [HideInInspector]
     public bool enRegeneration = false;
 
@@ -150,9 +159,9 @@ public class PersonnageData : MonoBehaviour
     [Header("Déplacement")]
     public float vitesse = 1.5f;
     public LayerMask layerSol;
-    
+
     [Header("Contournement")]
-    public LayerMask layerBatiments ;
+    public LayerMask layerBatiments;
     public float rayonDetection = 1.2f;
     public float forceContournement = 2f;
 
@@ -184,9 +193,9 @@ public class PersonnageData : MonoBehaviour
         layerBatiments = LayerMask.GetMask("Buildings");
         // 🔥 NOUVEAU : Initialiser le propriétaire du sac à dos
         sacADos.SetProprietaire(this);
-        
         name = NomAleatoire.ObtenirNomUnique();
         transform.position = TrouverSolLePlusProche();
+
         ChoisirNouvelleCible();
     }
 
@@ -205,12 +214,13 @@ public class PersonnageData : MonoBehaviour
             faim -= Time.deltaTime * 0.1f;
             soif -= Time.deltaTime * 0.15f;
             fatigue -= Time.deltaTime * 0.05f;
-            vie -=  Time.deltaTime * 0.02f;
+            vie -= Time.deltaTime * 0.02f;
         }
 
         if (vie <= 0 || faim <= 0 || soif <= 0 || fatigue <= 0)
         {
             Debug.Log($"{name} est mort.");
+            MetierAssignmentManager.Instance.SupprimerPersonnage(this);
             OnPersonnageMort?.Invoke(this);
             Destroy(gameObject);
             return;
@@ -219,16 +229,55 @@ public class PersonnageData : MonoBehaviour
         EvaluerBesoinsUrgents();
 
         timer -= Time.deltaTime;
-        
+
         // 🔥 NOUVEAU : Système de déplacement avec contournement
         DeplacementAvecContournement();
 
         // Comportement pour les personnages sans métier
-        if (metier == JobType.Aucun && !enRegeneration)
+        if (!enRegeneration && metier == JobType.Aucun)
         {
             GérerLogiqueSansMetier();
         }
+        else
+        {
+            GérerLogiqueAllerBatimentDeMetier();
+        }
     }
+
+
+
+
+    void GérerLogiqueAllerBatimentDeMetier()
+    {
+        switch (etatActuel)
+        {
+            case EtatPerso.Normal:
+                GameObject batiment = TrouverBatimentDeMetier();
+                if (batiment != null)
+                {
+                    cibleObjet = batiment;
+                    DeplacerVers(batiment.transform.position);
+                    etatActuel = EtatPerso.AllerStockage;
+                }
+                break;
+
+            case EtatPerso.AllerStockage:
+                if (cibleObjet == null)
+                {
+                    etatActuel = EtatPerso.Normal;
+                    return;
+                }
+
+                float dist = Vector3.Distance(transform.position, cibleObjet.transform.position);
+                if (dist < 0.5f)
+                {
+                    Debug.Log($"{name} est arrivé à son bâtiment de métier ({metier})");
+                    etatActuel = EtatPerso.Normal;
+                }
+                break;
+        }
+    }
+
 
     /// <summary>
     /// 🔥 NOUVELLE MÉTHODE : Gère le déplacement avec contournement automatique des bâtiments
@@ -240,7 +289,7 @@ public class PersonnageData : MonoBehaviour
 
         // Détection des bâtiments devant le personnage
         GameObject batimentDevant = DetecterBatimentDevant(directionPrincipale);
-        
+
         if (batimentDevant != null && batimentDevant != cibleObjet)
         {
             // Si on détecte un bâtiment et qu'on n'est pas déjà en contournement
@@ -256,11 +305,11 @@ public class PersonnageData : MonoBehaviour
         if (enContournement)
         {
             timerContournement -= Time.deltaTime;
-            
+
             // Mélange la direction de contournement avec la direction principale
             float ratioContournement = Mathf.Clamp01(timerContournement / 2f);
             directionFinale = Vector3.Lerp(directionPrincipale, directionContournement, ratioContournement * forceContournement);
-            
+
             // Arrêter le contournement si on a contourné assez longtemps ou si on n'a plus d'obstacle
             if (timerContournement <= 0f || DetecterBatimentDevant(directionPrincipale) == null)
             {
@@ -290,7 +339,7 @@ public class PersonnageData : MonoBehaviour
     {
         // Lancer un raycast pour détecter les bâtiments
         RaycastHit2D hit = Physics2D.Raycast(transform.position, direction, rayonDetection, layerBatiments);
-        
+
         if (hit.collider != null)
         {
             return hit.collider.gameObject;
@@ -298,7 +347,7 @@ public class PersonnageData : MonoBehaviour
 
         // Également vérifier avec un cercle pour une détection plus large
         Collider2D[] batiments = Physics2D.OverlapCircleAll(transform.position + direction * (rayonDetection * 0.7f), 0.5f, layerBatiments);
-        
+
         if (batiments.Length > 0)
         {
             return batiments[0].gameObject;
@@ -314,17 +363,17 @@ public class PersonnageData : MonoBehaviour
     {
         Vector3 versBatiment = (batiment.transform.position - transform.position).normalized;
         Vector3 versCible = (cible - transform.position).normalized;
-        
+
         // Calculer deux directions perpendiculaires
         Vector3 droite = new Vector3(-versBatiment.y, versBatiment.x, 0);
         Vector3 gauche = new Vector3(versBatiment.y, -versBatiment.x, 0);
-        
+
         // Choisir la direction qui nous rapproche le plus de la cible
         float dotDroite = Vector3.Dot(droite, versCible);
         float dotGauche = Vector3.Dot(gauche, versCible);
-        
+
         Vector3 directionContournement = (dotDroite > dotGauche) ? droite : gauche;
-        
+
         // Mélanger avec la direction originale pour un mouvement plus fluide
         return Vector3.Lerp(directionContournement, directionOriginale, 0.3f).normalized;
     }
@@ -363,15 +412,15 @@ public class PersonnageData : MonoBehaviour
                 return true;
             }
         }
-        
+
         return false;
     }
 
-    void DeplacerVers(Vector3 destination)
+    public void DeplacerVers(Vector3 destination)
     {
         cible = destination;
         timer = UnityEngine.Random.Range(2f, 4f);
-        
+
         // 🔥 NOUVEAU : Réinitialiser le système de contournement lors d'un nouveau déplacement
         enContournement = false;
         timerContournement = 0f;
@@ -391,7 +440,7 @@ public class PersonnageData : MonoBehaviour
             {
                 cible = tentative;
                 timer = UnityEngine.Random.Range(2f, 4f);
-                
+
                 // 🔥 NOUVEAU : Réinitialiser le contournement
                 enContournement = false;
                 timerContournement = 0f;
@@ -556,8 +605,8 @@ public class PersonnageData : MonoBehaviour
             .OrderBy(obj => Vector3.Distance(transform.position, obj.transform.position))
             .FirstOrDefault();
     }
-    
-    GameObject TrouverPlusProcheParTag(params string[] tags)
+
+    public GameObject TrouverPlusProcheParTag(params string[] tags)
     {
         GameObject plusProche = null;
         float distanceMin = float.MaxValue;
@@ -579,28 +628,35 @@ public class PersonnageData : MonoBehaviour
         return plusProche;
     }
 
-    /// <summary>
-    /// 🔥 NOUVELLE MÉTHODE : Pour débugger le système de contournement (optionnel)
-    /// </summary>
-    private void OnDrawGizmos()
+    GameObject TrouverBatimentDeMetier()
     {
-        if (Application.isPlaying)
+        BatimentInteractif[] tous = FindObjectsOfType<BatimentInteractif>();
+        GameObject plusProche = null;
+        float distanceMin = float.MaxValue;
+
+        foreach (BatimentInteractif b in tous)
         {
-            // Dessiner la direction vers la cible
-            Gizmos.color = Color.blue;
-            Gizmos.DrawLine(transform.position, cible);
-            
-            // Dessiner la zone de détection des bâtiments
-            Gizmos.color = Color.yellow;
-            Vector3 direction = (cible - transform.position).normalized;
-            Gizmos.DrawWireSphere(transform.position + direction * rayonDetection, 0.3f);
-            
-            // Dessiner la direction de contournement si active
-            if (enContournement)
+            if (b.metierAssocie != metier) continue;
+
+            float dist = Vector3.Distance(transform.position, b.transform.position);
+            if (dist < distanceMin)
             {
-                Gizmos.color = Color.red;
-                Gizmos.DrawRay(transform.position, directionContournement * 1.5f);
+                distanceMin = dist;
+                plusProche = b.gameObject;
             }
         }
+
+        return plusProche;
+    }
+    
+    public void AssignerMetier(JobType nouveauMetier)
+    {
+        metier = nouveauMetier;
+        etatActuel = EtatPerso.Normal;
+        cibleObjet = null;
+        cibleRessource = null;
+        timerCollecte = 0f; // <- Ajout important
+        DeplacerVers(transform.position); // Stop déplacement
+        Debug.Log($"{name} a reçu le métier {metier}, état réinitialisé");
     }
 }
