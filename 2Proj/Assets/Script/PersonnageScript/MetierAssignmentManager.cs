@@ -1,11 +1,9 @@
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 public class MetierAssignmentManager : MonoBehaviour
 {
     public static MetierAssignmentManager Instance;
-
     private List<PersonnageData> tousLesPersonnages = new List<PersonnageData>();
 
     private void Awake()
@@ -14,9 +12,6 @@ public class MetierAssignmentManager : MonoBehaviour
         else Destroy(gameObject);
     }
 
-    /// <summary>
-    /// Appelé par chaque personnage à sa création pour s’enregistrer
-    /// </summary>
     public void EnregistrerPersonnage(PersonnageData perso)
     {
         if (!tousLesPersonnages.Contains(perso))
@@ -25,14 +20,10 @@ public class MetierAssignmentManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Appelé quand un personnage meurt
-    /// </summary>
     public void SupprimerPersonnage(PersonnageData perso)
     {
+        Debug.Log("SupprimerPersonnage");
         tousLesPersonnages.Remove(perso);
-
-        // Préviens tous les bâtiments métier de la disparition de ce travailleur
         BatimentInteractif[] batiments = GameObject.FindObjectsOfType<BatimentInteractif>();
         foreach (var bat in batiments)
         {
@@ -40,9 +31,23 @@ public class MetierAssignmentManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Retourne un personnage sans métier (ou null si aucun disponible)
-    /// </summary>
+    // NOUVELLE METHODE : SANS METIER ET SANS BATIMENT
+    public PersonnageData TrouverPersonnageSansMetierEtSansBatiment()
+    {
+        PersonnageData[] tous = GameObject.FindObjectsOfType<PersonnageData>();
+        foreach (var perso in tous)
+        {
+            if (perso.metier == JobType.Aucun)
+            {
+                Debug.Log($"[MetierAssignment] Candidat possible : {perso.name}");
+                return perso;
+            }
+        }
+        Debug.Log($"[MetierAssignment] Aucun personnage sans métier ET sans bâtiment trouvé !");
+        return null;
+    }
+
+    // Garde aussi l'ancienne si tu veux
     public PersonnageData TrouverPersonnageSansMetier()
     {
         PersonnageData[] tous = GameObject.FindObjectsOfType<PersonnageData>();
@@ -53,8 +58,18 @@ public class MetierAssignmentManager : MonoBehaviour
                 return perso;
             }
         }
-        Debug.Log($"[MetierAssignment] Aucun personnage sans métier trouvé !");
         return null;
     }
 
+    public void TrouverDuJob(PersonnageData perso)
+    {
+        BatimentInteractif[] batiments = GameObject.FindObjectsOfType<BatimentInteractif>();
+        foreach (var bat in batiments)
+        {
+            if (bat.metierAssocie != JobType.Aucun)
+            {
+                bat.candidatsAssignerAuBatiment(perso);
+            }
+        }
+    }
 }

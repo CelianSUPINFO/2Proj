@@ -2,7 +2,6 @@ using UnityEngine;
 using System.Linq;
 using System.Collections.Generic;
 using System;
-using System.Collections;
 
 public enum JobType
 {
@@ -19,8 +18,6 @@ public enum JobType
     Pecheur
 }
 
-
-
 [System.Serializable]
 public class Backpack
 {
@@ -28,7 +25,6 @@ public class Backpack
     public int quantite = 0;
     public int capaciteMax = 5;
 
-    // Référence vers le personnage propriétaire pour les notifications
     private PersonnageData proprietaire;
 
     public void SetProprietaire(PersonnageData perso)
@@ -141,49 +137,16 @@ public class PersonnageData : MonoBehaviour
 {
     public BatimentInteractif batimentAssigné;
 
-    [HideInInspector]
-    public bool enRegeneration = false;
+    [HideInInspector] public bool enRegeneration = false;
+    [Header("Stats")] public float vie = 100f, faim = 100f, soif = 100f, fatigue = 100f;
+    [Header("Métier")] public JobType metier = JobType.Aucun;
+    [Header("Sac à dos")] public Backpack sacADos = new Backpack();
+    [Header("Déplacement")] public float vitesse = 1.5f; public LayerMask layerSol;
+    [Header("Contournement")] public LayerMask layerBatiments; public float rayonDetection = 1.2f; public float forceContournement = 2f;
+    private Vector3 cible; private float timer; public GameObject cibleObjet; public static event Action<PersonnageData> OnPersonnageMort;
+    private Vector3 directionContournement = Vector3.zero; private float timerContournement = 0f; private bool enContournement = false;
 
-    [Header("Stats")]
-    public float vie = 100f;
-    public float faim = 100f;
-    public float soif = 100f;
-    public float fatigue = 100f;
-
-    [Header("Métier")]
-    public JobType metier = JobType.Aucun;
-
-    [Header("Sac à dos")]
-    public Backpack sacADos = new Backpack();
-
-    [Header("Déplacement")]
-    public float vitesse = 1.5f;
-    public LayerMask layerSol;
-
-    [Header("Contournement")]
-    public LayerMask layerBatiments;
-    public float rayonDetection = 1.2f;
-    public float forceContournement = 2f;
-
-    private Vector3 cible;
-    private float timer;
-    public GameObject cibleObjet;
-    public static event Action<PersonnageData> OnPersonnageMort;
-
-    // 🔥 NOUVEAU : Variables pour le système de contournement
-    private Vector3 directionContournement = Vector3.zero;
-    private float timerContournement = 0f;
-    private bool enContournement = false;
-
-    private enum EtatPerso
-    {
-        Normal,
-        Collecte,
-        AttenteCollecte,
-        AllerStockage,
-        DeposerRessource
-    }
-
+    private enum EtatPerso { Normal, Collecte, AttenteCollecte, AllerStockage, DeposerRessource }
     private EtatPerso etatActuel = EtatPerso.Normal;
     private GameObject cibleRessource;
     private float timerCollecte;
@@ -191,12 +154,12 @@ public class PersonnageData : MonoBehaviour
     private void Start()
     {
         layerBatiments = LayerMask.GetMask("Buildings");
-        // 🔥 NOUVEAU : Initialiser le propriétaire du sac à dos
         sacADos.SetProprietaire(this);
         name = NomAleatoire.ObtenirNomUnique();
         transform.position = TrouverSolLePlusProche();
-
         ChoisirNouvelleCible();
+        // Enregistrement automatique au manager pour une meilleure gestion
+        MetierAssignmentManager.Instance?.EnregistrerPersonnage(this);
     }
 
     public void NotifyResourceChanged()
@@ -220,7 +183,10 @@ public class PersonnageData : MonoBehaviour
         if (vie <= 0 || faim <= 0 || soif <= 0 || fatigue <= 0)
         {
             Debug.Log($"{name} est mort.");
-            MetierAssignmentManager.Instance.SupprimerPersonnage(this);
+            if (this.metier != JobType.Aucun)
+            {
+                MetierAssignmentManager.Instance.SupprimerPersonnage(this);
+            }
             OnPersonnageMort?.Invoke(this);
             Destroy(gameObject);
             return;
@@ -246,18 +212,82 @@ public class PersonnageData : MonoBehaviour
 
 
 
+    public void AssignerAuBatiment(BatimentInteractif nouveauBatiment, JobType nouveauMetier)
+    {
+
+
+        batimentAssigné = nouveauBatiment;
+        AssignerMetier(nouveauMetier);
+        Debug.Log($"{name} est maintenant affecté au bâtiment {nouveauBatiment?.name ?? "NULL"} comme {nouveauMetier}");
+    }
+
+
+
+    public void AssignerMetier(JobType nouveauMetier)
+    {
+        metier = nouveauMetier;
+        etatActuel = EtatPerso.Normal;
+        cibleObjet = null;
+        cibleRessource = null;
+        timerCollecte = 0f;
+        DeplacerVers(transform.position); // Stop déplacement
+        Debug.Log($"{name} a reçu le métier {metier}, état réinitialisé");
+    }
 
     void GérerLogiqueAllerBatimentDeMetier()
     {
         switch (etatActuel)
         {
             case EtatPerso.Normal:
-                GameObject batiment = TrouverBatimentDeMetier();
-                if (batiment != null)
+                // Si sac plein, chercher un stockage
+                if (sacADos.quantite >= sacADos.capaciteMax)
                 {
-                    cibleObjet = batiment;
-                    DeplacerVers(batiment.transform.position);
-                    etatActuel = EtatPerso.AllerStockage;
+                    GameObject stockage = TrouverPlusProcheParTag("Stockage");
+                    if (stockage != null)
+                    {
+                        cibleObjet = stockage;
+                        DeplacerVers(stockage.transform.position);
+                        etatActuel = EtatPerso.AllerStockage;
+                    }
+                }
+                else
+                {
+                    GameObject batiment = TrouverBatimentDeMetier();
+                    if (batiment != null)
+                    {
+                        // On vérifie si le batiment associé est une transformation
+                        BatimentInteractif batimentInteractif = batiment.GetComponent<BatimentInteractif>();
+                        if (batimentInteractif != null && batimentInteractif.metierAssocie == metier)
+                        {
+                            var prodInfo = batimentInteractif.metierProductions.Find(p => p.metier == metier && p.transformation);
+                            if (prodInfo != null)
+                            {
+                                // S'il lui faut une ressource, on vérifie si le sac est vide ou s'il n'a pas la bonne ressource
+                                if (sacADos.EstVide() || sacADos.ressourceActuelle != prodInfo.ressourceRequise || sacADos.quantite < prodInfo.quantiteRequise)
+
+                                {
+                                    GameObject stockageAvecRessource = TrouverStockageAvecRessource(prodInfo.ressourceRequise, prodInfo.quantiteRequise);
+                                    if (stockageAvecRessource != null)
+                                    {
+                                        cibleObjet = stockageAvecRessource;
+                                        DeplacerVers(stockageAvecRessource.transform.position);
+                                        etatActuel = EtatPerso.AllerStockage;
+                                        Debug.Log($"{name} va chercher {prodInfo.ressourceRequise} dans le stockage avant d'aller au bâtiment de transformation {batimentInteractif.name}");
+                                        return; // On sort pour ne pas enchaîner tout de suite sur le batiment
+                                    }
+                                    else
+                                    {
+                                        Debug.Log($"{name} n'a pas trouvé de stockage avec {prodInfo.ressourceRequise} disponible !");
+                                        // Il pourrait errer ou attendre, ou aller au batiment pour rien...
+                                    }
+                                }
+                            }
+                        }
+                        // Comportement normal : aller au batiment de métier
+                        cibleObjet = batiment;
+                        DeplacerVers(batiment.transform.position);
+
+                    }
                 }
                 break;
 
@@ -272,8 +302,14 @@ public class PersonnageData : MonoBehaviour
                 if (dist < 0.5f)
                 {
                     Debug.Log($"{name} est arrivé à son bâtiment de métier ({metier})");
-                    etatActuel = EtatPerso.Normal;
+                    etatActuel = EtatPerso.DeposerRessource;
                 }
+                break;
+
+            case EtatPerso.DeposerRessource:
+                Debug.Log($"{name} a déposé : {sacADos.ressourceActuelle} x{sacADos.quantite}");
+                sacADos.Vider();
+                etatActuel = EtatPerso.Normal;
                 break;
         }
     }
@@ -649,14 +685,22 @@ public class PersonnageData : MonoBehaviour
         return plusProche;
     }
     
-    public void AssignerMetier(JobType nouveauMetier)
+    /// <summary>
+    /// Cherche le stockage qui contient au moins la quantité demandée de la ressource spécifiée
+    /// </summary>
+    GameObject TrouverStockageAvecRessource(string ressource, int quantiteMin = 1)
     {
-        metier = nouveauMetier;
-        etatActuel = EtatPerso.Normal;
-        cibleObjet = null;
-        cibleRessource = null;
-        timerCollecte = 0f; // <- Ajout important
-        DeplacerVers(transform.position); // Stop déplacement
-        Debug.Log($"{name} a reçu le métier {metier}, état réinitialisé");
+        GameObject[] stockages = GameObject.FindGameObjectsWithTag("Stockage");
+        foreach (GameObject go in stockages)
+        {
+            BatimentInteractif stockage = go.GetComponent<BatimentInteractif>();
+            if (stockage != null && stockage.ObtenirQuantite(ressource) >= quantiteMin)
+            {
+                return go;
+            }
+        }
+        return null;
     }
+
+
 }

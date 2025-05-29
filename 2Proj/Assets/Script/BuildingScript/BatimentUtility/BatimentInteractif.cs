@@ -2,31 +2,15 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Collections;
 
+public enum TypeBesoin { Aucun, Fatigue, Faim, Soif }
 
-public enum TypeBesoin
-{
-    Aucun,
-    Fatigue,
-    Faim,
-    Soif
-}
-
-
-[RequireComponent(typeof(Collider2D))]
 [RequireComponent(typeof(Collider2D))]
 public class BatimentInteractif : MonoBehaviour
 {
-    [Header("Capacité")]
-    public int capaciteMax = 2;
-
-    [Header("Régénération")]
-    public bool regenereBesoin = false;
-    public TypeBesoin typeBesoin = TypeBesoin.Fatigue;
-
-    [Header("Stockage")]
-    public bool estUnStockage = false;
-
-    private Dictionary<PersonnageData, float> timerProduction = new();
+    [Header("Capacité")] public int capaciteMax = 2;
+    [Header("Régénération")] public bool regenereBesoin = false; public TypeBesoin typeBesoin = TypeBesoin.Fatigue;
+    [Header("Stockage")] public bool estUnStockage = false;
+    private Dictionary<PersonnageData, float> timerProduction = new Dictionary<PersonnageData, float>();
 
     [System.Serializable]
     public class MetierProductionInfo
@@ -55,11 +39,15 @@ public class BatimentInteractif : MonoBehaviour
     };
 
 
-       [System.Serializable]
+   
+
+
+    [System.Serializable]
     public class RessourceStockee
     {
         public string nom;
         public int quantite;
+
         public RessourceStockee(string nom, int quantite)
         {
             this.nom = nom;
@@ -67,69 +55,85 @@ public class BatimentInteractif : MonoBehaviour
         }
     }
 
-    private List<RessourceStockee> stock = new();
+    private List<RessourceStockee> stock = new List<RessourceStockee>();
     public int maxTypes = 4;
     public int maxParType = 20;
 
     [Header("Extension future")]
     public bool aFonctionPersonnalisee = false;
 
-    private List<PersonnageData> occupants = new();
-    private Dictionary<PersonnageData, float> tempsRestant = new();
-    private Dictionary<PersonnageData, float> timerRegen = new();
+    private List<PersonnageData> occupants = new List<PersonnageData>();
+    private Dictionary<PersonnageData, float> tempsRestant = new Dictionary<PersonnageData, float>();
+    private Dictionary<PersonnageData, float> timerRegen = new Dictionary<PersonnageData, float>();
+
+
 
     [Header("Métier associé")]
     public JobType metierAssocie;
-    private List<PersonnageData> travailleursActuels = new();
+    private List<PersonnageData> travailleursActuels = new List<PersonnageData>();
 
-    private float verifTimer = 0f;
 
     private void Start()
     {
         Debug.Log($"[Batiment {name}] Initialisation et tentative d'assignation de métier.");
         if (metierAssocie != JobType.Aucun)
-        {
             StartCoroutine(AssignerTravailleursInitiaux());
-        }
     }
+
+    
 
     private IEnumerator AssignerTravailleursInitiaux()
     {
         travailleursActuels.RemoveAll(p => p == null);
-
-        while (travailleursActuels.Count < capaciteMax)
+        if (travailleursActuels.Count < capaciteMax && metierAssocie != JobType.Aucun)
         {
-            PersonnageData candidat = MetierAssignmentManager.Instance.TrouverPersonnageSansMetier();
-
-            if (candidat != null)
+            for (int i = travailleursActuels.Count; i < capaciteMax; i++)
             {
-                if (!travailleursActuels.Contains(candidat))
+                PersonnageData candidat = MetierAssignmentManager.Instance.TrouverPersonnageSansMetierEtSansBatiment();
+                Debug.Log($"[Batiment {name}] Tentative d'assignation, trouvé: {(candidat != null ? candidat.name : "aucun")}");
+                if (candidat != null)
                 {
-                    candidat.AssignerMetier(metierAssocie);
-                    candidat.batimentAssigné = this;
-                    travailleursActuels.Add(candidat);
-                    Debug.Log($"[Batiment {name}] Nouveau travailleur assigné: {candidat.name}");
+                    candidatsAssignerAuBatiment(candidat);
                 }
+                else
+                {
+                    Debug.Log($"[Batiment {name}] Aucun candidat dispo. Attente...");
+                }
+                yield return new WaitForSeconds(0.1f); // court délai, évite bug assignation en masse
             }
-            else
-            {
-                Debug.Log($"[Batiment {name}] Aucun candidat disponible pour le métier {metierAssocie}.");
-            }
-
-            yield return new WaitForSeconds(0.5f);
         }
     }
+
+    public void candidatsAssignerAuBatiment(PersonnageData candidat)
+    {
+        if (travailleursActuels.Count >= capaciteMax) return;
+        if (candidat == null) return;
+        // Sécurité : évite d'assigner plusieurs fois
+        if (travailleursActuels.Contains(candidat)) return;
+        if (candidat.metier != JobType.Aucun) return;
+        if (candidat.batimentAssigné != null) return;
+
+        candidat.AssignerAuBatiment(this, metierAssocie);
+        travailleursActuels.Add(candidat);
+        Debug.Log($"[Batiment {name}] Ajout de {candidat.name} ({metierAssocie})");
+    }
+
 
     public void GererMortTravailleur(PersonnageData mort)
     {
-        if (mort == null) return;
-        travailleursActuels.RemoveAll(p => p == null);
-        if (travailleursActuels.Contains(mort))
+        Debug.Log($"mort et gestion {mort.name}");
+        
+       
+        if (!regenereBesoin && !estUnStockage)
         {
-            travailleursActuels.Remove(mort);
+            Debug.Log("mort et gestion       ok");
+            travailleursActuels.RemoveAll(p => p == null);
+            Debug.Log($"[Batiment {name}] Travailleur {mort.name} mort, lancement réassignation");
             StartCoroutine(AssignerTravailleursInitiaux());
         }
     }
+
+
 
     public bool EstDisponible()
     {
@@ -139,11 +143,13 @@ public class BatimentInteractif : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (!other.TryGetComponent(out PersonnageData perso)) return;
+
         if (occupants.Contains(perso) || !EstDisponible()) return;
 
         occupants.Add(perso);
         perso.cibleObjet = gameObject;
 
+        // --- NE PAS réinitialiser si un timer existe déjà pour ce perso ---
         if (!timerProduction.ContainsKey(perso))
         {
             MetierProductionInfo info = metierProductions.Find(i => i.metier == perso.metier);
@@ -154,16 +160,18 @@ public class BatimentInteractif : MonoBehaviour
                     int retiré = RetirerRessource(info.ressourceRequise, info.quantiteRequise);
                     if (retiré < info.quantiteRequise)
                     {
-                        Debug.Log($"{name}: Pas assez de {info.ressourceRequise} pour transformer.");
+                        Debug.Log($"{name}: Pas assez de {info.ressourceRequise} pour transformer. {perso.name} attend.");
                         return;
                     }
                 }
 
                 timerProduction[perso] = info.dureeProduction;
-                Debug.Log($"[PROD] {perso.name} commence la production de {info.ressourceProduite}");
+                Debug.Log($"[PROD] {perso.name} commence la production de {info.ressourceProduite} ({info.dureeProduction}s)");
             }
         }
 
+
+        // 🔁 Régénération, si activée
         if (regenereBesoin)
         {
             tempsRestant[perso] = GetTempsTotal(typeBesoin);
@@ -171,12 +179,15 @@ public class BatimentInteractif : MonoBehaviour
             perso.enRegeneration = true;
         }
 
+        
+
+        // Si c'est un bâtiment de stockage
         if (estUnStockage && perso.sacADos.quantite > 0)
         {
             StockerDepuis(perso);
         }
     }
-
+    
     private void OnTriggerExit2D(Collider2D other)
     {
         if (!other.TryGetComponent(out PersonnageData perso)) return;
@@ -184,60 +195,67 @@ public class BatimentInteractif : MonoBehaviour
         occupants.Remove(perso);
         tempsRestant.Remove(perso);
         timerRegen.Remove(perso);
+        timerProduction.Remove(perso); // <-- Ajoute cette ligne !
         perso.enRegeneration = false;
     }
+
 
     private void Update()
     {
         occupants.RemoveAll(p => p == null);
-        travailleursActuels.RemoveAll(p => p == null);
-
-        // 🔁 Réassignation automatique s'il manque des travailleurs
-        verifTimer -= Time.deltaTime;
-        if (verifTimer <= 0f)
-        {
-            verifTimer = 5f;
-            if (travailleursActuels.Count < capaciteMax)
-            {
-                StartCoroutine(AssignerTravailleursInitiaux());
-            }
-        }
-
-        // 🔁 Régénération
+        
+    
         List<PersonnageData> finis = new();
-        foreach (PersonnageData perso in new List<PersonnageData>(occupants))
+        List<PersonnageData> occupantsSnapshot = new(occupants); // éviter modification pendant boucle
+
+        // 🔁 1. Régénération
+        if (regenereBesoin)
         {
-            if (!tempsRestant.ContainsKey(perso)) continue;
-            timerRegen[perso] -= Time.deltaTime;
-
-            if (timerRegen[perso] <= 0f)
+            foreach (PersonnageData perso in occupantsSnapshot)
             {
-                int gain = GetGainParTick(typeBesoin);
-                switch (typeBesoin)
-                {
-                    case TypeBesoin.Fatigue:
-                        perso.fatigue = Mathf.Min(100f, perso.fatigue + gain); break;
-                    case TypeBesoin.Faim:
-                        perso.faim = Mathf.Min(100f, perso.faim + gain); break;
-                    case TypeBesoin.Soif:
-                        perso.soif = Mathf.Min(100f, perso.soif + gain); break;
-                }
+                if (!tempsRestant.ContainsKey(perso)) continue;
 
-                tempsRestant[perso] -= 1f;
-                timerRegen[perso] = 1f;
-                if (tempsRestant[perso] <= 0f) finis.Add(perso);
+                timerRegen[perso] -= Time.deltaTime;
+
+                if (timerRegen[perso] <= 0f)
+                {
+                    int gain = GetGainParTick(typeBesoin);
+                    switch (typeBesoin)
+                    {
+                        case TypeBesoin.Fatigue:
+                            perso.fatigue = Mathf.Min(100f, perso.fatigue + gain);
+                            break;
+                        case TypeBesoin.Faim:
+                            perso.faim = Mathf.Min(100f, perso.faim + gain);
+                            break;
+                        case TypeBesoin.Soif:
+                            perso.soif = Mathf.Min(100f, perso.soif + gain);
+                            break;
+                    }
+
+                    tempsRestant[perso] -= 1f;
+                    timerRegen[perso] = 1f;
+
+                    if (tempsRestant[perso] <= 0f)
+                    {
+                        finis.Add(perso);
+                    }
+                }
             }
         }
 
-        // 🔁 Production
+        // 🔁 2. Production (séparé de la régénération)
         List<PersonnageData> producteurs = new(timerProduction.Keys);
         producteurs.RemoveAll(p => p == null);
         foreach (var key in new List<PersonnageData>(timerProduction.Keys))
         {
-            if (key == null) timerProduction.Remove(key);
+            if (key == null)
+                timerProduction.Remove(key);
         }
 
+
         Dictionary<PersonnageData, MetierProductionInfo> aRelancer = new();
+
         foreach (var producteur in producteurs)
         {
             timerProduction[producteur] -= Time.deltaTime;
@@ -250,28 +268,34 @@ public class BatimentInteractif : MonoBehaviour
                     bool ajouté = producteur.sacADos.Ajouter(info.ressourceProduite, info.quantiteProduite);
                     if (ajouté)
                     {
-                        Debug.Log($"[{name}] {producteur.name} a produit {info.quantiteProduite} {info.ressourceProduite}");
+                        Debug.Log($"[{name}] {producteur.name} a produit {info.quantiteProduite} {info.ressourceProduite} (dans son sac)");
                         aRelancer[producteur] = info;
                     }
                     else
                     {
-                        Debug.LogWarning($"[{name}] Sac plein pour {producteur.name} !");
+                        Debug.LogWarning($"[{name}] {producteur.name} n'a pas pu stocker {info.ressourceProduite} (sac plein)");
+
                         GameObject stockage = producteur.TrouverPlusProcheParTag("Stockage");
                         if (stockage != null)
                         {
                             producteur.cibleObjet = stockage;
                             producteur.DeplacerVers(stockage.transform.position);
+                            // Assure-toi que le personnage passera en mode AllerStockage
                         }
+
+                        // ❌ Pas de relance du timer ici pour éviter production infinie quand sac est plein
                     }
                 }
             }
         }
 
+        // 🔁 3. Redémarrer les timers de production
         foreach (var kvp in aRelancer)
         {
             timerProduction[kvp.Key] = kvp.Value.dureeProduction;
         }
 
+        // 🔁 4. Terminer les régénérations
         foreach (var p in finis)
         {
             occupants.Remove(p);
@@ -281,26 +305,28 @@ public class BatimentInteractif : MonoBehaviour
         }
     }
 
+
+
     private int GetGainParTick(TypeBesoin besoin)
     {
-        return besoin switch
+        switch (besoin)
         {
-            TypeBesoin.Fatigue => 5,
-            TypeBesoin.Faim => 10,
-            TypeBesoin.Soif => 10,
-            _ => 0
-        };
+            case TypeBesoin.Fatigue: return 5;
+            case TypeBesoin.Faim: return 10;
+            case TypeBesoin.Soif: return 10;
+            default: return 0;
+        }
     }
 
     private float GetTempsTotal(TypeBesoin besoin)
     {
-        return besoin switch
+        switch (besoin)
         {
-            TypeBesoin.Fatigue => 20f,
-            TypeBesoin.Faim => 10f,
-            TypeBesoin.Soif => 10f,
-            _ => 0f
-        };
+            case TypeBesoin.Fatigue: return 20f;
+            case TypeBesoin.Faim: return 10f;
+            case TypeBesoin.Soif: return 10f;
+            default: return 0f;
+        }
     }
 
     private void StockerDepuis(PersonnageData perso)
@@ -311,6 +337,7 @@ public class BatimentInteractif : MonoBehaviour
         if (string.IsNullOrEmpty(type)) return;
 
         int quantiteAvant = ObtenirQuantite(type);
+
         RessourceStockee existante = stock.Find(r => r.nom == type);
 
         if (existante != null)
@@ -331,11 +358,18 @@ public class BatimentInteractif : MonoBehaviour
             perso.sacADos.Vider();
         }
 
+        // 🔥 NOUVEAU : Notifier le ResourceManager des changements
         int quantiteApres = ObtenirQuantite(type);
-        if (quantiteAvant != quantiteApres && ResourceManager.Instance != null)
+        if (quantiteAvant != quantiteApres)
         {
-            ResourceManager.Instance.NotifyResourceChanged();
+            Debug.Log($"[Stockage {name}] {type}: {quantiteAvant} → {quantiteApres}");
+            if (ResourceManager.Instance != null)
+            {
+                ResourceManager.Instance.NotifyResourceChanged();
+            }
         }
+
+        Debug.Log($"[Stockage {name}] Contenu : " + string.Join(", ", stock.ConvertAll(r => $"{r.nom}:{r.quantite}")));
     }
 
     public int ObtenirQuantite(string ressource)
@@ -344,35 +378,61 @@ public class BatimentInteractif : MonoBehaviour
         return r != null ? r.quantite : 0;
     }
 
+    public List<RessourceStockee> GetAllStockedResources()
+    {
+        return new List<RessourceStockee>(stock);
+    }
+
     public int RetirerRessource(string nom, int quantiteVoulu)
     {
         var r = stock.Find(s => s.nom.Equals(nom, System.StringComparison.OrdinalIgnoreCase));
         if (r == null || r.quantite <= 0) return 0;
 
+        int quantiteAvant = r.quantite;
         int aRetirer = Mathf.Min(quantiteVoulu, r.quantite);
         r.quantite -= aRetirer;
-        if (r.quantite <= 0) stock.Remove(r);
-
-        if (aRetirer > 0 && ResourceManager.Instance != null)
+        
+        if (r.quantite <= 0) 
         {
-            ResourceManager.Instance.NotifyResourceChanged();
+            stock.Remove(r);
+        }
+
+        // 🔥 NOUVEAU : Notifier le ResourceManager des changements
+        if (aRetirer > 0)
+        {
+            Debug.Log($"[Stockage {name}] Retiré {aRetirer} x {nom} ({quantiteAvant} → {r?.quantite ?? 0})");
+            if (ResourceManager.Instance != null)
+            {
+                ResourceManager.Instance.NotifyResourceChanged();
+            }
         }
 
         return aRetirer;
     }
 
+    /// <summary>
+    /// 🔥 NOUVELLE MÉTHODE : Ajouter directement des ressources au stockage
+    /// Utile pour la production de bâtiments ou les récompenses
+    /// </summary>
     public bool AjouterRessource(string nom, int quantite)
     {
         if (string.IsNullOrEmpty(nom) || quantite <= 0) return false;
 
+        int quantiteAvant = ObtenirQuantite(nom);
         RessourceStockee existante = stock.Find(r => r.nom == nom);
+
         if (existante != null)
         {
             int ajoutPossible = Mathf.Min(maxParType - existante.quantite, quantite);
             if (ajoutPossible > 0)
             {
                 existante.quantite += ajoutPossible;
-                ResourceManager.Instance?.NotifyResourceChanged();
+                
+                Debug.Log($"[Stockage {name}] Ajouté {ajoutPossible} x {nom} ({quantiteAvant} → {existante.quantite})");
+                if (ResourceManager.Instance != null)
+                {
+                    ResourceManager.Instance.NotifyResourceChanged();
+                }
                 return true;
             }
         }
@@ -380,23 +440,38 @@ public class BatimentInteractif : MonoBehaviour
         {
             int ajout = Mathf.Min(maxParType, quantite);
             stock.Add(new RessourceStockee(nom, ajout));
-            ResourceManager.Instance?.NotifyResourceChanged();
+            
+            Debug.Log($"[Stockage {name}] Nouveau type ajouté: {ajout} x {nom}");
+            if (ResourceManager.Instance != null)
+            {
+                ResourceManager.Instance.NotifyResourceChanged();
+            }
             return true;
         }
 
-        return false;
+        return false; // Stockage plein
     }
 
+    /// <summary>
+    /// 🔥 NOUVELLE MÉTHODE : Obtenir l'espace libre pour un type de ressource
+    /// </summary>
     public int GetEspaceLibre(string nom)
     {
         RessourceStockee existante = stock.Find(r => r.nom == nom);
         if (existante != null)
+        {
             return maxParType - existante.quantite;
+        }
         else if (stock.Count < maxTypes)
+        {
             return maxParType;
+        }
         return 0;
     }
 
+    /// <summary>
+    /// 🔥 NOUVELLE MÉTHODE : Vérifier si le stockage peut accepter une certaine quantité
+    /// </summary>
     public bool PeutAccepter(string nom, int quantite)
     {
         return GetEspaceLibre(nom) >= quantite;

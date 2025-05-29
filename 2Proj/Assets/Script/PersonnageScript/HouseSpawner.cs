@@ -59,6 +59,7 @@ public class HouseSpawner : MonoBehaviour
         for (int i = 0; i < nombrePersonnagesMax; i++)
         {
             SpawnPersonnage();
+            ResourceManager.Instance.Add(ResourceType.Search, 1);
             yield return new WaitForSeconds(0.1f);
         }
 
@@ -83,6 +84,7 @@ public class HouseSpawner : MonoBehaviour
         {
             personnagesVivants.Add(personnageData);
             StartCoroutine(SurveillerPersonnage(personnageData));
+            // MetierAssignmentManager.Instance.TrouverDuJob(personnageData);
 
 
 
