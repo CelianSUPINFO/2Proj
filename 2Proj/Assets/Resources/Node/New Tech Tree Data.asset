@@ -161,7 +161,7 @@ MonoBehaviour:
     unlocked: 1
   - id: 25
     displayName: Stockage +
-    icon: {fileID: -4145918398515304283, guid: 26d435702dedb784694895af12418eff, type: 3}
+    icon: {fileID: -4632952011949136127, guid: bc014bc1b701eb8459480c776b44eaad, type: 3}
     cost: 10
     prerequisiteIds:
     - 20
@@ -203,7 +203,7 @@ MonoBehaviour:
     unlocked: 1
   - id: 34
     displayName: Usine d'outil
-    icon: {fileID: -8715952300590330243, guid: b3c08c7703ae40b4ebb09a563a2694d2, type: 3}
+    icon: {fileID: 143650519362993016, guid: bb422bfaf6ad5fc4d99989bbb953f5a0, type: 3}
     cost: 10
     prerequisiteIds:
     - 30

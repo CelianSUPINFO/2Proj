@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2bc76cb91bdb8bf4e934a0be13a71ece, type: 3}
+  m_Name: MineDePierre
+  m_EditorClassIdentifier: 
+  buildingName: Mine de Pierre
+  prefab: {fileID: 9032798326439436642, guid: 43600758204305e4a80d952dc4e70db1, type: 3}
+  unlockAge: 0
+  locked: 0
+  icon: {fileID: -8485238429189375801, guid: b6400b8aa13512140a5067a9f743dbd8, type: 3}
+  function: 4
+  cost:
+    resourceCosts:
+    - type: 0
+      amount: 20
+    - type: 1
+      amount: 10
+  capacity: 0
+  description: "Une zone d\xE9di\xE9 \xE0 la r\xE9colte de pierre."
