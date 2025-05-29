@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2bc76cb91bdb8bf4e934a0be13a71ece, type: 3}
+  m_Name: ImmeublePour12
+  m_EditorClassIdentifier: 
+  buildingName: Immeuble
+  prefab: {fileID: 9032798326439436642, guid: 331e0255fd45c8c4292fae97028f5714, type: 3}
+  unlockAge: 3
+  locked: 0
+  icon: {fileID: 3546764163808522946, guid: eebd0a4aaf2235545bc765d809e0e5d4, type: 3}
+  function: 0
+  cost:
+    resourceCosts:
+    - type: 7
+      amount: 40
+    - type: 12
+      amount: 30
+    - type: 13
+      amount: 20
+  capacity: 12
+  description: Un immeuble pour 12 personnes, de quoi accueillir plein de famille
+    !

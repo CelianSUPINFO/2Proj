@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2bc76cb91bdb8bf4e934a0be13a71ece, type: 3}
+  m_Name: Bar
+  m_EditorClassIdentifier: 
+  buildingName: Bar
+  prefab: {fileID: 9032798326439436642, guid: 0ccd1feba5920a4458f3c3360a19f03c, type: 3}
+  unlockAge: 2
+  locked: 0
+  icon: {fileID: 3737897332693287829, guid: 4758b62d0016153428528322f7f05187, type: 3}
+  function: 1
+  cost:
+    resourceCosts:
+    - type: 0
+      amount: 25
+    - type: 1
+      amount: 10
+    - type: 7
+      amount: 20
+  capacity: 6
+  description: "Boire un verre au bar pour bien se d\xE9salt\xE9rer"

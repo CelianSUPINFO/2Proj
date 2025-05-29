@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2bc76cb91bdb8bf4e934a0be13a71ece, type: 3}
+  m_Name: MineDeFer
+  m_EditorClassIdentifier: 
+  buildingName: Mine de fer
+  prefab: {fileID: 9032798326439436642, guid: 8a8b507dc839d4343a63aff8057648f7, type: 3}
+  unlockAge: 2
+  locked: 0
+  icon: {fileID: -4729462048328783126, guid: 326d198b53801f14c9029eea920098d3, type: 3}
+  function: 4
+  cost:
+    resourceCosts:
+    - type: 0
+      amount: 25
+    - type: 1
+      amount: 35
+    - type: 4
+      amount: 5
+  capacity: 6
+  description: "Une mine pour r\xE9colter du fer"

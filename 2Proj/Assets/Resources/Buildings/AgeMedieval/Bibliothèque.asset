@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2bc76cb91bdb8bf4e934a0be13a71ece, type: 3}
+  m_Name: "Biblioth\xE8que"
+  m_EditorClassIdentifier: 
+  buildingName: "Biblioth\xE8que"
+  prefab: {fileID: 9032798326439436642, guid: 32f470a5d376d5b49b3d9bee7f540c8a, type: 3}
+  unlockAge: 2
+  locked: 0
+  icon: {fileID: 393364619172556430, guid: 1f4c2b30c6ed53a4a9563c13c94cfac4, type: 3}
+  function: 6
+  cost:
+    resourceCosts:
+    - type: 0
+      amount: 25
+    - type: 4
+      amount: 10
+    - type: 7
+      amount: 25
+  capacity: 6
+  description: "Une biblioth\xE8que pour tous nous \xE9duquer"

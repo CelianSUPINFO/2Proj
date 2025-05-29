@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2bc76cb91bdb8bf4e934a0be13a71ece, type: 3}
+  m_Name: "Stockage avanc\xE9"
+  m_EditorClassIdentifier: 
+  buildingName: "Stockage avanc\xE9"
+  prefab: {fileID: 870588462395568201, guid: ea37613e4814b834eb1da33389ce51ce, type: 3}
+  unlockAge: 2
+  locked: 0
+  icon: {fileID: -4632952011949136127, guid: bc014bc1b701eb8459480c776b44eaad, type: 3}
+  function: 3
+  cost:
+    resourceCosts:
+    - type: 0
+      amount: 35
+    - type: 7
+      amount: 20
+    - type: 12
+      amount: 10
+  capacity: 6
+  description: "Une maison pr\xEAte \xE0 accueilir plein de ressources"

@@ -12,9 +12,9 @@ GameObject:
   - component: {fileID: 475265937618052408}
   - component: {fileID: 7446186184393414187}
   - component: {fileID: 5887112756866022967}
-  - component: {fileID: -8480676959420094740}
+  - component: {fileID: -4339634046297157397}
   m_Layer: 0
-  m_Name: stockage_1
+  m_Name: "stockage avanc\xE9"
   m_TagString: Stockage
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -79,7 +79,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 8
-  m_Sprite: {fileID: -7656482747145632760, guid: f4c0f7d8fe2ee36488b466a8f2dea7d4, type: 3}
+  m_Sprite: {fileID: -4632952011949136127, guid: bc014bc1b701eb8459480c776b44eaad, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -139,8 +139,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b4fe10620fe983b4d9e12a15d73cd6e1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  data: {fileID: 11400000, guid: 6a0e6f0df1384bd47b6be5e8eeb67306, type: 2}
---- !u!114 &-8480676959420094740
+  data: {fileID: 11400000, guid: fe385cc583928df44acd93197cd6b10c, type: 2}
+--- !u!114 &-4339634046297157397
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -156,6 +156,6 @@ MonoBehaviour:
   regenereBesoin: 0
   typeBesoin: 1
   estUnStockage: 1
-  maxTypes: 4
-  maxParType: 20
+  maxTypes: 10
+  maxParType: 40
   aFonctionPersonnalisee: 1

@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2bc76cb91bdb8bf4e934a0be13a71ece, type: 3}
+  m_Name: "Entrep\xF4t"
+  m_EditorClassIdentifier: 
+  buildingName: "Entrep\xF4t"
+  prefab: {fileID: 9032798326439436642, guid: 3de58d51ba3fb0c46a9894e9d9bffb7a, type: 3}
+  unlockAge: 3
+  locked: 0
+  icon: {fileID: 5955780380912161588, guid: 7d92e033bfcb7c94091412e02ee2096c, type: 3}
+  function: 1
+  cost:
+    resourceCosts:
+    - type: 7
+      amount: 40
+    - type: 1
+      amount: 50
+    - type: 13
+      amount: 25
+  capacity: 12
+  description: "D\xE9poser toutes les affaires dans notre entrep\xF4t dernier cri\n"

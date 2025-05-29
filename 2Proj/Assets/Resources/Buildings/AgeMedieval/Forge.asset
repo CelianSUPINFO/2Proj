@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2bc76cb91bdb8bf4e934a0be13a71ece, type: 3}
+  m_Name: Forge
+  m_EditorClassIdentifier: 
+  buildingName: Forge
+  prefab: {fileID: 9032798326439436642, guid: c8ed23c48d9848c4fbda91f21f3df57f, type: 3}
+  unlockAge: 2
+  locked: 0
+  icon: {fileID: 1298260404372906065, guid: 952d7cc5e2aea564ba80c106cb8b415c, type: 3}
+  function: 5
+  cost:
+    resourceCosts:
+    - type: 0
+      amount: 20
+    - type: 13
+      amount: 15
+    - type: 1
+      amount: 15
+  capacity: 6
+  description: "Forge d'outil pour am\xE9liorer les b\xE2timents"
