@@ -1,6 +1,8 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.Collections;
+using System.Linq;
+
 
 public enum TypeBesoin { Aucun, Fatigue, Faim, Soif }
 
@@ -30,12 +32,13 @@ public class BatimentInteractif : MonoBehaviour
         new MetierProductionInfo { metier = JobType.CarrierPierre, ressourceProduite = "Pierre", dureeProduction = 20f, quantiteProduite = 5 },
         new MetierProductionInfo { metier = JobType.CarrierFer, ressourceProduite = "Fer", dureeProduction = 30f, quantiteProduite = 5 },
         new MetierProductionInfo { metier = JobType.CarrierOr, ressourceProduite = "Or", dureeProduction = 40f, quantiteProduite = 5 },
-        new MetierProductionInfo { metier = JobType.FermierAnimaux, ressourceProduite = "Nourriture", dureeProduction = 20f, quantiteProduite = 5 },
+        new MetierProductionInfo { metier = JobType.FermierAnimaux, ressourceProduite = "Viande", dureeProduction = 20f, quantiteProduite = 5 },
         new MetierProductionInfo { metier = JobType.FermierBle, ressourceProduite = "Ble", dureeProduction = 30f, quantiteProduite = 5 },
         new MetierProductionInfo { metier = JobType.Chercheur, ressourceProduite = "Recherche", dureeProduction = 30f, quantiteProduite = 5 },
         new MetierProductionInfo { metier = JobType.Boulanger, ressourceProduite = "Pain", dureeProduction = 30f, transformation = true, ressourceRequise = "Ble", quantiteRequise = 5, quantiteProduite = 5 },
         new MetierProductionInfo { metier = JobType.Scieur, ressourceProduite = "Planche", dureeProduction = 30f, transformation = true, ressourceRequise = "Bois", quantiteRequise = 5, quantiteProduite = 5 },
         new MetierProductionInfo { metier = JobType.Pecheur, ressourceProduite = "Poisson", dureeProduction = 20f, quantiteProduite = 5 },
+        new MetierProductionInfo { metier = JobType.Forgeron, ressourceProduite = "Outil", dureeProduction = 30f, transformation = true, ressourceRequise = "fer", quantiteRequise = 5, quantiteProduite = 5 },
     };
 
 
@@ -165,7 +168,10 @@ public class BatimentInteractif : MonoBehaviour
                     }
                 }
 
-                timerProduction[perso] = info.dureeProduction;
+                float duree = info.dureeProduction;
+                if (perso.aOutil) duree /= 2f;
+                timerProduction[perso] = duree;
+
                 Debug.Log($"[PROD] {perso.name} commence la production de {info.ressourceProduite} ({info.dureeProduction}s)");
             }
         }
@@ -269,6 +275,30 @@ public class BatimentInteractif : MonoBehaviour
                     if (ajouté)
                     {
                         Debug.Log($"[{name}] {producteur.name} a produit {info.quantiteProduite} {info.ressourceProduite} (dans son sac)");
+                        if (info.ressourceProduite == "Outil")
+                        {
+                            int outilsDistribues = 0;
+                            for (int i = 0; i < info.quantiteProduite; i++)
+                            {
+                                var sansOutil = FindObjectsOfType<PersonnageData>()
+                                    .Where(p => !p.aOutil)
+                                    .OrderBy(_ => UnityEngine.Random.value)
+                                    .FirstOrDefault();
+
+                                if (sansOutil != null)
+                                {
+                                    sansOutil.aOutil = true;
+                                    outilsDistribues++;
+                                    Debug.Log($"[OUTIL] {sansOutil.name} a reçu un outil !");
+                                }
+                            }
+
+                            if (outilsDistribues > 0)
+                            {
+                                Debug.Log($"[OUTIL] {outilsDistribues} outils ont été distribués à des personnages.");
+                            }
+                        }
+
                         aRelancer[producteur] = info;
                     }
                     else
@@ -292,7 +322,10 @@ public class BatimentInteractif : MonoBehaviour
         // 🔁 3. Redémarrer les timers de production
         foreach (var kvp in aRelancer)
         {
-            timerProduction[kvp.Key] = kvp.Value.dureeProduction;
+            float duree = kvp.Value.dureeProduction;
+            if (kvp.Key.aOutil) duree /= 2f;
+            timerProduction[kvp.Key] = duree;
+
         }
 
         // 🔁 4. Terminer les régénérations

@@ -206,19 +206,30 @@ public class TechTreeUI : MonoBehaviour
             return;
         }
 
-        Vector2 start = fromBtn.GetComponent<RectTransform>().anchoredPosition;
-        Vector2 end = toBtn.GetComponent<RectTransform>().anchoredPosition;
+        RectTransform fromRT = fromBtn.GetComponent<RectTransform>();
+        RectTransform toRT = toBtn.GetComponent<RectTransform>();
 
-        Vector2 direction = end - start;
+        Vector2 fromPos = fromRT.anchoredPosition;
+        Vector2 toPos = toRT.anchoredPosition;
+
+        // === AJUSTEMENT VERTICAL ===
+        float verticalOffset = -200f; // décale les flèches un peu vers le bas
+        fromPos.y += verticalOffset;
+        toPos.y += verticalOffset;
+
+        float horizontalOffsset = 150f; // décale les flèches un peu vers le bas
+        fromPos.x += horizontalOffsset;
+        toPos.x += horizontalOffsset;
+
+        Vector2 direction = toPos - fromPos;
         float distance = direction.magnitude;
-
-        arrowRect.anchorMin = Vector2.zero;
-        arrowRect.anchorMax = Vector2.one;
-        arrowRect.offsetMin = Vector2.zero;
-        arrowRect.offsetMax = Vector2.zero;
-        arrowRect.sizeDelta = new Vector2(distance, 8f);
-        arrowRect.anchoredPosition = start + direction / 2f;
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+
+        arrowRect.anchorMin = new Vector2(0, 1);
+        arrowRect.anchorMax = new Vector2(0, 1);
+        arrowRect.pivot = new Vector2(0, 0.5f);
+        arrowRect.sizeDelta = new Vector2(distance, 8f);
+        arrowRect.anchoredPosition = fromPos;
         arrowRect.rotation = Quaternion.Euler(0, 0, angle);
 
         Image arrowImage = arrow.GetComponent<Image>();
@@ -226,7 +237,8 @@ public class TechTreeUI : MonoBehaviour
         {
             if (arrowImage.sprite == null)
                 arrowImage.sprite = Resources.GetBuiltinResource<Sprite>("UI/Skin/Knob.psd");
-            arrowImage.color = Color.red;
+
+            arrowImage.color = Color.white;
             arrowImage.raycastTarget = false;
             arrowImage.type = Image.Type.Sliced;
         }
@@ -234,33 +246,35 @@ public class TechTreeUI : MonoBehaviour
         arrow.transform.SetAsLastSibling();
     }
 
+
+
     void CreateSimpleArrow(GameObject fromBtn, GameObject toBtn)
     {
-        GameObject arrow = new GameObject("SimpleArrow");
+        GameObject arrow = new GameObject("SimpleArrow", typeof(RectTransform));
         arrow.transform.SetParent(arrowContainer.transform, false);
 
         Image arrowImage = arrow.AddComponent<Image>();
-        arrowImage.color = Color.yellow;
+        arrowImage.color = Color.white;
         arrowImage.raycastTarget = false;
+        arrowImage.sprite = Resources.GetBuiltinResource<Sprite>("UI/Skin/Knob.psd");
 
         RectTransform arrowRect = arrow.GetComponent<RectTransform>();
 
-        Vector2 start = fromBtn.GetComponent<RectTransform>().anchoredPosition;
-        Vector2 end = toBtn.GetComponent<RectTransform>().anchoredPosition;
-        Vector2 direction = end - start;
+        Vector2 fromPos = fromBtn.GetComponent<RectTransform>().anchoredPosition;
+        Vector2 toPos = toBtn.GetComponent<RectTransform>().anchoredPosition;
+
+        Vector2 direction = toPos - fromPos;
         float distance = direction.magnitude;
-
-        arrowRect.anchorMin = Vector2.zero;
-        arrowRect.anchorMax = Vector2.one;
-        arrowRect.offsetMin = Vector2.zero;
-        arrowRect.offsetMax = Vector2.zero;
-        arrowRect.sizeDelta = new Vector2(distance, 10f);
-        arrowRect.anchoredPosition = start + direction / 2;
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-        arrowRect.rotation = Quaternion.Euler(0, 0, angle);
 
-        arrow.transform.SetAsLastSibling();
+        arrowRect.anchorMin = new Vector2(0, 1);
+        arrowRect.anchorMax = new Vector2(0, 1);
+        arrowRect.pivot = new Vector2(0, 0.5f);
+        arrowRect.sizeDelta = new Vector2(distance, 8f);
+        arrowRect.anchoredPosition = fromPos;
+        arrowRect.rotation = Quaternion.Euler(0, 0, angle);
     }
+
 
     // --- LOGIQUE DES NOEUDS (identique à la tienne) ---
     Dictionary<string, TreeNode> BuildTreeGraph()
@@ -365,7 +379,7 @@ public class TechTreeUI : MonoBehaviour
                 buildingBarUI.RefreshBar(AgeManager.Instance.GetCurrentAge());
                 break;
             case "2":
-                BuildingManager.UnlockBuilding("Stockage");
+                BuildingManager.UnlockBuilding("Cabane en pierre");
                 buildingBarUI.RefreshBar(AgeManager.Instance.GetCurrentAge());
                 break;
             case "3":

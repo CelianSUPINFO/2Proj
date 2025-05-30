@@ -14,6 +14,7 @@ public class PersonnageTooltipUI : MonoBehaviour
     public TMP_Text fatigueText;
     public TMP_Text metierText;
     public TMP_Text sacText;
+    public TMP_Text outilText; 
 
     private PersonnageData personnageActuel;
 
@@ -69,5 +70,8 @@ public class PersonnageTooltipUI : MonoBehaviour
             sacText.text = $"Sac : {personnageActuel.sacADos.ressourceActuelle} x{personnageActuel.sacADos.quantite}";
         else
             sacText.text = "Sac : Vide";
+
+        
+        outilText.text = personnageActuel.aOutil ? "Outil : Oui" : "Outil : Non";
     }
 }

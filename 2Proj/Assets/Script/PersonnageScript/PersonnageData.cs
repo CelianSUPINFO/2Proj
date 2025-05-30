@@ -15,7 +15,8 @@ public enum JobType
     Chercheur,
     Boulanger,
     Scieur,
-    Pecheur
+    Pecheur, 
+    Forgeron,
 }
 
 [System.Serializable]
@@ -136,6 +137,8 @@ public class Backpack
 public class PersonnageData : MonoBehaviour
 {
     public BatimentInteractif batimentAssigné;
+    [Header("Équipement")]
+    public bool aOutil = false;
 
     [HideInInspector] public bool enRegeneration = false;
     [Header("Stats")] public float vie = 100f, faim = 100f, soif = 100f, fatigue = 100f;
