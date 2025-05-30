@@ -68,14 +68,11 @@ MonoBehaviour:
     cost: 10
     prerequisiteIds:
     - 2
-    - 0
-    - 0
-    - 0
     unlocked: 1
   - id: 10
     displayName: Pythagore ?
     icon: {fileID: -4954164978722355842, guid: 26d435702dedb784694895af12418eff, type: 3}
-    cost: 10
+    cost: 200
     prerequisiteIds:
     - 0
     unlocked: 1
@@ -137,7 +134,7 @@ MonoBehaviour:
     cost: 10
     prerequisiteIds:
     - 20
-    unlocked: 1
+    unlocked: 0
   - id: 22
     displayName: "Bar \xE0 Boisson"
     icon: {fileID: 3737897332693287829, guid: 4758b62d0016153428528322f7f05187, type: 3}

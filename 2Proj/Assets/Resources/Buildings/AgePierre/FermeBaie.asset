@@ -15,7 +15,7 @@ MonoBehaviour:
   buildingName: Ferme de Baie
   prefab: {fileID: 9032798326439436642, guid: 43be10e0d5c16ca44aa46e9aab2ec080, type: 3}
   unlockAge: 0
-  locked: 0
+  locked: 1
   icon: {fileID: 8713119064123441593, guid: 4bc3edcaaeac67948a8d4570d5cc0cdc, type: 3}
   function: 1
   cost:

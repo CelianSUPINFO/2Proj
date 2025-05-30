@@ -17,7 +17,7 @@ public class TechTreeUI : MonoBehaviour
     [Header("Références")]
     public GameObject treePanel;
     public GameObject techNodePrefab;
-    public Transform nodesParent;
+    public Transform nodesParent; // Content du ScrollRect
     public TechTreeData techTreeData;
 
     [SerializeField] private GameObject arrowPrefab;
@@ -26,8 +26,9 @@ public class TechTreeUI : MonoBehaviour
     private Dictionary<string, GameObject> nodeButtons = new();
     private GameObject arrowContainer;
 
-    private float nodeSpacingX = 180f;
-    private float nodeSpacingY = 200f;
+    // Espacement configurable
+    [SerializeField] private float nodeSpacingX = 250f;
+    [SerializeField] private float nodeSpacingY = 200f;
 
     void Start()
     {
@@ -44,85 +45,67 @@ public class TechTreeUI : MonoBehaviour
         treePanel.SetActive(!treePanel.activeSelf);
     }
 
-    // --- Arbre logique ---
-
-    Dictionary<string, TreeNode> BuildTreeGraph()
-    {
-        Dictionary<string, TreeNode> allNodes = new();
-
-        foreach (var tech in techTreeData.techNodes)
-            allNodes[tech.id] = new TreeNode { data = tech };
-
-        foreach (var node in allNodes.Values)
-        {
-            foreach (string prereqId in node.data.prerequisiteIds)
-            {
-                if (allNodes.TryGetValue(prereqId, out var parent))
-                {
-                    parent.children.Add(node);
-                    node.depth = Mathf.Max(node.depth, parent.depth + 1);
-                }
-            }
-        }
-
-        return allNodes;
-    }
-
-    float LayoutTree(TreeNode node, float x = 0)
-    {
-        if (node.children.Count == 0)
-        {
-            node.position = new Vector2(x, -node.depth * nodeSpacingY);
-            return x + nodeSpacingX;
-        }
-
-        float currentX = x;
-        foreach (var child in node.children)
-            currentX = LayoutTree(child, currentX);
-
-        float left = node.children.First().position.x;
-        float right = node.children.Last().position.x;
-        float center = (left + right) / 2f;
-
-        node.position = new Vector2(center, -node.depth * nodeSpacingY);
-        return currentX;
-    }
-
-    // --- Génération ---
-
+    // --- AFFICHAGE ET LAYOUT ---
     void LayoutAndInstantiateTree()
     {
+        // 1. Nettoyage ancien affichage
         foreach (Transform child in nodesParent) Destroy(child.gameObject);
         nodeButtons.Clear();
-
-        // Créer le conteneur de flèches APRÈS les nœuds (pour qu'il soit devant)
         if (arrowContainer != null) Destroy(arrowContainer);
-        
+
+        // 2. Création du graphe logique
         var graph = BuildTreeGraph();
 
-        // Trouver racines (sans prerequisite)
+        // 3. Détection des racines
         var roots = graph.Values
             .Where(n => n.data.prerequisiteIds == null || n.data.prerequisiteIds.Count == 0)
             .ToList();
 
-        float startX = 0;
+        // 4. Placement logique de chaque nœud (LayoutTree modifie node.position)
+        float startX = -50;
         foreach (var root in roots)
             startX = LayoutTree(root, startX);
 
-        // Générer boutons D'ABORD
+        // 5. Calculer min/max
+        float minX = float.MaxValue, maxX = float.MinValue;
+        float minY = float.MaxValue, maxY = float.MinValue;
+        foreach (var node in graph.Values)
+        {
+            minX = Mathf.Min(minX, node.position.x);
+            maxX = Mathf.Max(maxX, node.position.x);
+            minY = Mathf.Min(minY, node.position.y);
+            maxY = Mathf.Max(maxY, node.position.y);
+        }
+
+        // 6. Décaler tous les noeuds pour minX=0 (gauche) et maxY=0 (haut), avec marge
+        float margeX = 30f; // marge à gauche
+        float margeY = 30f; // marge en haut
+
+        foreach (var node in graph.Values)
+        {
+            node.position.x = node.position.x - minX + margeX;
+            node.position.y = node.position.y - maxY + margeY;
+        }
+
+        // 7. Instanciation des boutons aux bonnes positions
         foreach (var node in graph.Values)
             InstantiateTreeNode(node);
 
-        // Créer le conteneur de flèches APRÈS les nœuds
+        // 8. Détermination de la taille idéale du content
+        float treeWidth = (maxX - minX) + nodeSpacingX + margeX * 2;
+        float treeHeight = (maxY - minY) + nodeSpacingY + margeY * 2;
+        var nodesParentRect = nodesParent.GetComponent<RectTransform>();
+        nodesParentRect.sizeDelta = new Vector2(treeWidth, treeHeight);
+
+        // 9. PAS de centrage automatique ! Content est ancré haut gauche.
+
+        // 10. Génération des flèches (APRÈS tous les boutons)
         arrowContainer = new GameObject("ArrowLines");
         arrowContainer.transform.SetParent(nodesParent, false);
-        
-        // Ajouter un Canvas Group pour contrôler l'ordre de rendu
         CanvasGroup arrowCanvasGroup = arrowContainer.AddComponent<CanvasGroup>();
         arrowCanvasGroup.interactable = false;
         arrowCanvasGroup.blocksRaycasts = false;
 
-        // Générer flèches APRÈS (pour avoir les positions correctes)
         foreach (var node in graph.Values)
         {
             foreach (var child in node.children)
@@ -135,9 +118,38 @@ public class TechTreeUI : MonoBehaviour
             }
         }
 
-        // Appliquer couleur visuelle
-        foreach (var node in techTreeData.techNodes)
-            UpdateNodeVisual(nodeButtons[node.id], node);
+        // 11. Met à jour la couleur/état de chaque nœud selon son statut
+        foreach (var node in techTreeData.techNodes){
+            UpdateNodeVisual(nodeButtons[node.id], node);}
+
+        // === Ajustement dynamique du content ===
+        Vector2 min = Vector2.positiveInfinity;
+        Vector2 max = Vector2.negativeInfinity;
+
+        foreach (var node in graph.Values)
+        {
+            Vector2 pos = node.position;
+            min = Vector2.Min(min, pos);
+            max = Vector2.Max(max, pos);
+        }
+
+        float padding = 200f;
+
+        RectTransform contentRT = nodesParent.GetComponent<RectTransform>();
+        contentRT.sizeDelta = new Vector2(
+            max.x - min.x + padding * 2,
+            Mathf.Abs(min.y - max.y) + padding * 2
+        );
+
+        // Recentrage des nodes
+        Vector2 offset = new Vector2(padding - min.x, padding - max.y);
+        foreach (var kv in nodeButtons)
+        {
+            RectTransform rt = kv.Value.GetComponent<RectTransform>();
+            rt.anchoredPosition += offset;
+        }
+
+
     }
 
     void InstantiateTreeNode(TreeNode node)
@@ -178,11 +190,10 @@ public class TechTreeUI : MonoBehaviour
 
     void DrawArrow(GameObject fromBtn, GameObject toBtn)
     {
-        // Vérification du prefab
         if (arrowPrefab == null)
         {
             Debug.LogError("ArrowPrefab n'est pas assigné !");
-            CreateSimpleArrow(fromBtn, toBtn); // Fallback
+            CreateSimpleArrow(fromBtn, toBtn); // fallback
             return;
         }
 
@@ -201,89 +212,108 @@ public class TechTreeUI : MonoBehaviour
         Vector2 direction = end - start;
         float distance = direction.magnitude;
 
-        // Configuration pour remplir toute la zone
         arrowRect.anchorMin = Vector2.zero;
         arrowRect.anchorMax = Vector2.one;
         arrowRect.offsetMin = Vector2.zero;
         arrowRect.offsetMax = Vector2.zero;
-        
-        // Taille correcte pour la distance
         arrowRect.sizeDelta = new Vector2(distance, 8f);
-        arrowRect.anchoredPosition = start + direction / 2;
-        
+        arrowRect.anchoredPosition = start + direction / 2f;
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
         arrowRect.rotation = Quaternion.Euler(0, 0, angle);
 
-        // S'assurer que la flèche est visible au premier plan
         Image arrowImage = arrow.GetComponent<Image>();
         if (arrowImage != null)
         {
-            // Forcer un sprite visible si celui du prefab ne fonctionne pas
             if (arrowImage.sprite == null)
-            {
-                // Utiliser le sprite par défaut d'Unity (carré blanc)
                 arrowImage.sprite = Resources.GetBuiltinResource<Sprite>("UI/Skin/Knob.psd");
-            }
-            
-            arrowImage.color = Color.red; // Rouge pour être bien visible
-            arrowImage.raycastTarget = false; // Évite d'intercepter les clics
-            arrowImage.type = Image.Type.Sliced; // Pour bien s'étirer
+            arrowImage.color = Color.red;
+            arrowImage.raycastTarget = false;
+            arrowImage.type = Image.Type.Sliced;
         }
 
-        // Mettre la flèche au premier plan
         arrow.transform.SetAsLastSibling();
-
-        Debug.Log($"Flèche créée de {fromBtn.name} vers {toBtn.name} - Distance: {distance}");
     }
 
-    // Méthode fallback pour créer une flèche simple si le prefab manque
     void CreateSimpleArrow(GameObject fromBtn, GameObject toBtn)
     {
         GameObject arrow = new GameObject("SimpleArrow");
         arrow.transform.SetParent(arrowContainer.transform, false);
-        
+
         Image arrowImage = arrow.AddComponent<Image>();
-        arrowImage.color = Color.yellow; // Couleur visible pour debug
+        arrowImage.color = Color.yellow;
         arrowImage.raycastTarget = false;
-        
+
         RectTransform arrowRect = arrow.GetComponent<RectTransform>();
-        
+
         Vector2 start = fromBtn.GetComponent<RectTransform>().anchoredPosition;
         Vector2 end = toBtn.GetComponent<RectTransform>().anchoredPosition;
-
         Vector2 direction = end - start;
         float distance = direction.magnitude;
 
-        // Configuration pour remplir la zone correctement
         arrowRect.anchorMin = Vector2.zero;
         arrowRect.anchorMax = Vector2.one;
         arrowRect.offsetMin = Vector2.zero;
         arrowRect.offsetMax = Vector2.zero;
-        
-        arrowRect.sizeDelta = new Vector2(distance, 10f); // Plus épais pour être visible
+        arrowRect.sizeDelta = new Vector2(distance, 10f);
         arrowRect.anchoredPosition = start + direction / 2;
-        
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
         arrowRect.rotation = Quaternion.Euler(0, 0, angle);
-        
-        // Mettre au premier plan
+
         arrow.transform.SetAsLastSibling();
-        
-        Debug.Log($"Flèche simple créée de {fromBtn.name} vers {toBtn.name}");
     }
 
-    // --- Logique techs ---
+    // --- LOGIQUE DES NOEUDS (identique à la tienne) ---
+    Dictionary<string, TreeNode> BuildTreeGraph()
+    {
+        Dictionary<string, TreeNode> allNodes = new();
 
+        foreach (var tech in techTreeData.techNodes)
+            allNodes[tech.id] = new TreeNode { data = tech };
+
+        foreach (var node in allNodes.Values)
+        {
+            foreach (string prereqId in node.data.prerequisiteIds)
+            {
+                if (allNodes.TryGetValue(prereqId, out var parent))
+                {
+                    parent.children.Add(node);
+                    node.depth = Mathf.Max(node.depth, parent.depth + 1);
+                }
+            }
+        }
+
+        return allNodes;
+    }
+
+    float LayoutTree(TreeNode node, float x = -50)
+    {
+        if (node.children.Count == 0)
+        {
+            node.position = new Vector2(x, -node.depth * nodeSpacingY);
+            return x + nodeSpacingX;
+        }
+
+        float currentX = x;
+        foreach (var child in node.children)
+            currentX = LayoutTree(child, currentX);
+
+        float left = node.children.First().position.x;
+        float right = node.children.Last().position.x;
+        float center = (left + right) / 2f;
+
+        node.position = new Vector2(center, -node.depth * nodeSpacingY);
+        return currentX;
+    }
+
+    // --- LOGIQUE DE DEBLOCAGE ---
     void TryUnlock(string nodeId)
     {
         var node = techTreeData.techNodes.Find(n => n.id == nodeId);
         if (node == null || node.unlocked) return;
-
         if (!ArePrerequisitesMet(node)) return;
         if (!ResourceManager.Instance.HasEnough(ResourceType.Search, node.cost)) return;
 
         ResourceManager.Instance.Spend(ResourceType.Search, node.cost);
-
         node.unlocked = true;
         UpdateNodeVisual(nodeButtons[nodeId], node);
         ApplyTechEffect(node.id);
@@ -300,17 +330,17 @@ public class TechTreeUI : MonoBehaviour
         if (node.unlocked)
         {
             image.color = Color.green;
-            btn.interactable = false; // débloqué = non-cliquable
+            btn.interactable = false;
         }
         else if (ArePrerequisitesMet(node))
         {
             image.color = Color.white;
-            btn.interactable = true;  // prêt à être débloqué
+            btn.interactable = true;
         }
         else
         {
             image.color = Color.gray;
-            btn.interactable = false; // verrouillé
+            btn.interactable = false;
         }
     }
 
@@ -318,7 +348,6 @@ public class TechTreeUI : MonoBehaviour
     {
         if (node.prerequisiteIds == null || node.prerequisiteIds.Count == 0)
             return true;
-            
         return node.prerequisiteIds.All(id =>
             techTreeData.techNodes.Find(n => n.id == id)?.unlocked == true);
     }
@@ -335,9 +364,115 @@ public class TechTreeUI : MonoBehaviour
                 BuildingManager.UnlockBuilding("Puit");
                 buildingBarUI.RefreshBar(AgeManager.Instance.GetCurrentAge());
                 break;
+            case "2":
+                BuildingManager.UnlockBuilding("Stockage");
+                buildingBarUI.RefreshBar(AgeManager.Instance.GetCurrentAge());
+                break;
+            case "3":
+                BuildingManager.UnlockBuilding("Ferme de Baie");
+                buildingBarUI.RefreshBar(AgeManager.Instance.GetCurrentAge());
+                break;
+            case "4":
+                BuildingManager.UnlockBuilding("Zone de bois");
+                buildingBarUI.RefreshBar(AgeManager.Instance.GetCurrentAge());
+                break;
+            case "5":
+                // Sac +
+                break;
+            case "6":
+                BuildingManager.UnlockBuilding("Mine de Pierre");
+                buildingBarUI.RefreshBar(AgeManager.Instance.GetCurrentAge());
+                break;
+            case "7":
+                BuildingManager.UnlockBuilding("Port");
+                buildingBarUI.RefreshBar(AgeManager.Instance.GetCurrentAge());
+                break;
             case "10":
                 AgeManager.Instance.AdvanceToNextAge();
                 break;
+            case "11":
+                BuildingManager.UnlockBuilding("Maison Pour 4");
+                buildingBarUI.RefreshBar(AgeManager.Instance.GetCurrentAge());
+                break;
+            case "12":
+                BuildingManager.UnlockBuilding("Ferme de blé");
+                buildingBarUI.RefreshBar(AgeManager.Instance.GetCurrentAge());
+                break;
+            case "13":
+                BuildingManager.UnlockBuilding("Peche");
+                buildingBarUI.RefreshBar(AgeManager.Instance.GetCurrentAge());
+                break;
+            case "14":
+                BuildingManager.UnlockBuilding("Etable");
+                buildingBarUI.RefreshBar(AgeManager.Instance.GetCurrentAge());
+                break;
+            case "15":
+                BuildingManager.UnlockBuilding("Scierie");
+                buildingBarUI.RefreshBar(AgeManager.Instance.GetCurrentAge());
+                break;
+            case "16":
+                BuildingManager.UnlockBuilding("Eglise");
+                buildingBarUI.RefreshBar(AgeManager.Instance.GetCurrentAge());
+                break;
+            case "20":
+                AgeManager.Instance.AdvanceToNextAge();
+                break;
+            case "21":
+                BuildingManager.UnlockBuilding("Maison Pour 6");
+                buildingBarUI.RefreshBar(AgeManager.Instance.GetCurrentAge());
+                break;
+            case "22":
+                BuildingManager.UnlockBuilding("Bar");
+                buildingBarUI.RefreshBar(AgeManager.Instance.GetCurrentAge());
+                break;
+            case "23":
+                BuildingManager.UnlockBuilding("Forge");
+                buildingBarUI.RefreshBar(AgeManager.Instance.GetCurrentAge());
+                break;
+            case "24":
+                BuildingManager.UnlockBuilding("Mine de fer");
+                buildingBarUI.RefreshBar(AgeManager.Instance.GetCurrentAge());
+                break;
+            case "25":
+                BuildingManager.UnlockBuilding("Stockage Avance");
+                buildingBarUI.RefreshBar(AgeManager.Instance.GetCurrentAge());
+                break;
+            case "26":
+                BuildingManager.UnlockBuilding("Bibliotheque");
+                buildingBarUI.RefreshBar(AgeManager.Instance.GetCurrentAge());
+                break;
+            case "30":
+                AgeManager.Instance.AdvanceToNextAge();
+                break;
+            case "31":
+                BuildingManager.UnlockBuilding("Immeuble");
+                buildingBarUI.RefreshBar(AgeManager.Instance.GetCurrentAge());
+                break;
+            case "32":
+                BuildingManager.UnlockBuilding("Mine d'or");
+                buildingBarUI.RefreshBar(AgeManager.Instance.GetCurrentAge());
+                break;
+            case "33":
+                BuildingManager.UnlockBuilding("Boulangerie industrielle");
+                buildingBarUI.RefreshBar(AgeManager.Instance.GetCurrentAge());
+                break;
+            case "34":
+                BuildingManager.UnlockBuilding("Usine d'outil");
+                buildingBarUI.RefreshBar(AgeManager.Instance.GetCurrentAge());
+                break;
+            case "35":
+                BuildingManager.UnlockBuilding("Entrepot");
+                buildingBarUI.RefreshBar(AgeManager.Instance.GetCurrentAge());
+                break;
+            case "36":
+                BuildingManager.UnlockBuilding("Grand port");
+                buildingBarUI.RefreshBar(AgeManager.Instance.GetCurrentAge());
+                break;
+            case "37":
+                BuildingManager.UnlockBuilding("Laboratoire");
+                buildingBarUI.RefreshBar(AgeManager.Instance.GetCurrentAge());
+                break;
         }
     }
+
 }

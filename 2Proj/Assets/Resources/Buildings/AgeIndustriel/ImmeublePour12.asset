@@ -15,14 +15,14 @@ MonoBehaviour:
   buildingName: Immeuble
   prefab: {fileID: 9032798326439436642, guid: 331e0255fd45c8c4292fae97028f5714, type: 3}
   unlockAge: 3
-  locked: 0
+  locked: 1
   icon: {fileID: 3546764163808522946, guid: eebd0a4aaf2235545bc765d809e0e5d4, type: 3}
   function: 0
   cost:
     resourceCosts:
     - type: 7
       amount: 40
-    - type: 12
+    - type: 1
       amount: 30
     - type: 13
       amount: 20

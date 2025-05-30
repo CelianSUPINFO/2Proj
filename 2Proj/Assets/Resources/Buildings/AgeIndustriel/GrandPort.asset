@@ -15,7 +15,7 @@ MonoBehaviour:
   buildingName: Grand port
   prefab: {fileID: 9032798326439436642, guid: 69f4ada494a2e12499126a0be666057c, type: 3}
   unlockAge: 3
-  locked: 0
+  locked: 1
   icon: {fileID: 2533548304019223795, guid: 027b12124b2c55b4ebabd68eaa0f3e08, type: 3}
   function: 9
   cost:

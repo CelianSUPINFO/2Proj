@@ -15,7 +15,7 @@ MonoBehaviour:
   buildingName: Boulangerie
   prefab: {fileID: 9032798326439436642, guid: 6f90b567c9ed1a84fab7150352ae7ae2, type: 3}
   unlockAge: 2
-  locked: 0
+  locked: 1
   icon: {fileID: 7648446683007888229, guid: 978049b444d8f234b86c5511a36e1b7b, type: 3}
   function: 1
   cost:

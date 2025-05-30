@@ -15,7 +15,7 @@ MonoBehaviour:
   buildingName: Maison Pour 4
   prefab: {fileID: 9032798326439436642, guid: 366cc931ecfa6fc4282e40ef0aa785a1, type: 3}
   unlockAge: 1
-  locked: 0
+  locked: 1
   icon: {fileID: 21300000, guid: 93b2a1ddff9b9a04a805822eb31253bb, type: 3}
   function: 0
   cost:
@@ -24,7 +24,5 @@ MonoBehaviour:
       amount: 20
     - type: 1
       amount: 10
-    - type: 4
-      amount: 5
   capacity: 4
   description: Une belle maison pour une simple famille

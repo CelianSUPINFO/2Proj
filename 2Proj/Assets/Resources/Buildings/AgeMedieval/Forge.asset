@@ -15,7 +15,7 @@ MonoBehaviour:
   buildingName: Forge
   prefab: {fileID: 9032798326439436642, guid: c8ed23c48d9848c4fbda91f21f3df57f, type: 3}
   unlockAge: 2
-  locked: 0
+  locked: 1
   icon: {fileID: 1298260404372906065, guid: 952d7cc5e2aea564ba80c106cb8b415c, type: 3}
   function: 5
   cost:
