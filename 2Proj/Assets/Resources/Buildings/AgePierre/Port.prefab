@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: -4339634046297157397}
   m_Layer: 7
   m_Name: Port
-  m_TagString: Untagged
+  m_TagString: Port
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -229,5 +229,10 @@ MonoBehaviour:
     quantiteProduite: 5
   maxTypes: 4
   maxParType: 20
-  aFonctionPersonnalisee: 0
+  estUnPort: 1
+  portCible: {fileID: 0}
+  "delaiTravers\xE9e": 5
+  bateauPrefab: {fileID: 1911912008391190962, guid: 0ab6d95816729cf47bc177db8fc74878, type: 3}
+  pointDepartBateau: {fileID: 0}
+  pointArriveeBateau: {fileID: 0}
   metierAssocie: 0

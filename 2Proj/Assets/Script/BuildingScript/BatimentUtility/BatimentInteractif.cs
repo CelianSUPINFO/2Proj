@@ -42,7 +42,7 @@ public class BatimentInteractif : MonoBehaviour
     };
 
 
-   
+
 
 
     [System.Serializable]
@@ -62,12 +62,22 @@ public class BatimentInteractif : MonoBehaviour
     public int maxTypes = 4;
     public int maxParType = 20;
 
-    [Header("Extension future")]
-    public bool aFonctionPersonnalisee = false;
+
 
     private List<PersonnageData> occupants = new List<PersonnageData>();
     private Dictionary<PersonnageData, float> tempsRestant = new Dictionary<PersonnageData, float>();
     private Dictionary<PersonnageData, float> timerRegen = new Dictionary<PersonnageData, float>();
+
+    [Header("Port")]
+    public bool estUnPort = false;
+    public BatimentInteractif portCible;
+    public float delaiTraversée = 5f;
+
+    [Header("Animation bateau")]
+    public GameObject bateauPrefab;
+    public Transform pointDepartBateau;
+    public Transform pointArriveeBateau;
+
 
 
 
@@ -75,15 +85,23 @@ public class BatimentInteractif : MonoBehaviour
     public JobType metierAssocie;
     private List<PersonnageData> travailleursActuels = new List<PersonnageData>();
 
+    private bool dejaInitialise = false;
+    private bool pointsInitialises = false;
+
+
 
     private void Start()
     {
+        if (estUnPort)
+        {
+            InitialiserPointsBateau();
+        }
         Debug.Log($"[Batiment {name}] Initialisation et tentative d'assignation de métier.");
         if (metierAssocie != JobType.Aucun)
             StartCoroutine(AssignerTravailleursInitiaux());
     }
 
-    
+
 
     private IEnumerator AssignerTravailleursInitiaux()
     {
@@ -125,8 +143,8 @@ public class BatimentInteractif : MonoBehaviour
     public void GererMortTravailleur(PersonnageData mort)
     {
         Debug.Log($"mort et gestion {mort.name}");
-        
-       
+
+
         if (!regenereBesoin && !estUnStockage)
         {
             Debug.Log("mort et gestion       ok");
@@ -176,6 +194,14 @@ public class BatimentInteractif : MonoBehaviour
             }
         }
 
+        // Si c'est un port, initier traversée
+        if (estUnPort && portCible != null)
+        {
+            StartCoroutine(TraverserAvecBateau(perso));
+            return;
+        }
+
+
 
         // 🔁 Régénération, si activée
         if (regenereBesoin)
@@ -185,7 +211,7 @@ public class BatimentInteractif : MonoBehaviour
             perso.enRegeneration = true;
         }
 
-        
+
 
         // Si c'est un bâtiment de stockage
         if (estUnStockage && perso.sacADos.quantite > 0)
@@ -193,7 +219,7 @@ public class BatimentInteractif : MonoBehaviour
             StockerDepuis(perso);
         }
     }
-    
+
     private void OnTriggerExit2D(Collider2D other)
     {
         if (!other.TryGetComponent(out PersonnageData perso)) return;
@@ -208,9 +234,22 @@ public class BatimentInteractif : MonoBehaviour
 
     private void Update()
     {
+
+        if (estUnPort && portCible == null)
+        {
+            portCible = TrouverPortLePlusProche();
+        }
+
+        if (estUnPort && portCible != null && !pointsInitialises)
+        {
+            InitialiserPointsBateau();
+            pointsInitialises = true;
+        }
+
+
         occupants.RemoveAll(p => p == null);
-        
-    
+
+
         List<PersonnageData> finis = new();
         List<PersonnageData> occupantsSnapshot = new(occupants); // éviter modification pendant boucle
 
@@ -424,8 +463,8 @@ public class BatimentInteractif : MonoBehaviour
         int quantiteAvant = r.quantite;
         int aRetirer = Mathf.Min(quantiteVoulu, r.quantite);
         r.quantite -= aRetirer;
-        
-        if (r.quantite <= 0) 
+
+        if (r.quantite <= 0)
         {
             stock.Remove(r);
         }
@@ -460,7 +499,7 @@ public class BatimentInteractif : MonoBehaviour
             if (ajoutPossible > 0)
             {
                 existante.quantite += ajoutPossible;
-                
+
                 Debug.Log($"[Stockage {name}] Ajouté {ajoutPossible} x {nom} ({quantiteAvant} → {existante.quantite})");
                 if (ResourceManager.Instance != null)
                 {
@@ -473,7 +512,7 @@ public class BatimentInteractif : MonoBehaviour
         {
             int ajout = Mathf.Min(maxParType, quantite);
             stock.Add(new RessourceStockee(nom, ajout));
-            
+
             Debug.Log($"[Stockage {name}] Nouveau type ajouté: {ajout} x {nom}");
             if (ResourceManager.Instance != null)
             {
@@ -509,4 +548,105 @@ public class BatimentInteractif : MonoBehaviour
     {
         return GetEspaceLibre(nom) >= quantite;
     }
+
+    private IEnumerator TraverserAvecBateau(PersonnageData perso)
+    {
+        Debug.Log($"[PORT] {perso.name} embarque sur le bateau...");
+
+        occupants.Remove(perso);
+        perso.gameObject.SetActive(false);
+
+        GameObject bateau = Instantiate(bateauPrefab, pointDepartBateau.position, Quaternion.identity);
+        if (portCible.pointArriveeBateau == null)
+        {
+            portCible.InitialiserPointsBateau(); // ⚠️ Assure-toi que cette méthode existe
+        }
+
+        if (portCible.pointArriveeBateau != null)
+        {
+            bateau.GetComponent<BateauController>().destination = portCible.pointArriveeBateau.position;
+        }
+        else
+        {
+            Debug.LogError($"[{name}] portCible n'a pas de pointArriveeBateau défini !");
+            Destroy(bateau);
+            yield break;
+        }
+
+
+
+        Vector3 start = pointDepartBateau.position;
+        Vector3 end = portCible.pointArriveeBateau.position;
+        float duration = delaiTraversée;
+        float t = 0f;
+
+        while (t < duration)
+        {
+            t += Time.deltaTime;
+            bateau.transform.position = Vector3.Lerp(start, end, t / duration);
+            yield return null;
+        }
+
+        Destroy(bateau);
+        perso.transform.position = portCible.transform.position + new Vector3(Random.Range(-0.5f, 0.5f), 0.5f, 0);
+        perso.gameObject.SetActive(true);
+
+        Debug.Log($"[PORT] {perso.name} a débarqué !");
+    }
+
+    private BatimentInteractif TrouverPortLePlusProche()
+    {
+        float minDist = float.MaxValue;
+        BatimentInteractif plusProche = null;
+
+        foreach (var b in FindObjectsOfType<BatimentInteractif>())
+        {
+            if (b == this || !b.estUnPort) continue;
+
+            float dist = Vector3.Distance(transform.position, b.transform.position);
+            if (dist < minDist)
+            {
+                minDist = dist;
+                plusProche = b;
+            }
+        }
+
+        return plusProche;
+    }
+
+    private void InitialiserPointsBateau()
+    {
+        if (dejaInitialise) return;
+        dejaInitialise = true;
+
+        if (pointDepartBateau == null)
+        {
+            GameObject depart = new GameObject("PointDepartBateau");
+            depart.transform.SetParent(this.transform);
+            depart.transform.position = transform.position + new Vector3(-1f, -0.5f, 0);
+            pointDepartBateau = depart.transform;
+            Debug.Log($"[PORT INIT] {name} → PointDépart créé");
+        }
+
+        if (portCible != null)
+        {
+            portCible.InitialiserPointsBateau(); // Appelé une seule fois, grâce au bool
+
+            if (portCible.pointDepartBateau != null)
+            {
+                pointArriveeBateau = portCible.pointDepartBateau;
+                Debug.Log($"----------------------------------------------------[PORT INIT] {name} → pointArrivee = {portCible.name}");
+            }
+            else
+            {
+                Debug.LogWarning($"[PORT INIT] {portCible.name} → pas de pointDepartBateau !");
+            }
+        }
+    }
+
+
+
+
+    
+
 }

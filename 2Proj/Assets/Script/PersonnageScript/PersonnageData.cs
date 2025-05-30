@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Linq;
 using System.Collections.Generic;
 using System;
+using Unity.VisualScripting;
 
 public enum JobType
 {
@@ -246,12 +247,17 @@ public class PersonnageData : MonoBehaviour
                 if (sacADos.quantite >= sacADos.capaciteMax)
                 {
                     GameObject stockage = TrouverPlusProcheParTag("Stockage");
-                    if (stockage != null)
+                    if (stockage == null)
                     {
-                        cibleObjet = stockage;
-                        DeplacerVers(stockage.transform.position);
-                        etatActuel = EtatPerso.AllerStockage;
+                        GameObject port = TrouverPlusProcheParTag("Port");
+                        if (port != null)
+                        {
+                            cibleObjet = port;
+                            DeplacerVers(port.transform.position);
+                            etatActuel = EtatPerso.AllerStockage; // ou un état spécial si besoin
+                        }
                     }
+
                 }
                 else
                 {
@@ -457,13 +463,32 @@ public class PersonnageData : MonoBehaviour
 
     public void DeplacerVers(Vector3 destination)
     {
+        // 💡 Vérifie si une traversée est nécessaire
+        if (EstSéparéParEau(transform.position, destination))
+        {
+            GameObject port = TrouverPlusProcheParTag("Port");
+            if (port != null)
+            {
+                cibleObjet = port;
+                DeplacerVers(port.transform.position); // relance vers le port
+                return;
+            }
+        }
+
         cible = destination;
         timer = UnityEngine.Random.Range(2f, 4f);
 
-        // 🔥 NOUVEAU : Réinitialiser le système de contournement lors d'un nouveau déplacement
         enContournement = false;
         timerContournement = 0f;
     }
+
+    private bool EstSéparéParEau(Vector3 a, Vector3 b)
+    {
+        RaycastHit2D hit = Physics2D.Linecast(a, b, LayerMask.GetMask("Water")); // adapte au layer de l’eau
+        return hit.collider != null;
+    }
+
+
 
     void ChoisirNouvelleCible()
     {
@@ -577,6 +602,18 @@ public class PersonnageData : MonoBehaviour
                         DeplacerVers(cibleRessource.transform.position);
                         etatActuel = EtatPerso.Collecte;
                     }
+                    // if (UnityEngine.Random.value < 0.05f )
+                    // {
+                    GameObject port = TrouverPlusProcheParTag("Port");
+                    if (port != null)
+                    {
+                        Debug.Log("ok");
+                        cibleObjet = port;
+                        DeplacerVers(port.transform.position);
+                        return;
+                    }
+                    // }
+
                 }
                 break;
 
