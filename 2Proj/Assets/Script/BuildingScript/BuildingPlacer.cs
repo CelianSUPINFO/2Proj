@@ -4,9 +4,9 @@ using UnityEngine.EventSystems;
 public class SimpleBuildingPlacer : MonoBehaviour
 {
     [Header("Références")]
-    public GameObject[] buildingPrefabs; 
+    public GameObject[] buildingPrefabs;
     public BuildingEraser eraser;
-    
+
     [Header("Spawn de personnages pour les maisons")]
     public GameObject personnagePrefab; // Prefab du personnage à spawner
     public LayerMask layerSol; // Layer du sol
@@ -51,7 +51,7 @@ public class SimpleBuildingPlacer : MonoBehaviour
     }
 
     public void SelectBuilding(int index)
-    {   
+    {
         if (eraser != null && eraser.IsEraseModeActive())
             return;
 
@@ -134,7 +134,7 @@ public class SimpleBuildingPlacer : MonoBehaviour
             : new Color(1f, 0f, 0f, 0.5f);
     }
 
-   bool CanPlace()
+    bool CanPlace()
     {
         // 1. Empêche si curseur sur l'UI
         if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
@@ -145,6 +145,7 @@ public class SimpleBuildingPlacer : MonoBehaviour
         Vector2 boxCenter = new Vector2(centerPos.x, centerPos.y - 0.5f);
         Vector2 boxSize = new Vector2(3f, 3f);
 
+
         // 3. Vérifie s'il y a un obstacle (eau, falaise, etc.)
         Collider2D obstacleHit = Physics2D.OverlapBox(boxCenter, boxSize, 0f, placementObstaclesLayer);
         if (obstacleHit != null)
@@ -152,6 +153,13 @@ public class SimpleBuildingPlacer : MonoBehaviour
 
         // 4. Vérifie si on est bien sur du sol (Layer Ground)
         Collider2D groundHit = Physics2D.OverlapBox(boxCenter, boxSize, 0f, LayerMask.GetMask("Ground"));
+        // Si c'est un port, on applique une règle spéciale
+        BatimentInteractif portTest = previewBuilding.GetComponent<BatimentInteractif>();
+        if (portTest != null && portTest.estUnPort)
+        {
+            return EstPlacementValidePort(boxCenter, boxSize);
+        }
+
         if (groundHit == null)
             return false;
 
@@ -197,7 +205,7 @@ public class SimpleBuildingPlacer : MonoBehaviour
         Destroy(previewBuilding);
         previewBuilding = null;
         isPlacing = false;
-        
+
         Debug.Log("Bâtiment placé avec succès !");
     }
 
@@ -208,30 +216,26 @@ public class SimpleBuildingPlacer : MonoBehaviour
     {
         // Méthode 1 : Vérifier par le nom du bâtiment
         bool estUneMaison = false;
-        
+
         if (selectedBuildingData != null)
         {
             string nomBatiment = selectedBuildingData.buildingName.ToLower();
-            estUneMaison = nomBatiment.Contains("maison") || 
-                          nomBatiment.Contains("house") || 
+            estUneMaison = nomBatiment.Contains("maison") ||
+                          nomBatiment.Contains("house") ||
                           nomBatiment.Contains("habitation") ||
                           nomBatiment.Contains("cabane") ||
                           nomBatiment.Contains("logement");
         }
-        
-        // Méthode 2 : Vérifier par le tag (si vous utilisez des tags)
-        if (!estUneMaison && batiment.CompareTag("Maison"))
-        {
-            estUneMaison = true;
-        }
-        
+
+
+
         // Méthode 3 : Vérifier si le bâtiment a déjà un HouseSpawner (au cas où il serait préconfiguré)
         HouseSpawner spawnerExistant = batiment.GetComponent<HouseSpawner>();
         if (spawnerExistant != null)
         {
             estUneMaison = true;
         }
-        
+
         // Si c'est une maison, ajouter/configurer le spawner
         if (estUneMaison)
         {
@@ -271,4 +275,32 @@ public class SimpleBuildingPlacer : MonoBehaviour
             Debug.Log("Placement annulé !");
         }
     }
+    
+    private bool EstPlacementValidePort(Vector2 boxCenter, Vector2 boxSize)
+    {
+        int total = 0, sol = 0, eau = 0;
+        int resolution = 5;
+
+        float stepX = boxSize.x / (resolution - 1);
+        float stepY = boxSize.y / (resolution - 1);
+
+        for (int x = 0; x < resolution; x++)
+        {
+            for (int y = 0; y < resolution; y++)
+            {
+                Vector2 point = boxCenter + new Vector2(-boxSize.x / 2 + x * stepX, -boxSize.y / 2 + y * stepY);
+
+                if (Physics2D.OverlapPoint(point, LayerMask.GetMask("Ground"))) sol++;
+                else if (Physics2D.OverlapPoint(point, LayerMask.GetMask("Water"))) eau++;
+
+                total++;
+            }
+        }
+
+        float ratioSol = (float)sol / total;
+        float ratioEau = (float)eau / total;
+
+        return ratioSol >= 0.2f && ratioSol <= 0.6f ;
+    }
+
 }
