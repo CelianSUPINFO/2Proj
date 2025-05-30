@@ -15,7 +15,7 @@ MonoBehaviour:
   buildingName: Bar
   prefab: {fileID: 9032798326439436642, guid: 0ccd1feba5920a4458f3c3360a19f03c, type: 3}
   unlockAge: 2
-  locked: 0
+  locked: 1
   icon: {fileID: 3737897332693287829, guid: 4758b62d0016153428528322f7f05187, type: 3}
   function: 1
   cost:

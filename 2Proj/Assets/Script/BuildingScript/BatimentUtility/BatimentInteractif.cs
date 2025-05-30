@@ -1,26 +1,49 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System.Collections;
+using System.Linq;
 
-public enum TypeBesoin
-{
-    Aucun,
-    Fatigue,
-    Faim,
-    Soif
-}
+
+public enum TypeBesoin { Aucun, Fatigue, Faim, Soif }
 
 [RequireComponent(typeof(Collider2D))]
 public class BatimentInteractif : MonoBehaviour
 {
-    [Header("Capacité")]
-    public int capaciteMax = 2;
+    [Header("Capacité")] public int capaciteMax = 2;
+    [Header("Régénération")] public bool regenereBesoin = false; public TypeBesoin typeBesoin = TypeBesoin.Fatigue;
+    [Header("Stockage")] public bool estUnStockage = false;
+    private Dictionary<PersonnageData, float> timerProduction = new Dictionary<PersonnageData, float>();
 
-    [Header("Régénération")]
-    public bool regenereBesoin = false;
-    public TypeBesoin typeBesoin = TypeBesoin.Fatigue;
+    [System.Serializable]
+    public class MetierProductionInfo
+    {
+        public JobType metier;
+        public string ressourceProduite;
+        public float dureeProduction;
+        public bool transformation;
+        public string ressourceRequise;
+        public int quantiteRequise;
+        public int quantiteProduite;
+    }
 
-    [Header("Stockage")]
-    public bool estUnStockage = false;
+    public List<MetierProductionInfo> metierProductions = new List<MetierProductionInfo>()
+    {
+        new MetierProductionInfo { metier = JobType.Bucheron, ressourceProduite = "Bois", dureeProduction = 20f, quantiteProduite = 5 },
+        new MetierProductionInfo { metier = JobType.CarrierPierre, ressourceProduite = "Pierre", dureeProduction = 20f, quantiteProduite = 5 },
+        new MetierProductionInfo { metier = JobType.CarrierFer, ressourceProduite = "Fer", dureeProduction = 30f, quantiteProduite = 5 },
+        new MetierProductionInfo { metier = JobType.CarrierOr, ressourceProduite = "Or", dureeProduction = 40f, quantiteProduite = 5 },
+        new MetierProductionInfo { metier = JobType.FermierAnimaux, ressourceProduite = "Viande", dureeProduction = 20f, quantiteProduite = 5 },
+        new MetierProductionInfo { metier = JobType.FermierBle, ressourceProduite = "Ble", dureeProduction = 30f, quantiteProduite = 5 },
+        new MetierProductionInfo { metier = JobType.Chercheur, ressourceProduite = "Recherche", dureeProduction = 30f, quantiteProduite = 5 },
+        new MetierProductionInfo { metier = JobType.Boulanger, ressourceProduite = "Pain", dureeProduction = 30f, transformation = true, ressourceRequise = "Ble", quantiteRequise = 5, quantiteProduite = 5 },
+        new MetierProductionInfo { metier = JobType.Scieur, ressourceProduite = "Planche", dureeProduction = 30f, transformation = true, ressourceRequise = "Bois", quantiteRequise = 5, quantiteProduite = 5 },
+        new MetierProductionInfo { metier = JobType.Pecheur, ressourceProduite = "Poisson", dureeProduction = 20f, quantiteProduite = 5 },
+        new MetierProductionInfo { metier = JobType.Forgeron, ressourceProduite = "Outil", dureeProduction = 30f, transformation = true, ressourceRequise = "fer", quantiteRequise = 5, quantiteProduite = 5 },
+    };
+
+
+   
+
 
     [System.Serializable]
     public class RessourceStockee
@@ -46,6 +69,75 @@ public class BatimentInteractif : MonoBehaviour
     private Dictionary<PersonnageData, float> tempsRestant = new Dictionary<PersonnageData, float>();
     private Dictionary<PersonnageData, float> timerRegen = new Dictionary<PersonnageData, float>();
 
+
+
+    [Header("Métier associé")]
+    public JobType metierAssocie;
+    private List<PersonnageData> travailleursActuels = new List<PersonnageData>();
+
+
+    private void Start()
+    {
+        Debug.Log($"[Batiment {name}] Initialisation et tentative d'assignation de métier.");
+        if (metierAssocie != JobType.Aucun)
+            StartCoroutine(AssignerTravailleursInitiaux());
+    }
+
+    
+
+    private IEnumerator AssignerTravailleursInitiaux()
+    {
+        travailleursActuels.RemoveAll(p => p == null);
+        if (travailleursActuels.Count < capaciteMax && metierAssocie != JobType.Aucun)
+        {
+            for (int i = travailleursActuels.Count; i < capaciteMax; i++)
+            {
+                PersonnageData candidat = MetierAssignmentManager.Instance.TrouverPersonnageSansMetierEtSansBatiment();
+                Debug.Log($"[Batiment {name}] Tentative d'assignation, trouvé: {(candidat != null ? candidat.name : "aucun")}");
+                if (candidat != null)
+                {
+                    candidatsAssignerAuBatiment(candidat);
+                }
+                else
+                {
+                    Debug.Log($"[Batiment {name}] Aucun candidat dispo. Attente...");
+                }
+                yield return new WaitForSeconds(0.1f); // court délai, évite bug assignation en masse
+            }
+        }
+    }
+
+    public void candidatsAssignerAuBatiment(PersonnageData candidat)
+    {
+        if (travailleursActuels.Count >= capaciteMax) return;
+        if (candidat == null) return;
+        // Sécurité : évite d'assigner plusieurs fois
+        if (travailleursActuels.Contains(candidat)) return;
+        if (candidat.metier != JobType.Aucun) return;
+        if (candidat.batimentAssigné != null) return;
+
+        candidat.AssignerAuBatiment(this, metierAssocie);
+        travailleursActuels.Add(candidat);
+        Debug.Log($"[Batiment {name}] Ajout de {candidat.name} ({metierAssocie})");
+    }
+
+
+    public void GererMortTravailleur(PersonnageData mort)
+    {
+        Debug.Log($"mort et gestion {mort.name}");
+        
+       
+        if (!regenereBesoin && !estUnStockage)
+        {
+            Debug.Log("mort et gestion       ok");
+            travailleursActuels.RemoveAll(p => p == null);
+            Debug.Log($"[Batiment {name}] Travailleur {mort.name} mort, lancement réassignation");
+            StartCoroutine(AssignerTravailleursInitiaux());
+        }
+    }
+
+
+
     public bool EstDisponible()
     {
         return occupants.Count < capaciteMax;
@@ -60,7 +152,32 @@ public class BatimentInteractif : MonoBehaviour
         occupants.Add(perso);
         perso.cibleObjet = gameObject;
 
-        // Démarrer régénération si activée
+        // --- NE PAS réinitialiser si un timer existe déjà pour ce perso ---
+        if (!timerProduction.ContainsKey(perso))
+        {
+            MetierProductionInfo info = metierProductions.Find(i => i.metier == perso.metier);
+            if (info != null)
+            {
+                if (info.transformation)
+                {
+                    int retiré = RetirerRessource(info.ressourceRequise, info.quantiteRequise);
+                    if (retiré < info.quantiteRequise)
+                    {
+                        Debug.Log($"{name}: Pas assez de {info.ressourceRequise} pour transformer. {perso.name} attend.");
+                        return;
+                    }
+                }
+
+                float duree = info.dureeProduction;
+                if (perso.aOutil) duree /= 2f;
+                timerProduction[perso] = duree;
+
+                Debug.Log($"[PROD] {perso.name} commence la production de {info.ressourceProduite} ({info.dureeProduction}s)");
+            }
+        }
+
+
+        // 🔁 Régénération, si activée
         if (regenereBesoin)
         {
             tempsRestant[perso] = GetTempsTotal(typeBesoin);
@@ -68,13 +185,15 @@ public class BatimentInteractif : MonoBehaviour
             perso.enRegeneration = true;
         }
 
+        
+
         // Si c'est un bâtiment de stockage
         if (estUnStockage && perso.sacADos.quantite > 0)
         {
             StockerDepuis(perso);
         }
     }
-
+    
     private void OnTriggerExit2D(Collider2D other)
     {
         if (!other.TryGetComponent(out PersonnageData perso)) return;
@@ -82,55 +201,144 @@ public class BatimentInteractif : MonoBehaviour
         occupants.Remove(perso);
         tempsRestant.Remove(perso);
         timerRegen.Remove(perso);
+        timerProduction.Remove(perso); // <-- Ajoute cette ligne !
         perso.enRegeneration = false;
     }
 
+
     private void Update()
     {
-        if (!regenereBesoin) return;
+        occupants.RemoveAll(p => p == null);
+        
+    
+        List<PersonnageData> finis = new();
+        List<PersonnageData> occupantsSnapshot = new(occupants); // éviter modification pendant boucle
 
-        List<PersonnageData> finis = new List<PersonnageData>();
-
-        foreach (PersonnageData perso in occupants)
+        // 🔁 1. Régénération
+        if (regenereBesoin)
         {
-            if (!tempsRestant.ContainsKey(perso)) continue;
-
-            timerRegen[perso] -= Time.deltaTime;
-
-            if (timerRegen[perso] <= 0f)
+            foreach (PersonnageData perso in occupantsSnapshot)
             {
-                int gain = GetGainParTick(typeBesoin);
-                switch (typeBesoin)
-                {
-                    case TypeBesoin.Fatigue:
-                        perso.fatigue = Mathf.Min(100f, perso.fatigue + gain);
-                        break;
-                    case TypeBesoin.Faim:
-                        perso.faim = Mathf.Min(100f, perso.faim + gain);
-                        break;
-                    case TypeBesoin.Soif:
-                        perso.soif = Mathf.Min(100f, perso.soif + gain);
-                        break;
-                }
+                if (!tempsRestant.ContainsKey(perso)) continue;
 
-                tempsRestant[perso] -= 1f;
-                timerRegen[perso] = 1f;
+                timerRegen[perso] -= Time.deltaTime;
 
-                if (tempsRestant[perso] <= 0f)
+                if (timerRegen[perso] <= 0f)
                 {
-                    finis.Add(perso);
+                    int gain = GetGainParTick(typeBesoin);
+                    switch (typeBesoin)
+                    {
+                        case TypeBesoin.Fatigue:
+                            perso.fatigue = Mathf.Min(100f, perso.fatigue + gain);
+                            break;
+                        case TypeBesoin.Faim:
+                            perso.faim = Mathf.Min(100f, perso.faim + gain);
+                            break;
+                        case TypeBesoin.Soif:
+                            perso.soif = Mathf.Min(100f, perso.soif + gain);
+                            break;
+                    }
+
+                    tempsRestant[perso] -= 1f;
+                    timerRegen[perso] = 1f;
+
+                    if (tempsRestant[perso] <= 0f)
+                    {
+                        finis.Add(perso);
+                    }
                 }
             }
         }
 
+        // 🔁 2. Production (séparé de la régénération)
+        List<PersonnageData> producteurs = new(timerProduction.Keys);
+        producteurs.RemoveAll(p => p == null);
+        foreach (var key in new List<PersonnageData>(timerProduction.Keys))
+        {
+            if (key == null)
+                timerProduction.Remove(key);
+        }
+
+
+        Dictionary<PersonnageData, MetierProductionInfo> aRelancer = new();
+
+        foreach (var producteur in producteurs)
+        {
+            timerProduction[producteur] -= Time.deltaTime;
+
+            if (timerProduction[producteur] <= 0f)
+            {
+                MetierProductionInfo info = metierProductions.Find(i => i.metier == producteur.metier);
+                if (info != null)
+                {
+                    bool ajouté = producteur.sacADos.Ajouter(info.ressourceProduite, info.quantiteProduite);
+                    if (ajouté)
+                    {
+                        Debug.Log($"[{name}] {producteur.name} a produit {info.quantiteProduite} {info.ressourceProduite} (dans son sac)");
+                        if (info.ressourceProduite == "Outil")
+                        {
+                            int outilsDistribues = 0;
+                            for (int i = 0; i < info.quantiteProduite; i++)
+                            {
+                                var sansOutil = FindObjectsOfType<PersonnageData>()
+                                    .Where(p => !p.aOutil)
+                                    .OrderBy(_ => UnityEngine.Random.value)
+                                    .FirstOrDefault();
+
+                                if (sansOutil != null)
+                                {
+                                    sansOutil.aOutil = true;
+                                    outilsDistribues++;
+                                    Debug.Log($"[OUTIL] {sansOutil.name} a reçu un outil !");
+                                }
+                            }
+
+                            if (outilsDistribues > 0)
+                            {
+                                Debug.Log($"[OUTIL] {outilsDistribues} outils ont été distribués à des personnages.");
+                            }
+                        }
+
+                        aRelancer[producteur] = info;
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"[{name}] {producteur.name} n'a pas pu stocker {info.ressourceProduite} (sac plein)");
+
+                        GameObject stockage = producteur.TrouverPlusProcheParTag("Stockage");
+                        if (stockage != null)
+                        {
+                            producteur.cibleObjet = stockage;
+                            producteur.DeplacerVers(stockage.transform.position);
+                            // Assure-toi que le personnage passera en mode AllerStockage
+                        }
+
+                        // ❌ Pas de relance du timer ici pour éviter production infinie quand sac est plein
+                    }
+                }
+            }
+        }
+
+        // 🔁 3. Redémarrer les timers de production
+        foreach (var kvp in aRelancer)
+        {
+            float duree = kvp.Value.dureeProduction;
+            if (kvp.Key.aOutil) duree /= 2f;
+            timerProduction[kvp.Key] = duree;
+
+        }
+
+        // 🔁 4. Terminer les régénérations
         foreach (var p in finis)
         {
+            occupants.Remove(p);
             tempsRestant.Remove(p);
             timerRegen.Remove(p);
-            occupants.Remove(p);
             p.enRegeneration = false;
         }
     }
+
+
 
     private int GetGainParTick(TypeBesoin besoin)
     {

@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2bc76cb91bdb8bf4e934a0be13a71ece, type: 3}
   m_Name: "Entrep\xF4t"
   m_EditorClassIdentifier: 
-  buildingName: "Entrep\xF4t"
+  buildingName: Entrepot
   prefab: {fileID: 9032798326439436642, guid: 3de58d51ba3fb0c46a9894e9d9bffb7a, type: 3}
   unlockAge: 3
-  locked: 0
+  locked: 1
   icon: {fileID: 5955780380912161588, guid: 7d92e033bfcb7c94091412e02ee2096c, type: 3}
   function: 1
   cost:

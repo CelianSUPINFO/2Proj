@@ -147,7 +147,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      "Stockage_avanc\xE9e_0": -4632952011949136127
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

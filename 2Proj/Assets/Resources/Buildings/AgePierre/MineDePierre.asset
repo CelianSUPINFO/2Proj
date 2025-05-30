@@ -15,7 +15,7 @@ MonoBehaviour:
   buildingName: Mine de Pierre
   prefab: {fileID: 9032798326439436642, guid: 43600758204305e4a80d952dc4e70db1, type: 3}
   unlockAge: 0
-  locked: 0
+  locked: 1
   icon: {fileID: -8485238429189375801, guid: b6400b8aa13512140a5067a9f743dbd8, type: 3}
   function: 4
   cost:

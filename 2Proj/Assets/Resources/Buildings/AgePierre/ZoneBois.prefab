@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 1083802680162207094}
   - component: {fileID: 3052257896769478452}
   - component: {fileID: -2040532942499915145}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: ZoneBois
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -155,4 +155,79 @@ MonoBehaviour:
   capaciteMax: 2
   regenereBesoin: 0
   typeBesoin: 1
-  aFonctionPersonnalisee: 1
+  estUnStockage: 0
+  metierProductions:
+  - metier: 1
+    ressourceProduite: Bois
+    dureeProduction: 20
+    transformation: 0
+    ressourceRequise: 
+    quantiteRequise: 0
+    quantiteProduite: 5
+  - metier: 2
+    ressourceProduite: Pierre
+    dureeProduction: 20
+    transformation: 0
+    ressourceRequise: 
+    quantiteRequise: 0
+    quantiteProduite: 5
+  - metier: 3
+    ressourceProduite: Fer
+    dureeProduction: 30
+    transformation: 0
+    ressourceRequise: 
+    quantiteRequise: 0
+    quantiteProduite: 5
+  - metier: 4
+    ressourceProduite: Or
+    dureeProduction: 40
+    transformation: 0
+    ressourceRequise: 
+    quantiteRequise: 0
+    quantiteProduite: 5
+  - metier: 5
+    ressourceProduite: Nourriture
+    dureeProduction: 20
+    transformation: 0
+    ressourceRequise: 
+    quantiteRequise: 0
+    quantiteProduite: 5
+  - metier: 6
+    ressourceProduite: Ble
+    dureeProduction: 30
+    transformation: 0
+    ressourceRequise: 
+    quantiteRequise: 0
+    quantiteProduite: 5
+  - metier: 7
+    ressourceProduite: Recherche
+    dureeProduction: 30
+    transformation: 0
+    ressourceRequise: 
+    quantiteRequise: 0
+    quantiteProduite: 5
+  - metier: 8
+    ressourceProduite: Pain
+    dureeProduction: 30
+    transformation: 1
+    ressourceRequise: Ble
+    quantiteRequise: 5
+    quantiteProduite: 5
+  - metier: 9
+    ressourceProduite: Planche
+    dureeProduction: 30
+    transformation: 1
+    ressourceRequise: Bois
+    quantiteRequise: 5
+    quantiteProduite: 5
+  - metier: 10
+    ressourceProduite: Poisson
+    dureeProduction: 20
+    transformation: 0
+    ressourceRequise: 
+    quantiteRequise: 0
+    quantiteProduite: 5
+  maxTypes: 4
+  maxParType: 20
+  aFonctionPersonnalisee: 0
+  metierAssocie: 1

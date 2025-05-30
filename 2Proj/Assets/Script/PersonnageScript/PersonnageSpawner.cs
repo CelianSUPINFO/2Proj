@@ -18,7 +18,7 @@ public class SpawnManager : MonoBehaviour
             }
             else
             {
-                Debug.LogWarning($"❌ Pas de sol à la position {pos}, aucun perso généré ici.");
+                Debug.LogWarning($" Pas de sol à la position {pos}, aucun perso généré ici.");
             }
         }
     }

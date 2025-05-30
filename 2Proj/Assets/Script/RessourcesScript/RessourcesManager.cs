@@ -57,7 +57,7 @@ public class ResourceManager : MonoBehaviour
     {
         // Seules les ressources "virtuelles" sont initialisées ici
         virtualResources[ResourceType.Population] = 0;
-        virtualResources[ResourceType.Search] = 100;
+        virtualResources[ResourceType.Search] = 0;
     }
 
     /// <summary>

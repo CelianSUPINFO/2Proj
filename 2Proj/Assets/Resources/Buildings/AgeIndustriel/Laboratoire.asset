@@ -15,16 +15,16 @@ MonoBehaviour:
   buildingName: Laboratoire
   prefab: {fileID: 9032798326439436642, guid: c77e90a141a2f7e41b31097b945d4def, type: 3}
   unlockAge: 3
-  locked: 0
+  locked: 1
   icon: {fileID: -865247755742902372, guid: 55808f7464661944bafc783056f34fd5, type: 3}
   function: 6
   cost:
     resourceCosts:
     - type: 0
       amount: 40
-    - type: 12
+    - type: 1
       amount: 40
-    - type: 4
+    - type: 13
       amount: 20
     - type: 16
       amount: 15

@@ -15,7 +15,7 @@ MonoBehaviour:
   buildingName: Mine de fer
   prefab: {fileID: 9032798326439436642, guid: 8a8b507dc839d4343a63aff8057648f7, type: 3}
   unlockAge: 2
-  locked: 0
+  locked: 1
   icon: {fileID: -4729462048328783126, guid: 326d198b53801f14c9029eea920098d3, type: 3}
   function: 4
   cost:
@@ -24,7 +24,7 @@ MonoBehaviour:
       amount: 25
     - type: 1
       amount: 35
-    - type: 4
+    - type: 7
       amount: 5
   capacity: 6
   description: "Une mine pour r\xE9colter du fer"

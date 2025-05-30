@@ -78,7 +78,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 13
+  m_SortingOrder: 7
   m_Sprite: {fileID: -2311659948842064771, guid: 4d4ee5dc9ed9e044c83bd1be0c962092, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -102,6 +102,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f868d57292d929941b29d9a6a5f083a9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  "batimentAssign\xE9": {fileID: 0}
   enRegeneration: 0
   vie: 100
   faim: 100

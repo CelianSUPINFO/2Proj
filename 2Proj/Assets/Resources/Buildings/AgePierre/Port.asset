@@ -15,7 +15,7 @@ MonoBehaviour:
   buildingName: Port
   prefab: {fileID: 870588462395568201, guid: 6e6bfb731af784547b04ce045df97959, type: 3}
   unlockAge: 0
-  locked: 0
+  locked: 1
   icon: {fileID: 4920015224640609776, guid: 87268ce9ac3845949b214b5107fda3ea, type: 3}
   function: 9
   cost:

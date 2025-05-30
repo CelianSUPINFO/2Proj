@@ -15,14 +15,14 @@ MonoBehaviour:
   buildingName: Boulangerie industrielle
   prefab: {fileID: 9032798326439436642, guid: 07cdcca013a30a3428dda71ff32ecb7a, type: 3}
   unlockAge: 3
-  locked: 0
+  locked: 1
   icon: {fileID: -8715952300590330243, guid: b3c08c7703ae40b4ebb09a563a2694d2, type: 3}
   function: 1
   cost:
     resourceCosts:
     - type: 7
       amount: 40
-    - type: 12
+    - type: 13
       amount: 20
     - type: 13
       amount: 30

@@ -222,7 +222,11 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Bateau_moderne_0: 5955653555516600449
+      Bateau_moderne_1: 751601860737805494
+      Bateau_moderne_2: 4134585570050429285
+      Bateau_moderne_3: -1906299031200979798
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
