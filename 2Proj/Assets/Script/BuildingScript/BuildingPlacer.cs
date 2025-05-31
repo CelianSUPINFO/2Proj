@@ -154,11 +154,11 @@ public class SimpleBuildingPlacer : MonoBehaviour
         // 4. Vérifie si on est bien sur du sol (Layer Ground)
         Collider2D groundHit = Physics2D.OverlapBox(boxCenter, boxSize, 0f, LayerMask.GetMask("Ground"));
         // Si c'est un port, on applique une règle spéciale
-        BatimentInteractif portTest = previewBuilding.GetComponent<BatimentInteractif>();
-        if (portTest != null && portTest.estUnPort)
-        {
-            return EstPlacementValidePort(boxCenter, boxSize);
-        }
+        // BatimentInteractif portTest = previewBuilding.GetComponent<BatimentInteractif>();
+        // if (portTest != null && portTest.estUnPort)
+        // {
+        //     return EstPlacementValidePort(boxCenter, boxSize);
+        // }
 
         if (groundHit == null)
             return false;

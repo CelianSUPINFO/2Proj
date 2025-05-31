@@ -2,7 +2,6 @@ using UnityEngine;
 using System.Linq;
 using System.Collections.Generic;
 using System;
-using Unity.VisualScripting;
 
 public enum JobType
 {
@@ -247,17 +246,12 @@ public class PersonnageData : MonoBehaviour
                 if (sacADos.quantite >= sacADos.capaciteMax)
                 {
                     GameObject stockage = TrouverPlusProcheParTag("Stockage");
-                    if (stockage == null)
+                    if (stockage != null)
                     {
-                        GameObject port = TrouverPlusProcheParTag("Port");
-                        if (port != null)
-                        {
-                            cibleObjet = port;
-                            DeplacerVers(port.transform.position);
-                            etatActuel = EtatPerso.AllerStockage; // ou un état spécial si besoin
-                        }
+                        cibleObjet = stockage;
+                        DeplacerVers(stockage.transform.position);
+                        etatActuel = EtatPerso.AllerStockage;
                     }
-
                 }
                 else
                 {
@@ -463,32 +457,13 @@ public class PersonnageData : MonoBehaviour
 
     public void DeplacerVers(Vector3 destination)
     {
-        // 💡 Vérifie si une traversée est nécessaire
-        if (EstSéparéParEau(transform.position, destination))
-        {
-            GameObject port = TrouverPlusProcheParTag("Port");
-            if (port != null)
-            {
-                cibleObjet = port;
-                DeplacerVers(port.transform.position); // relance vers le port
-                return;
-            }
-        }
-
         cible = destination;
         timer = UnityEngine.Random.Range(2f, 4f);
 
+        // 🔥 NOUVEAU : Réinitialiser le système de contournement lors d'un nouveau déplacement
         enContournement = false;
         timerContournement = 0f;
     }
-
-    private bool EstSéparéParEau(Vector3 a, Vector3 b)
-    {
-        RaycastHit2D hit = Physics2D.Linecast(a, b, LayerMask.GetMask("Water")); // adapte au layer de l’eau
-        return hit.collider != null;
-    }
-
-
 
     void ChoisirNouvelleCible()
     {
@@ -500,7 +475,7 @@ public class PersonnageData : MonoBehaviour
             Vector3 tentative = transform.position + (Vector3)(direction * UnityEngine.Random.Range(1f, 2f));
             tentative.z = 0;
 
-            if (Physics2D.OverlapCircle(tentative, 0.1f, layerSol))
+            if (Physics2D.OverlapCircle(tentative, 2f, layerSol))
             {
                 cible = tentative;
                 timer = UnityEngine.Random.Range(2f, 4f);
@@ -602,18 +577,14 @@ public class PersonnageData : MonoBehaviour
                         DeplacerVers(cibleRessource.transform.position);
                         etatActuel = EtatPerso.Collecte;
                     }
-                    // if (UnityEngine.Random.value < 0.05f )
-                    // {
                     GameObject port = TrouverPlusProcheParTag("Port");
                     if (port != null)
                     {
-                        Debug.Log("ok");
                         cibleObjet = port;
                         DeplacerVers(port.transform.position);
+                        // état spécial si besoin
                         return;
                     }
-                    // }
-
                 }
                 break;
 
@@ -724,7 +695,7 @@ public class PersonnageData : MonoBehaviour
 
         return plusProche;
     }
-    
+
     /// <summary>
     /// Cherche le stockage qui contient au moins la quantité demandée de la ressource spécifiée
     /// </summary>
@@ -741,6 +712,30 @@ public class PersonnageData : MonoBehaviour
         }
         return null;
     }
+
+    public void TerminerRegeneration()
+    {
+        enRegeneration = false;
+        cibleObjet = null;
+        etatActuel = EtatPerso.Normal;
+        ChoisirNouvelleCible();
+    }
+    
+    public void QuitterBatiment()
+    {
+        cibleObjet = null;
+        cibleRessource = null;
+        enRegeneration = false;
+        etatActuel = EtatPerso.Normal;
+
+        if (!EvaluerBesoinsUrgents())
+        {
+            Debug.Log("bonla cest ok");
+            ChoisirNouvelleCible();
+        }
+    }
+
+
 
 
 }

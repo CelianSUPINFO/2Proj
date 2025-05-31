@@ -72,6 +72,6 @@ public class PersonnageTooltipUI : MonoBehaviour
             sacText.text = "Sac : Vide";
 
         
-        outilText.text = personnageActuel.aOutil ? "Outil : Oui" : "Outil : Non";
+         outilText.text = personnageActuel.aOutil ? "Outil : Oui" : "Outil : Non";
     }
 }

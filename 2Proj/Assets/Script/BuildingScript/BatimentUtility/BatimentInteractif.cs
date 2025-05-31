@@ -13,6 +13,8 @@ public class BatimentInteractif : MonoBehaviour
     [Header("Régénération")] public bool regenereBesoin = false; public TypeBesoin typeBesoin = TypeBesoin.Fatigue;
     [Header("Stockage")] public bool estUnStockage = false;
     private Dictionary<PersonnageData, float> timerProduction = new Dictionary<PersonnageData, float>();
+    [SerializeField] private LayerMask layerSol;
+
 
     [System.Serializable]
     public class MetierProductionInfo
@@ -71,7 +73,7 @@ public class BatimentInteractif : MonoBehaviour
     [Header("Port")]
     public bool estUnPort = false;
     public BatimentInteractif portCible;
-    public float delaiTraversée = 5f;
+    public float delaiTraversée = 10f;
 
     [Header("Animation bateau")]
     public GameObject bateauPrefab;
@@ -92,13 +94,11 @@ public class BatimentInteractif : MonoBehaviour
 
     private void Start()
     {
-        if (estUnPort)
-        {
-            InitialiserPointsBateau();
-        }
-        Debug.Log($"[Batiment {name}] Initialisation et tentative d'assignation de métier.");
+
+
         if (metierAssocie != JobType.Aucun)
-            StartCoroutine(AssignerTravailleursInitiaux());
+            Debug.Log($"[Batiment {name}] Initialisation et tentative d'assignation de métier.");
+        StartCoroutine(AssignerTravailleursInitiaux());
     }
 
 
@@ -162,10 +162,11 @@ public class BatimentInteractif : MonoBehaviour
     }
 
     private void OnTriggerEnter2D(Collider2D other)
-    {
-        if (!other.TryGetComponent(out PersonnageData perso)) return;
+    {     
 
+        if (!other.TryGetComponent(out PersonnageData perso)) return;
         if (occupants.Contains(perso) || !EstDisponible()) return;
+
 
         occupants.Add(perso);
         perso.cibleObjet = gameObject;
@@ -198,7 +199,7 @@ public class BatimentInteractif : MonoBehaviour
         if (estUnPort && portCible != null)
         {
             StartCoroutine(TraverserAvecBateau(perso));
-            return;
+            
         }
 
 
@@ -224,11 +225,16 @@ public class BatimentInteractif : MonoBehaviour
     {
         if (!other.TryGetComponent(out PersonnageData perso)) return;
 
+
+
+
         occupants.Remove(perso);
         tempsRestant.Remove(perso);
         timerRegen.Remove(perso);
         timerProduction.Remove(perso); // <-- Ajoute cette ligne !
         perso.enRegeneration = false;
+        
+        perso.gameObject.SetActive(true);
     }
 
 
@@ -373,8 +379,9 @@ public class BatimentInteractif : MonoBehaviour
             occupants.Remove(p);
             tempsRestant.Remove(p);
             timerRegen.Remove(p);
-            p.enRegeneration = false;
+            p.TerminerRegeneration(); // ✅ Utilise la nouvelle méthode
         }
+
     }
 
 
@@ -553,46 +560,73 @@ public class BatimentInteractif : MonoBehaviour
     {
         Debug.Log($"[PORT] {perso.name} embarque sur le bateau...");
 
-        occupants.Remove(perso);
-        perso.gameObject.SetActive(false);
-
-        GameObject bateau = Instantiate(bateauPrefab, pointDepartBateau.position, Quaternion.identity);
-        if (portCible.pointArriveeBateau == null)
+        // 🔐 Vérification de sécurité
+        if (portCible == null || portCible == this)
         {
-            portCible.InitialiserPointsBateau(); // ⚠️ Assure-toi que cette méthode existe
-        }
-
-        if (portCible.pointArriveeBateau != null)
-        {
-            bateau.GetComponent<BateauController>().destination = portCible.pointArriveeBateau.position;
-        }
-        else
-        {
-            Debug.LogError($"[{name}] portCible n'a pas de pointArriveeBateau défini !");
-            Destroy(bateau);
+            Debug.LogWarning($"[PORT] {name} → portCible invalide !");
             yield break;
         }
 
+        // 🔄 Initialisation des points
+        InitialiserPointsBateau();
+        portCible.InitialiserPointsBateau();
 
+        if (pointDepartBateau == null || portCible.pointDepartBateau == null)
+        {
+            Debug.LogError($"[PORT] Points de bateau manquants !");
+            yield break;
+        }
 
         Vector3 start = pointDepartBateau.position;
-        Vector3 end = portCible.pointArriveeBateau.position;
-        float duration = delaiTraversée;
-        float t = 0f;
+        Vector3 end = portCible.pointDepartBateau.position;
 
-        while (t < duration)
+        // 🔄 Stop si distance trop courte
+        if (Vector3.Distance(start, end) < 0.1f)
         {
-            t += Time.deltaTime;
-            bateau.transform.position = Vector3.Lerp(start, end, t / duration);
+            Debug.LogWarning($"[PORT] {name} → Points trop proches");
+            yield break;
+        }
+
+        // 🔄 Cacher le personnage
+        occupants.Remove(perso);
+        perso.gameObject.SetActive(false);
+
+        // 🛶 Créer le bateau
+        GameObject bateau = Instantiate(bateauPrefab, start, Quaternion.identity);
+        if (bateau == null)
+        {
+            Debug.LogError("[PORT] Bateau non instancié !");
+            yield break;
+        }
+
+        float duration = delaiTraversée;
+        float speed = Vector3.Distance(start, end) / duration;
+
+        // 🌊 Mouvement du bateau
+        while (bateau != null && Vector3.Distance(bateau.transform.position, end) > 0.05f)
+        {
+            bateau.transform.position = Vector3.MoveTowards(bateau.transform.position, end, speed * Time.deltaTime);
             yield return null;
         }
 
         Destroy(bateau);
-        perso.transform.position = portCible.transform.position + new Vector3(Random.Range(-0.5f, 0.5f), 0.5f, 0);
-        perso.gameObject.SetActive(true);
 
-        Debug.Log($"[PORT] {perso.name} a débarqué !");
+        // 📍 Trouver une position de sol libre
+        Vector3 debarquement = portCible.TrouverSolLePlusProche();
+        perso.transform.position = debarquement;
+
+
+
+
+        Debug.Log($"[PORT] {perso.name} a débarqué à {debarquement}");
+        perso.QuitterBatiment();
+       
+
+
+
     }
+
+
 
     private BatimentInteractif TrouverPortLePlusProche()
     {
@@ -619,23 +653,24 @@ public class BatimentInteractif : MonoBehaviour
         if (dejaInitialise) return;
         dejaInitialise = true;
 
+        // 🔹 Création du point de départ
         if (pointDepartBateau == null)
         {
-            GameObject depart = new GameObject("PointDepartBateau");
-            depart.transform.SetParent(this.transform);
+            GameObject depart = new GameObject($"PointDepart_{name}");
             depart.transform.position = transform.position + new Vector3(-1f, -0.5f, 0);
+            depart.transform.SetParent(GameObject.Find("GameScene")?.transform); // pour ne pas détruire avec le port
             pointDepartBateau = depart.transform;
             Debug.Log($"[PORT INIT] {name} → PointDépart créé");
         }
 
-        if (portCible != null)
+        // 🔹 Création automatique du point d'arrivée si portCible existe
+        if (portCible != null && portCible != this)
         {
-            portCible.InitialiserPointsBateau(); // Appelé une seule fois, grâce au bool
-
+            portCible.InitialiserPointsBateau(); // Sécurisé avec dejaInitialise
             if (portCible.pointDepartBateau != null)
             {
                 pointArriveeBateau = portCible.pointDepartBateau;
-                Debug.Log($"----------------------------------------------------[PORT INIT] {name} → pointArrivee = {portCible.name}");
+                Debug.Log($"[PORT INIT] {name} → pointArrivee = {portCible.name}");
             }
             else
             {
@@ -645,8 +680,28 @@ public class BatimentInteractif : MonoBehaviour
     }
 
 
+  
+    Vector3 TrouverSolLePlusProche()
+    {
+        float rayon = 0.5f;
+        int essais = 100;
+
+        for (int i = 0; i < essais; i++)
+        {
+            Vector2 direction = UnityEngine.Random.insideUnitCircle.normalized;
+            Vector3 testPos = transform.position + (Vector3)(direction * rayon);
+
+            if (Physics2D.OverlapCircle(testPos, 0.1f, layerSol))
+                return testPos;
+
+            rayon += 0.1f;
+        }
+
+        return transform.position;
+    }
 
 
-    
+
+
 
 }
