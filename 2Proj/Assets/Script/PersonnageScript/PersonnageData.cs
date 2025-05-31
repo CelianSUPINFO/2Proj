@@ -834,6 +834,7 @@ public class PersonnageData : MonoBehaviour
         {
             Debug.Log("bonla cest ok");
             ChoisirNouvelleCible();
+            
         }
     }
 

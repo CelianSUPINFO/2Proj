@@ -233,8 +233,11 @@ public class BatimentInteractif : MonoBehaviour
         timerRegen.Remove(perso);
         timerProduction.Remove(perso); // <-- Ajoute cette ligne !
         perso.enRegeneration = false;
+        if (!perso.gameObject.activeInHierarchy)
+        {
+            perso.gameObject.SetActive(true);
+        }
         
-        perso.gameObject.SetActive(true);
     }
 
 
