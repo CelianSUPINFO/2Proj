@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System;
 
+
 public enum JobType
 {
     Aucun,
@@ -15,7 +16,7 @@ public enum JobType
     Chercheur,
     Boulanger,
     Scieur,
-    Pecheur, 
+    Pecheur,
     Forgeron,
 }
 
@@ -79,7 +80,7 @@ public class Backpack
         ressourceActuelle = null;
         quantite = 0;
 
-        // 🔥 NOUVEAU : Notifier le ResourceManager
+        //  NOUVEAU : Notifier le ResourceManager
         if (hadResources)
         {
             Debug.Log($"[Sac {proprietaire?.name ?? "Unknown"}] Vidé (contenait {oldResource})");
@@ -154,8 +155,13 @@ public class PersonnageData : MonoBehaviour
     private GameObject cibleRessource;
     private float timerCollecte;
 
+    
+    Animator anim;
+    private Vector3 positionPrecedente;
+
     private void Start()
-    {
+    {   
+        anim = GetComponent<Animator>();
         layerBatiments = LayerMask.GetMask("Buildings");
         sacADos.SetProprietaire(this);
         name = NomAleatoire.ObtenirNomUnique();
@@ -196,13 +202,30 @@ public class PersonnageData : MonoBehaviour
         }
 
         EvaluerBesoinsUrgents();
-
         timer -= Time.deltaTime;
 
-        // 🔥 NOUVEAU : Système de déplacement avec contournement
+        // Déplacement
         DeplacementAvecContournement();
 
-        // Comportement pour les personnages sans métier
+        // Calcul de la vitesse réelle (différence entre la nouvelle position et l’ancienne)
+        Vector2 velocity = (transform.position - positionPrecedente) / Time.deltaTime;
+
+        // Animation : éviter les erreurs nulles si anim non initialisé
+        if (anim != null)
+        {
+            anim.SetFloat("inputX", velocity.x);
+            anim.SetFloat("inputY", velocity.y);
+
+            if (velocity.magnitude > 0.1f)
+            {
+                anim.SetFloat("lastinputX", Mathf.Sign(velocity.x));
+                anim.SetFloat("lastinputY", Mathf.Sign(velocity.y));
+            }
+        }
+
+        // Met à jour positionPrecedente pour la prochaine frame
+        positionPrecedente = transform.position;
+
         if (!enRegeneration && metier == JobType.Aucun)
         {
             GérerLogiqueSansMetier();
@@ -364,6 +387,7 @@ public class PersonnageData : MonoBehaviour
         if (Physics2D.OverlapCircle(nextPos, 0.1f, layerSol))
         {
             transform.position = nextPos;
+            
         }
         else if (timer <= 0f)
         {
@@ -600,7 +624,7 @@ public class PersonnageData : MonoBehaviour
                 break;
 
             case EtatPerso.AttenteCollecte:
-                timerCollecte -= Time.deltaTime;
+            timerCollecte -= Time.deltaTime;
                 if (timerCollecte <= 0f)
                 {
                     string type = cibleRessource.tag == "Arbre" ? "Bois" : "Pierre";
@@ -608,7 +632,38 @@ public class PersonnageData : MonoBehaviour
                     {
                         sacADos.Ajouter(type, 1);
                         RessourceOccupationManager.Liberer(cibleRessource);
-                        Destroy(cibleRessource);
+
+                        if (cibleRessource.tag == "Arbre")
+                        {
+                            // Appelle GestionDesArbres pour couper et gérer la souche/repousse
+                            GameObject treesManager = GameObject.Find("Trees");
+                            if (treesManager != null)
+                            {
+                                treesManager.GetComponent<GestionDesArbres>().CouperArbre(cibleRessource.transform);
+                            }
+                            else
+                            {
+                                Debug.LogWarning("GestionDesArbres (Trees) n'a pas été trouvé dans la scène !");
+                            }
+                        }
+                        else if (cibleRessource.tag == "Pierre")
+                        {
+                            // Appelle GestionDesRochers pour casser et gérer la souche/repousse
+                            GameObject rocksManager = GameObject.Find("Rocks");
+                            if (rocksManager != null)
+                            {
+                                rocksManager.GetComponent<GestionDesRochers>().CasserRocher(cibleRessource.transform);
+                            }
+                            else
+                            {
+                                Debug.LogWarning("GestionDesRochers (Rocks) n'a pas été trouvé dans la scène !");
+                            }
+                        }
+                        else
+                        {
+                            // Pour toute autre ressource : comportement par défaut (facultatif)
+                            Destroy(cibleRessource);
+                        }
                     }
                     else
                     {
