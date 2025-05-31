@@ -106,6 +106,13 @@ MonoBehaviour:
     prerequisiteIds:
     - 10
     unlocked: 0
+  - id: 37
+    displayName: Boucherie
+    icon: {fileID: -865247755742902372, guid: 55808f7464661944bafc783056f34fd5, type: 3}
+    cost: 10
+    prerequisiteIds:
+    - 10
+    unlocked: 0
   - id: 15
     displayName: Charpentier
     icon: {fileID: 2464966911932608909, guid: a00126eded54f824e8189abd3e19ba1a, type: 3}
