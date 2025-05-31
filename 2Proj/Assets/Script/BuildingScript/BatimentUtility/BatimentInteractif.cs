@@ -60,7 +60,7 @@ public class BatimentInteractif : MonoBehaviour
         }
     }
 
-    private List<RessourceStockee> stock = new List<RessourceStockee>();
+    public List<RessourceStockee> stock = new List<RessourceStockee>();
     public int maxTypes = 4;
     public int maxParType = 20;
 

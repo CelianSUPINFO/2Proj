@@ -663,11 +663,58 @@ public class PersonnageData : MonoBehaviour
             GameObject[] objets = GameObject.FindGameObjectsWithTag(tag);
             foreach (GameObject obj in objets)
             {
-                float dist = Vector3.Distance(transform.position, obj.transform.position);
-                if (dist < distanceMin)
+                BatimentInteractif batiment = obj.GetComponent<BatimentInteractif>();
+                if (obj == batiment.gameObject)
                 {
-                    distanceMin = dist;
-                    plusProche = obj;
+                    if (batiment.estUnStockage)
+                    {
+                        string ressourceDuSac = sacADos.ressourceActuelle;
+                        if (!string.IsNullOrEmpty(ressourceDuSac))
+                        {
+                            int quantiteDansStock = batiment.ObtenirQuantite(ressourceDuSac);
+                            int espaceLibre = batiment.GetEspaceLibre(ressourceDuSac);
+
+                            if (batiment.stock.Count < batiment.maxTypes)
+                            {
+                                if (quantiteDansStock != 0 && espaceLibre > 0)
+                                {
+                                    float dist = Vector3.Distance(transform.position, obj.transform.position);
+                                    if (dist < distanceMin)
+                                    {
+                                        distanceMin = dist;
+                                        plusProche = obj;
+                                    }
+                                }
+                                if (quantiteDansStock == 0)
+                                {
+                                   float dist = Vector3.Distance(transform.position, obj.transform.position);
+                                    if (dist < distanceMin)
+                                    {
+                                        distanceMin = dist;
+                                        plusProche = obj;
+                                    } 
+                                }
+                            }
+                            else if (batiment.stock.Count == batiment.maxTypes && quantiteDansStock != 0 && espaceLibre > 0)
+                            {
+                                float dist = Vector3.Distance(transform.position, obj.transform.position);
+                                if (dist < distanceMin)
+                                {
+                                    distanceMin = dist;
+                                    plusProche = obj;
+                                }
+                            }
+                        }
+                    } 
+                }
+                else
+                {
+                    float dist = Vector3.Distance(transform.position, obj.transform.position);
+                    if (dist < distanceMin)
+                    {
+                        distanceMin = dist;
+                        plusProche = obj;
+                    }
                 }
             }
         }
