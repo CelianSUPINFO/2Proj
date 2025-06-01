@@ -6,9 +6,26 @@
   <component name="ChangeListManager">
     <list default="true" id="32726f8d-8211-4212-b69b-aa23c44961bd" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.2Proj/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.2Proj/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Fait Main/minerais/minerai argile.png.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Fait Main/minerais/minerai argile.png.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Game Menu/Scripts/MenuController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Game Menu/Scripts/MenuController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Game Menu/Scripts/MenuPanel.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Game Menu/Scripts/MenuPanel.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Game Menu.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Game Menu/Scripts.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Game Menu/Scripts/GameManager.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Game Menu/Scripts/GameManager.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Game Menu/Scripts/MenuController.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Game Menu/Scripts/MenuController.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Game Menu/Scripts/MenuPanel.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Game Menu/Scripts/MenuPanel.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Game Menu/Scripts/OpenPanelButton.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Game Menu/Scripts/OpenPanelButton.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Game Menu/Sprite.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Game Menu/Sprite/4Z_2101.w017.n001.354B.p15.354-removebg-preview.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Game Menu/Sprite/4Z_2101.w017.n001.354B.p15.354-removebg-preview.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Game Menu/Sprite/UiCozyFree.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Game Menu/Sprite/UiCozyFree.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scenes/Menu.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/Menu.unity" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Script/Options.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Script/Options.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/TextMesh Pro/Resources/Fonts &amp; Materials/LiberationSans SDF - Fallback.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/TextMesh Pro/Resources/Fonts &amp; Materials/LiberationSans SDF - Fallback.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ProjectSettings/EditorBuildSettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/EditorBuildSettings.asset" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -23,6 +40,9 @@
   </component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/Assets/Game Menu/Scripts/MenuController.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Game Menu/Scripts/OpenPanelButton.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.render-pipelines.universal/Shaders/2D/Sprite-Lit-Default.shader" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.ugui/Runtime/UGUI/UI/Core/RawImage.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="ProblemsViewState">
     <option name="selectedTabId" value="CurrentFile" />
@@ -124,7 +144,15 @@
       <workItem from="1746176004617" duration="7874000" />
       <workItem from="1746840370448" duration="32000" />
       <workItem from="1747135785796" duration="1697000" />
-      <workItem from="1747225093040" duration="2823000" />
+      <workItem from="1747225093040" duration="5534000" />
+      <workItem from="1747309515507" duration="2123000" />
+      <workItem from="1747397452371" duration="1042000" />
+      <workItem from="1747638612211" duration="5810000" />
+      <workItem from="1748276213398" duration="1168000" />
+      <workItem from="1748344887392" duration="4645000" />
+      <workItem from="1748369053470" duration="4222000" />
+      <workItem from="1748419891816" duration="23944000" />
+      <workItem from="1748600338426" duration="18639000" />
     </task>
     <servers />
   </component>

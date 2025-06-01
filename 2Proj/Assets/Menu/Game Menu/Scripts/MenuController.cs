@@ -9,8 +9,8 @@ public enum PanelType
     Main,
     Option,
     Credits,
+    Exit,
 }
-
 public class MenuController : MonoBehaviour
 {
     [FormerlySerializedAs("panelslist")]
@@ -32,9 +32,24 @@ public class MenuController : MonoBehaviour
 
     private void OpenOnePanel(PanelType _type, bool _animate)
     {
-        foreach (var _panel in panelsList) _panel.ChangeState(_animate,false);
-        
-        if (_type != PanelType.None) panelsDictionary[_type].ChangeState(_animate,true);
+        // Désactiver tous les panels
+        foreach (var _panel in panelsList)
+        {
+            if (_panel != null)
+            {
+                _panel.gameObject.SetActive(false);
+            }
+        }
+
+        // Activer celui demandé
+        if (_type != PanelType.None && panelsDictionary.ContainsKey(_type))
+        {
+            var panel = panelsDictionary[_type];
+
+            panel.gameObject.SetActive(true); // 🔥 le rend visible dans la hiérarchie
+            panel.ChangeState(_animate, true); // 🔄 applique l’animation si besoin
+            
+        }
     }
 
     public void OpenPanel(PanelType _type)
