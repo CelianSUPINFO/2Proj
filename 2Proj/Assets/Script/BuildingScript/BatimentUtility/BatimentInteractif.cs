@@ -43,6 +43,8 @@ public class BatimentInteractif : MonoBehaviour
         new MetierProductionInfo { metier = JobType.Forgeron, ressourceProduite = "Outil", dureeProduction = 30f, transformation = true, ressourceRequise = "fer", quantiteRequise = 5, quantiteProduite = 5 },
     };
 
+    public BuildingData data;
+
 
 
 
@@ -89,6 +91,9 @@ public class BatimentInteractif : MonoBehaviour
 
     private bool dejaInitialise = false;
     private bool pointsInitialises = false;
+
+    public bool estPlace = false;
+
 
 
 
@@ -187,7 +192,7 @@ public class BatimentInteractif : MonoBehaviour
                     }
                 }
 
-                float duree = info.dureeProduction;
+                float duree = AppliquerBonusAge(info.dureeProduction);
                 if (perso.aOutil) duree /= 2f;
                 timerProduction[perso] = duree;
 
@@ -703,6 +708,22 @@ public class BatimentInteractif : MonoBehaviour
         return transform.position;
     }
 
+    private float AppliquerBonusAge(float baseDuree)
+    {
+        if (data == null) return baseDuree;
+
+        switch (data.unlockAge)
+        {
+            case GameAge.AncientAge:
+                return baseDuree * 0.8f;
+            case GameAge.MedievalAge:
+                return baseDuree * 0.65f;
+            case GameAge.IndustrialAge:
+                return baseDuree * 0.5f;
+            default:
+                return baseDuree; // StoneAge ou non défini
+        }
+    }
 
 
 

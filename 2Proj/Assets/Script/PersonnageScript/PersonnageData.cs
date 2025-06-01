@@ -380,12 +380,27 @@ public class PersonnageData : MonoBehaviour
             }
         }
 
-        // Calcul de la prochaine position
-        Vector3 nextPos = transform.position + directionFinale.normalized * vitesse * Time.deltaTime;
+        // BONUS VITESSE SI SUR CHEMIN
+        float bonusVitesse = 1f;
+        Collider2D pathCollider = Physics2D.OverlapPoint(transform.position, LayerMask.GetMask("Path"));
+
+        if (pathCollider != null)
+        {
+            PathTile path = pathCollider.GetComponent<PathTile>();
+            if (path != null)
+            {
+                bonusVitesse = path.GetSpeedMultiplier();
+            }
+        }
+
+        // Application du bonus
+        Vector3 nextPos = transform.position + directionFinale.normalized * (vitesse * bonusVitesse) * Time.deltaTime;
+
 
         // Vérification que la prochaine position est sur le sol
         if (Physics2D.OverlapCircle(nextPos, 0.1f, layerSol))
         {
+            
             transform.position = nextPos;
             
         }
@@ -481,13 +496,28 @@ public class PersonnageData : MonoBehaviour
 
     public void DeplacerVers(Vector3 destination)
     {
-        cible = destination;
-        timer = UnityEngine.Random.Range(2f, 4f);
+        // 1. Cherche un chemin près de la position actuelle
+        Collider2D cheminDepart = Physics2D.OverlapCircle(transform.position, 2f, LayerMask.GetMask("Path"));
 
-        // 🔥 NOUVEAU : Réinitialiser le système de contournement lors d'un nouveau déplacement
+        // 2. Cherche un chemin près de la destination
+        Collider2D cheminArrivee = Physics2D.OverlapCircle(destination, 2f, LayerMask.GetMask("Path"));
+
+        if (cheminDepart != null && cheminArrivee != null)
+        {
+            // Si les deux points sont proches d'un chemin, on fait une transition douce :
+            cible = cheminArrivee.transform.position;
+        }
+        else
+        {
+            // Sinon on y va normalement
+            cible = destination;
+        }
+
+        timer = UnityEngine.Random.Range(2f, 4f);
         enContournement = false;
         timerContournement = 0f;
     }
+
 
     void ChoisirNouvelleCible()
     {
@@ -542,8 +572,9 @@ public class PersonnageData : MonoBehaviour
 
         foreach (BatimentInteractif b in batiments)
         {
-            if (!b.regenereBesoin || b.typeBesoin != besoin || !b.EstDisponible())
+            if (!b.estPlace || !b.regenereBesoin || b.typeBesoin != besoin || !b.EstDisponible())
                 continue;
+
 
             float dist = Vector3.Distance(transform.position, b.transform.position);
             if (dist < distanceMin)
@@ -719,6 +750,7 @@ public class PersonnageData : MonoBehaviour
             foreach (GameObject obj in objets)
             {
                 BatimentInteractif batiment = obj.GetComponent<BatimentInteractif>();
+                if (batiment != null && !batiment.estPlace) continue;
                 if (obj == batiment.gameObject)
                 {
                     if (batiment.estUnStockage)
@@ -742,12 +774,12 @@ public class PersonnageData : MonoBehaviour
                                 }
                                 if (quantiteDansStock == 0)
                                 {
-                                   float dist = Vector3.Distance(transform.position, obj.transform.position);
+                                    float dist = Vector3.Distance(transform.position, obj.transform.position);
                                     if (dist < distanceMin)
                                     {
                                         distanceMin = dist;
                                         plusProche = obj;
-                                    } 
+                                    }
                                 }
                             }
                             else if (batiment.stock.Count == batiment.maxTypes && quantiteDansStock != 0 && espaceLibre > 0)
@@ -760,7 +792,7 @@ public class PersonnageData : MonoBehaviour
                                 }
                             }
                         }
-                    } 
+                    }
                 }
                 else
                 {
@@ -785,7 +817,8 @@ public class PersonnageData : MonoBehaviour
 
         foreach (BatimentInteractif b in tous)
         {
-            if (b.metierAssocie != metier) continue;
+            if (!b.estPlace || b.metierAssocie != metier) continue;
+
 
             float dist = Vector3.Distance(transform.position, b.transform.position);
             if (dist < distanceMin)

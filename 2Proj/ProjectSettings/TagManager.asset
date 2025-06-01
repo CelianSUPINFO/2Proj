@@ -8,6 +8,7 @@ TagManager:
   - Arbre
   - Pierre
   - Stockage
+  - Port
   layers:
   - Default
   - TransparentFX
@@ -20,7 +21,7 @@ TagManager:
   - Day&Night
   - Ground
   - Mountain
-  - 
+  - Path
   - 
   - 
   - 

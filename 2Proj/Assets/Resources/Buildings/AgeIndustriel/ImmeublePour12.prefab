@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 1083802680162207094}
   - component: {fileID: 3052257896769478452}
   - component: {fileID: 2489591719733007690}
+  - component: {fileID: 3388484994968632727}
   m_Layer: 7
   m_Name: ImmeublePour12
   m_TagString: Building
@@ -156,6 +157,114 @@ MonoBehaviour:
   regenereBesoin: 1
   typeBesoin: 1
   estUnStockage: 0
+  layerSol:
+    serializedVersion: 2
+    m_Bits: 0
+  metierProductions:
+  - metier: 1
+    ressourceProduite: Bois
+    dureeProduction: 20
+    transformation: 0
+    ressourceRequise: 
+    quantiteRequise: 0
+    quantiteProduite: 5
+  - metier: 2
+    ressourceProduite: Pierre
+    dureeProduction: 20
+    transformation: 0
+    ressourceRequise: 
+    quantiteRequise: 0
+    quantiteProduite: 5
+  - metier: 3
+    ressourceProduite: Fer
+    dureeProduction: 30
+    transformation: 0
+    ressourceRequise: 
+    quantiteRequise: 0
+    quantiteProduite: 5
+  - metier: 4
+    ressourceProduite: Or
+    dureeProduction: 40
+    transformation: 0
+    ressourceRequise: 
+    quantiteRequise: 0
+    quantiteProduite: 5
+  - metier: 5
+    ressourceProduite: Viande
+    dureeProduction: 20
+    transformation: 0
+    ressourceRequise: 
+    quantiteRequise: 0
+    quantiteProduite: 5
+  - metier: 6
+    ressourceProduite: Ble
+    dureeProduction: 30
+    transformation: 0
+    ressourceRequise: 
+    quantiteRequise: 0
+    quantiteProduite: 5
+  - metier: 7
+    ressourceProduite: Recherche
+    dureeProduction: 30
+    transformation: 0
+    ressourceRequise: 
+    quantiteRequise: 0
+    quantiteProduite: 5
+  - metier: 8
+    ressourceProduite: Pain
+    dureeProduction: 30
+    transformation: 1
+    ressourceRequise: Ble
+    quantiteRequise: 5
+    quantiteProduite: 5
+  - metier: 9
+    ressourceProduite: Planche
+    dureeProduction: 30
+    transformation: 1
+    ressourceRequise: Bois
+    quantiteRequise: 5
+    quantiteProduite: 5
+  - metier: 10
+    ressourceProduite: Poisson
+    dureeProduction: 20
+    transformation: 0
+    ressourceRequise: 
+    quantiteRequise: 0
+    quantiteProduite: 5
+  - metier: 11
+    ressourceProduite: Outil
+    dureeProduction: 30
+    transformation: 1
+    ressourceRequise: fer
+    quantiteRequise: 5
+    quantiteProduite: 5
+  stock: []
   maxTypes: 4
   maxParType: 20
-  aFonctionPersonnalisee: 0
+  estUnPort: 0
+  portCible: {fileID: 0}
+  "delaiTravers\xE9e": 10
+  bateauPrefab: {fileID: 0}
+  pointDepartBateau: {fileID: 0}
+  pointArriveeBateau: {fileID: 0}
+  metierAssocie: 0
+--- !u!114 &3388484994968632727
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9032798326439436642}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d583988269fe3d449bbbda31cf56260e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  personnagePrefab: {fileID: 0}
+  nombrePersonnagesMax: 8
+  delaiRespawn: 30
+  rayonSpawn: 1.5
+  layerSol:
+    serializedVersion: 2
+    m_Bits: 0
+  afficherDebug: 1
