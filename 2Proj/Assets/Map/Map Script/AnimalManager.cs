@@ -4,16 +4,15 @@ using System.Collections.Generic;
 
 public class AnimalSpawner : MonoBehaviour
 {
-    public Tilemap groundTilemap; // Drag ton Tilemap ici dans l'inspecteur
-    public GameObject animalPrefab; // Ton prefab animal
-    public int spawnCount = 10; // Nombre d'animaux à faire spawn
+    public Tilemap groundTilemap;
+    public GameObject animalPrefab; 
+    public int spawnCount = 10; 
 
     private List<Vector3> groundPositions = new List<Vector3>();
 
 
     void Start()
     {
-        // Parcourir toutes les positions de la Tilemap "Ground"
         BoundsInt bounds = groundTilemap.cellBounds;
         TileBase[] allTiles = groundTilemap.GetTilesBlock(bounds);
 
@@ -31,7 +30,7 @@ public class AnimalSpawner : MonoBehaviour
             }
         }
 
-        // Spawn les animaux à des positions aléatoires
+       
         for (int i = 0; i < spawnCount; i++)
         {
             if (groundPositions.Count == 0) break;
