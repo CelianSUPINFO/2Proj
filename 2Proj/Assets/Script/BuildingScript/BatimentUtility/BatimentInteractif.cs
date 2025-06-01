@@ -9,6 +9,8 @@ public enum TypeBesoin { Aucun, Fatigue, Faim, Soif }
 [RequireComponent(typeof(Collider2D))]
 public class BatimentInteractif : MonoBehaviour
 {
+    private LayerMask layerBatiment;
+
     [Header("Capacité")] public int capaciteMax = 2;
     [Header("Régénération")] public bool regenereBesoin = false; public TypeBesoin typeBesoin = TypeBesoin.Fatigue;
     [Header("Stockage")] public bool estUnStockage = false;
@@ -43,6 +45,8 @@ public class BatimentInteractif : MonoBehaviour
         new MetierProductionInfo { metier = JobType.Forgeron, ressourceProduite = "Outil", dureeProduction = 30f, transformation = true, ressourceRequise = "fer", quantiteRequise = 5, quantiteProduite = 5 },
     };
 
+    public BuildingData data;
+
 
 
 
@@ -60,7 +64,7 @@ public class BatimentInteractif : MonoBehaviour
         }
     }
 
-    private List<RessourceStockee> stock = new List<RessourceStockee>();
+    public List<RessourceStockee> stock = new List<RessourceStockee>();
     public int maxTypes = 4;
     public int maxParType = 20;
 
@@ -90,15 +94,21 @@ public class BatimentInteractif : MonoBehaviour
     private bool dejaInitialise = false;
     private bool pointsInitialises = false;
 
+    public bool estPlace = false;
+
+
 
 
     private void Start()
     {
+        layerBatiment = LayerMask.GetMask("Buildings");
 
 
         if (metierAssocie != JobType.Aucun)
+        {
             Debug.Log($"[Batiment {name}] Initialisation et tentative d'assignation de métier.");
-        StartCoroutine(AssignerTravailleursInitiaux());
+            StartCoroutine(AssignerTravailleursInitiaux());
+        }
     }
 
 
@@ -187,7 +197,7 @@ public class BatimentInteractif : MonoBehaviour
                     }
                 }
 
-                float duree = info.dureeProduction;
+                float duree = AppliquerBonusAge(info.dureeProduction);
                 if (perso.aOutil) duree /= 2f;
                 timerProduction[perso] = duree;
 
@@ -233,18 +243,24 @@ public class BatimentInteractif : MonoBehaviour
         timerRegen.Remove(perso);
         timerProduction.Remove(perso); // <-- Ajoute cette ligne !
         perso.enRegeneration = false;
+
         
-        perso.gameObject.SetActive(true);
     }
 
+    public bool EstDejaCible()
+    {
+        return FindObjectsOfType<BatimentInteractif>()
+            .Any(p => p != this && p.estUnPort && p.portCible == this);
+    }
 
     private void Update()
     {
 
-        if (estUnPort && portCible == null)
+        if (estUnPort && (portCible == null || portCible.EstDejaCible()))
         {
-            portCible = TrouverPortLePlusProche();
+            portCible = TrouverPortLePlusPropreEtLibre();
         }
+
 
         if (estUnPort && portCible != null && !pointsInitialises)
         {
@@ -355,6 +371,7 @@ public class BatimentInteractif : MonoBehaviour
                         {
                             producteur.cibleObjet = stockage;
                             producteur.DeplacerVers(stockage.transform.position);
+                            
                             // Assure-toi que le personnage passera en mode AllerStockage
                         }
 
@@ -619,7 +636,10 @@ public class BatimentInteractif : MonoBehaviour
 
 
         Debug.Log($"[PORT] {perso.name} a débarqué à {debarquement}");
+        perso.gameObject.SetActive(true);
+
         perso.QuitterBatiment();
+        perso.cibleObjet = null;
        
 
 
@@ -683,15 +703,22 @@ public class BatimentInteractif : MonoBehaviour
   
     Vector3 TrouverSolLePlusProche()
     {
-        float rayon = 0.5f;
+        float rayon = 2f;
         int essais = 100;
+        float rayonDetection = 0.1f;
 
         for (int i = 0; i < essais; i++)
         {
             Vector2 direction = UnityEngine.Random.insideUnitCircle.normalized;
             Vector3 testPos = transform.position + (Vector3)(direction * rayon);
 
-            if (Physics2D.OverlapCircle(testPos, 0.1f, layerSol))
+            // Vérifie s'il y a du sol
+            bool solTrouve = Physics2D.OverlapCircle(testPos, rayonDetection, layerSol);
+
+            // Vérifie s'il y a un bâtiment
+            bool batimentPresent = Physics2D.OverlapCircle(testPos, rayonDetection, layerBatiment); // nouveau layer pour bâtiments
+
+            if (solTrouve && !batimentPresent)
                 return testPos;
 
             rayon += 0.1f;
@@ -701,7 +728,44 @@ public class BatimentInteractif : MonoBehaviour
     }
 
 
+    private float AppliquerBonusAge(float baseDuree)
+    {
+        if (data == null) return baseDuree;
 
+        switch (data.unlockAge)
+        {
+            case GameAge.AncientAge:
+                return baseDuree * 0.8f;
+            case GameAge.MedievalAge:
+                return baseDuree * 0.65f;
+            case GameAge.IndustrialAge:
+                return baseDuree * 0.5f;
+            default:
+                return baseDuree; // StoneAge ou non défini
+        }
+    }
+
+
+    private BatimentInteractif TrouverPortLePlusPropreEtLibre()
+    {
+        float minDist = float.MaxValue;
+        BatimentInteractif plusProche = null;
+
+        foreach (var b in FindObjectsOfType<BatimentInteractif>())
+        {
+            if (b == this || !b.estUnPort || b.EstDejaCible())
+                continue;
+
+            float dist = Vector3.Distance(transform.position, b.transform.position);
+            if (dist < minDist)
+            {
+                minDist = dist;
+                plusProche = b;
+            }
+        }
+
+        return plusProche;
+    }
 
 
 }

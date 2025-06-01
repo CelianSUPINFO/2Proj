@@ -230,6 +230,7 @@ MonoBehaviour:
     ressourceRequise: 
     quantiteRequise: 0
     quantiteProduite: 5
+  stock: []
   maxTypes: 4
   maxParType: 20
   estUnPort: 0
@@ -238,4 +239,4 @@ MonoBehaviour:
   bateauPrefab: {fileID: 0}
   pointDepartBateau: {fileID: 0}
   pointArriveeBateau: {fileID: 0}
-  metierAssocie: 8
+  metierAssocie: 0

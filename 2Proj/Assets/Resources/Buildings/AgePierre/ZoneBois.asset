@@ -15,14 +15,14 @@ MonoBehaviour:
   buildingName: Zone de bois
   prefab: {fileID: 9032798326439436642, guid: c23f90e4a2dbd4a4e8c6c3163587b5d6, type: 3}
   unlockAge: 0
-  locked: 0
+  locked: 1
   icon: {fileID: -3958463070074077975, guid: 74cdb6080dfeb0541b648e9e91531536, type: 3}
   function: 4
   cost:
     resourceCosts:
     - type: 0
-      amount: 1
+      amount: 20
     - type: 1
-      amount: 1
+      amount: 10
   capacity: 0
   description: "Une zone d\xE9di\xE9 \xE0 la d\xE9coupe et ressource de bois"

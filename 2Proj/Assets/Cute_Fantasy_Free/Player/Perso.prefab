@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 3082241256246329453}
   m_Layer: 0
   m_Name: Perso
-  m_TagString: Untagged
+  m_TagString: Personnage
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -103,6 +103,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   "batimentAssign\xE9": {fileID: 0}
+  aOutil: 0
   enRegeneration: 0
   vie: 100
   faim: 100

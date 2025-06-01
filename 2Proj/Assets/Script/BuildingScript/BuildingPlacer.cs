@@ -21,6 +21,9 @@ public class SimpleBuildingPlacer : MonoBehaviour
     private GameObject previewBuilding;
     private bool isPlacing = false;
     private BuildingData selectedBuildingData;
+    [Header("Layer de suppression automatique")]
+    public LayerMask removableObjectsLayer;
+
 
     void Update()
     {
@@ -129,10 +132,27 @@ public class SimpleBuildingPlacer : MonoBehaviour
         SpriteRenderer sr = previewBuilding.GetComponent<SpriteRenderer>();
         if (sr == null) return;
 
-        sr.color = CanPlace()
-            ? new Color(0f, 1f, 0f, 0.5f)
-            : new Color(1f, 0f, 0f, 0.5f);
+        bool canPlace = CanPlace();
+        bool hasRemovable = HasRemovableObjectsUnderPreview();
+
+        if (!canPlace)
+            sr.color = new Color(1f, 0f, 0f, 0.5f); // Rouge
+        else if (hasRemovable)
+            sr.color = new Color(1f, 0.5f, 0f, 0.5f); // Orange
+        else
+            sr.color = new Color(0f, 1f, 0f, 0.5f); // Vert
     }
+    private bool HasRemovableObjectsUnderPreview()
+    {
+        Vector2 centerPos = previewBuilding.transform.position;
+        Vector2 boxCenter = new Vector2(centerPos.x, centerPos.y - 0.5f);
+        Vector2 boxSize = new Vector2(3f, 3f);
+
+        Collider2D[] overlaps = Physics2D.OverlapBoxAll(boxCenter, boxSize, 0f, removableObjectsLayer);
+        return overlaps.Length > 0;
+    }
+
+
 
     bool CanPlace()
     {
@@ -146,22 +166,31 @@ public class SimpleBuildingPlacer : MonoBehaviour
         Vector2 boxSize = new Vector2(3f, 3f);
 
 
+        // Si c'est un port, on applique une règle spéciale
+        BatimentInteractif portTest = previewBuilding.GetComponent<BatimentInteractif>();
+        if (portTest != null && portTest.estUnPort)
+        {
+            return EstPlacementValidePort(boxCenter, boxSize);
+        }
+
+
         // 3. Vérifie s'il y a un obstacle (eau, falaise, etc.)
         Collider2D obstacleHit = Physics2D.OverlapBox(boxCenter, boxSize, 0f, placementObstaclesLayer);
         if (obstacleHit != null)
             return false;
 
-        // 4. Vérifie si on est bien sur du sol (Layer Ground)
-        Collider2D groundHit = Physics2D.OverlapBox(boxCenter, boxSize, 0f, LayerMask.GetMask("Ground"));
-        // Si c'est un port, on applique une règle spéciale
-        // BatimentInteractif portTest = previewBuilding.GetComponent<BatimentInteractif>();
-        // if (portTest != null && portTest.estUnPort)
-        // {
-        //     return EstPlacementValidePort(boxCenter, boxSize);
-        // }
-
-        if (groundHit == null)
+        if (!EstEntierementSurLeSol(boxCenter, boxSize))
+        {
+            Debug.Log("❌ Le bâtiment n’est pas entièrement sur le sol !");
             return false;
+        }
+        
+     
+        if (ContientDesPersonnagesSousBâtiment())
+        {
+            Debug.Log("Un personnage empêche le placement !");
+            return false;
+        }
 
         // 5. Autorisé !
         return true;
@@ -175,6 +204,8 @@ public class SimpleBuildingPlacer : MonoBehaviour
             return;
         }
 
+        SupprimerObjetsSousBâtiment(previewBuilding.transform.position);
+
         GameObject placed = Instantiate(buildingPrefab, previewBuilding.transform.position, Quaternion.identity);
 
         Collider2D col = placed.GetComponent<Collider2D>();
@@ -185,17 +216,30 @@ public class SimpleBuildingPlacer : MonoBehaviour
 
         placed.layer = LayerMask.NameToLayer("Buildings");
 
+        // ✅ Marquer le bâtiment comme placé
+        BatimentInteractif bat = placed.GetComponent<BatimentInteractif>();
+        if (bat != null)
+        {
+            bat.estPlace = true;
+        }
+
         // Lien entre prefab et données
         Building buildingComponent = placed.GetComponent<Building>();
         if (buildingComponent != null)
         {
             buildingComponent.data = selectedBuildingData;
         }
+        BatimentInteractif interactif = placed.GetComponent<BatimentInteractif>();
+        if (interactif != null)
+        {
+            interactif.data = selectedBuildingData;
+        }
 
-        // 🔥 NOUVEAU : Vérifier si c'est une maison et configurer le spawner
+
+        // 🔥 Configurer la maison si nécessaire
         ConfigurerMaisonSiNecessaire(placed);
 
-        // 🔬 NOUVEAU : Gagner des points de recherche pour avoir placé un bâtiment
+        // 🔬 Ajouter des points de recherche
         if (ResourceManager.Instance != null)
         {
             ResourceManager.Instance.Add(ResourceType.Search, pointsRechercheParBatiment);
@@ -208,6 +252,7 @@ public class SimpleBuildingPlacer : MonoBehaviour
 
         Debug.Log("Bâtiment placé avec succès !");
     }
+
 
     /// <summary>
     /// 🔥 NOUVELLE MÉTHODE : Configure le spawner si le bâtiment est une maison
@@ -275,7 +320,7 @@ public class SimpleBuildingPlacer : MonoBehaviour
             Debug.Log("Placement annulé !");
         }
     }
-    
+
     private bool EstPlacementValidePort(Vector2 boxCenter, Vector2 boxSize)
     {
         int total = 0, sol = 0, eau = 0;
@@ -300,7 +345,63 @@ public class SimpleBuildingPlacer : MonoBehaviour
         float ratioSol = (float)sol / total;
         float ratioEau = (float)eau / total;
 
-        return ratioSol >= 0.2f && ratioSol <= 0.6f ;
+        return ratioSol >= 0.2f && ratioSol <= 0.6f;
     }
+
+    private void SupprimerObjetsSousBâtiment(Vector2 position)
+    {
+        Vector2 boxCenter = new Vector2(position.x, position.y - 0.5f);
+        Vector2 boxSize = new Vector2(3f, 3f);
+
+        Collider2D[] toRemove = Physics2D.OverlapBoxAll(boxCenter, boxSize, 0f, removableObjectsLayer);
+        foreach (var col in toRemove)
+        {
+            Destroy(col.gameObject);
+            Debug.Log($"🧹 Objet supprimé : {col.gameObject.name}");
+        }
+    }
+
+    private bool ContientDesPersonnagesSousBâtiment()
+    {
+        Vector2 centerPos = previewBuilding.transform.position;
+        Vector2 boxCenter = new Vector2(centerPos.x, centerPos.y - 0.5f);
+        Vector2 boxSize = new Vector2(3f, 3f);
+
+        Collider2D[] overlaps = Physics2D.OverlapBoxAll(boxCenter, boxSize, 0f);
+
+        foreach (var col in overlaps)
+        {
+            if (col.CompareTag("Personnage")) // ou un composant spécifique comme "Personnage"
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private bool EstEntierementSurLeSol(Vector2 boxCenter, Vector2 boxSize)
+    {
+        int resolution = 5;
+        float stepX = boxSize.x / (resolution - 1);
+        float stepY = boxSize.y / (resolution - 1);
+
+        for (int x = 0; x < resolution; x++)
+        {
+            for (int y = 0; y < resolution; y++)
+            {
+                Vector2 point = boxCenter + new Vector2(-boxSize.x / 2 + x * stepX, -boxSize.y / 2 + y * stepY);
+                if (!Physics2D.OverlapPoint(point, LayerMask.GetMask("Ground")))
+                {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+
+
 
 }

@@ -156,6 +156,9 @@ MonoBehaviour:
   regenereBesoin: 0
   typeBesoin: 1
   estUnStockage: 0
+  layerSol:
+    serializedVersion: 2
+    m_Bits: 0
   metierProductions:
   - metier: 1
     ressourceProduite: Bois
@@ -234,11 +237,12 @@ MonoBehaviour:
     ressourceRequise: fer
     quantiteRequise: 5
     quantiteProduite: 5
+  stock: []
   maxTypes: 19
   maxParType: 21
   estUnPort: 1
   portCible: {fileID: 0}
-  "delaiTravers\xE9e": 5
+  "delaiTravers\xE9e": 2
   bateauPrefab: {fileID: 6682809213986162374, guid: 36e684570560ec248a7c94f54a7ce032, type: 3}
   pointDepartBateau: {fileID: 0}
   pointArriveeBateau: {fileID: 0}
