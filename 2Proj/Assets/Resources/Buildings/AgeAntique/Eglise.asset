@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2bc76cb91bdb8bf4e934a0be13a71ece, type: 3}
+  m_Name: Eglise
+  m_EditorClassIdentifier: 
+  buildingName: Eglise
+  prefab: {fileID: 9032798326439436642, guid: c66b0fbeaf2f9e641954175f4ab0895b, type: 3}
+  unlockAge: 1
+  locked: 1
+  icon: {fileID: 3875422212671668646, guid: 709223d5a9cf2344bb5cb9f8d4c307a0, type: 3}
+  function: 6
+  cost:
+    resourceCosts:
+    - type: 0
+      amount: 20
+    - type: 1
+      amount: 15
+    - type: 7
+      amount: 5
+  capacity: 4
+  description: "Les pr\xEAtres \xE9tudient et recherchent la v\xE9rit\xE9"

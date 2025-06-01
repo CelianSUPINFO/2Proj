@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2bc76cb91bdb8bf4e934a0be13a71ece, type: 3}
+  m_Name: Stockage
+  m_EditorClassIdentifier: 
+  buildingName: Stockage
+  prefab: {fileID: 870588462395568201, guid: ea37613e4814b834eb1da33389ce51ce, type: 3}
+  unlockAge: 0
+  locked: 0
+  icon: {fileID: -7656482747145632760, guid: f4c0f7d8fe2ee36488b466a8f2dea7d4, type: 3}
+  function: 3
+  cost:
+    resourceCosts:
+    - type: 0
+      amount: 5
+  capacity: 4
+  description: "Un coin stockage pratique pour y d\xE9poser quelques ressources"

@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2bc76cb91bdb8bf4e934a0be13a71ece, type: 3}
+  m_Name: MaisonPour4
+  m_EditorClassIdentifier: 
+  buildingName: Maison Pour 4
+  prefab: {fileID: 9032798326439436642, guid: 366cc931ecfa6fc4282e40ef0aa785a1, type: 3}
+  unlockAge: 1
+  locked: 1
+  icon: {fileID: 21300000, guid: 93b2a1ddff9b9a04a805822eb31253bb, type: 3}
+  function: 0
+  cost:
+    resourceCosts:
+    - type: 0
+      amount: 20
+    - type: 1
+      amount: 10
+  capacity: 4
+  description: Une belle maison pour une simple famille

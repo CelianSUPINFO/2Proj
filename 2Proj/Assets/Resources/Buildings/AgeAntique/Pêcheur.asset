@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2bc76cb91bdb8bf4e934a0be13a71ece, type: 3}
+  m_Name: "P\xEAcheur"
+  m_EditorClassIdentifier: 
+  buildingName: Peche
+  prefab: {fileID: 9032798326439436642, guid: 994a12e1faa29af44a0713e37c326aac, type: 3}
+  unlockAge: 1
+  locked: 1
+  icon: {fileID: -3055708007780212459, guid: 8b43eb702d092f54aa12dd439a9d5328, type: 3}
+  function: 10
+  cost:
+    resourceCosts:
+    - type: 0
+      amount: 25
+  capacity: 4
+  description: "Une cabane pour les p\xEAcheurs"

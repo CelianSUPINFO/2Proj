@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2bc76cb91bdb8bf4e934a0be13a71ece, type: 3}
+  m_Name: GrandPort
+  m_EditorClassIdentifier: 
+  buildingName: Grand port
+  prefab: {fileID: 9032798326439436642, guid: 69f4ada494a2e12499126a0be666057c, type: 3}
+  unlockAge: 3
+  locked: 1
+  icon: {fileID: 2533548304019223795, guid: 027b12124b2c55b4ebabd68eaa0f3e08, type: 3}
+  function: 9
+  cost:
+    resourceCosts:
+    - type: 7
+      amount: 40
+    - type: 0
+      amount: 40
+    - type: 13
+      amount: 20
+  capacity: 12
+  description: "Voyager \xE0 travers le monde pour d\xE9couvrir ce qu'il se cache...\n"

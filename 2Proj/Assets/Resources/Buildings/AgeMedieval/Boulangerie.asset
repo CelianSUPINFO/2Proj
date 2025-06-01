@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2bc76cb91bdb8bf4e934a0be13a71ece, type: 3}
+  m_Name: Boulangerie
+  m_EditorClassIdentifier: 
+  buildingName: Boulangerie
+  prefab: {fileID: 9032798326439436642, guid: 6f90b567c9ed1a84fab7150352ae7ae2, type: 3}
+  unlockAge: 2
+  locked: 1
+  icon: {fileID: 7648446683007888229, guid: 978049b444d8f234b86c5511a36e1b7b, type: 3}
+  function: 1
+  cost:
+    resourceCosts:
+    - type: 0
+      amount: 25
+    - type: 1
+      amount: 10
+    - type: 7
+      amount: 5
+  capacity: 6
+  description: Du bon petit pain chaud pour se remplir le ventre

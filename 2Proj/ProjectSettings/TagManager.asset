@@ -5,6 +5,11 @@ TagManager:
   serializedVersion: 3
   tags:
   - Building
+  - Arbre
+  - Pierre
+  - Stockage
+  - Port
+  - Personnage
   layers:
   - Default
   - TransparentFX
@@ -14,10 +19,10 @@ TagManager:
   - UI
   - Obstacles
   - Buildings
-  - 
-  - 
-  - 
-  - 
+  - Day&Night
+  - Ground
+  - Mountain
+  - Path
   - 
   - 
   - 
@@ -47,6 +52,9 @@ TagManager:
     locked: 0
   - name: Terrain
     uniqueID: 531665513
+    locked: 0
+  - name: Animals
+    uniqueID: 524482003
     locked: 0
   - name: cloud
     uniqueID: 738502427
