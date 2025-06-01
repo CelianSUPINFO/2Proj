@@ -31,7 +31,7 @@ public class GestionDesRochers : MonoBehaviour
             // Instancie la "souce de pierre" (pierre vide) à la position et rotation du rocher
             GameObject souchePierre = Instantiate(prefabSouchePierre, rocher.position, rocher.rotation, transform);
 
-            // 🔥 Change le Sorting Layer pour être visible
+            //  Change le Sorting Layer pour être visible
             SpriteRenderer sr = souchePierre.GetComponent<SpriteRenderer>();
             if (sr != null)
             {

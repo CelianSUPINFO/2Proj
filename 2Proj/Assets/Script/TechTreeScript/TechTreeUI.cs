@@ -4,69 +4,69 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
+// Classe représentant un nœud logique dans l'arbre technologique
 class TreeNode
 {
-    public TechNode data;
-    public List<TreeNode> children = new();
-    public int depth = 0;
-    public Vector2 position;
+    public TechNode data; // Les données techniques liées à ce nœud
+    public List<TreeNode> children = new(); // Liste des enfants (techs dépendantes)
+    public int depth = 0; // Profondeur dans l’arbre
+    public Vector2 position; // Position sur l’UI
 }
 
 public class TechTreeUI : MonoBehaviour
 {
     [Header("Références")]
-    public GameObject treePanel;
-    public GameObject techNodePrefab;
-    public Transform nodesParent; // Content du ScrollRect
-    public TechTreeData techTreeData;
+    public GameObject treePanel; // Panneau global de l’arbre
+    public GameObject techNodePrefab; // Préfab pour chaque technologie
+    public Transform nodesParent; // Le content du ScrollRect
+    public TechTreeData techTreeData; // Les données de l’arbre
 
     [SerializeField] private GameObject arrowPrefab;
     [SerializeField] private BuildingBarUI buildingBarUI;
 
-    private Dictionary<string, GameObject> nodeButtons = new();
-    private GameObject arrowContainer;
+    private Dictionary<string, GameObject> nodeButtons = new(); // Dictionnaire des boutons associés aux nodes
+    private GameObject arrowContainer; // Container pour les flèches
 
-    // Espacement configurable
     [SerializeField] private float nodeSpacingX = 250f;
     [SerializeField] private float nodeSpacingY = 200f;
 
     void Start()
     {
-        treePanel.SetActive(false);
+        treePanel.SetActive(false); // On cache l’arbre au début
         foreach (var node in techTreeData.techNodes)
         {
-            node.unlocked = false;
+            node.unlocked = false; // On verrouille tout au départ
         }
-        LayoutAndInstantiateTree();
+        LayoutAndInstantiateTree(); // On génère l’UI
     }
 
     public void ToggleTree()
     {
-        treePanel.SetActive(!treePanel.activeSelf);
+        treePanel.SetActive(!treePanel.activeSelf); // Ouvre ou ferme l’arbre
     }
 
-    // --- AFFICHAGE ET LAYOUT ---
+    // Positionne et instancie tous les éléments du tech tree
     void LayoutAndInstantiateTree()
     {
-        // 1. Nettoyage ancien affichage
+        // Nettoyage des anciens éléments
         foreach (Transform child in nodesParent) Destroy(child.gameObject);
         nodeButtons.Clear();
         if (arrowContainer != null) Destroy(arrowContainer);
 
-        // 2. Création du graphe logique
+        // Création du graphe logique
         var graph = BuildTreeGraph();
 
-        // 3. Détection des racines
+        // On récupère les racines (pas de prérequis)
         var roots = graph.Values
             .Where(n => n.data.prerequisiteIds == null || n.data.prerequisiteIds.Count == 0)
             .ToList();
 
-        // 4. Placement logique de chaque nœud (LayoutTree modifie node.position)
+        // Placement des racines et de leurs enfants
         float startX = -50;
         foreach (var root in roots)
             startX = LayoutTree(root, startX);
 
-        // 5. Calculer min/max
+        // Calcul des extrémités de l’arbre
         float minX = float.MaxValue, maxX = float.MinValue;
         float minY = float.MaxValue, maxY = float.MinValue;
         foreach (var node in graph.Values)
@@ -77,9 +77,9 @@ public class TechTreeUI : MonoBehaviour
             maxY = Mathf.Max(maxY, node.position.y);
         }
 
-        // 6. Décaler tous les noeuds pour minX=0 (gauche) et maxY=0 (haut), avec marge
-        float margeX = 30f; // marge à gauche
-        float margeY = 30f; // marge en haut
+        // Décalage des positions pour tout voir à l’écran
+        float margeX = 30f;
+        float margeY = 30f;
 
         foreach (var node in graph.Values)
         {
@@ -87,19 +87,17 @@ public class TechTreeUI : MonoBehaviour
             node.position.y = node.position.y - maxY + margeY;
         }
 
-        // 7. Instanciation des boutons aux bonnes positions
+        // Instanciation de chaque nœud (bouton UI)
         foreach (var node in graph.Values)
             InstantiateTreeNode(node);
 
-        // 8. Détermination de la taille idéale du content
+        // Taille du ScrollRect content
         float treeWidth = (maxX - minX) + nodeSpacingX + margeX * 2;
         float treeHeight = (maxY - minY) + nodeSpacingY + margeY * 2;
         var nodesParentRect = nodesParent.GetComponent<RectTransform>();
         nodesParentRect.sizeDelta = new Vector2(treeWidth, treeHeight);
 
-        // 9. PAS de centrage automatique ! Content est ancré haut gauche.
-
-        // 10. Génération des flèches (APRÈS tous les boutons)
+        // Création des flèches entre les nœuds
         arrowContainer = new GameObject("ArrowLines");
         arrowContainer.transform.SetParent(nodesParent, false);
         CanvasGroup arrowCanvasGroup = arrowContainer.AddComponent<CanvasGroup>();
@@ -118,11 +116,11 @@ public class TechTreeUI : MonoBehaviour
             }
         }
 
-        // 11. Met à jour la couleur/état de chaque nœud selon son statut
+        // Mise à jour de la couleur des nœuds
         foreach (var node in techTreeData.techNodes){
             UpdateNodeVisual(nodeButtons[node.id], node);}
 
-        // === Ajustement dynamique du content ===
+        // Ajustement final : recentrage
         Vector2 min = Vector2.positiveInfinity;
         Vector2 max = Vector2.negativeInfinity;
 
@@ -141,17 +139,15 @@ public class TechTreeUI : MonoBehaviour
             Mathf.Abs(min.y - max.y) + padding * 2
         );
 
-        // Recentrage des nodes
         Vector2 offset = new Vector2(padding - min.x, padding - max.y);
         foreach (var kv in nodeButtons)
         {
             RectTransform rt = kv.Value.GetComponent<RectTransform>();
             rt.anchoredPosition += offset;
         }
-
-
     }
 
+    // Crée un bouton pour une tech
     void InstantiateTreeNode(TreeNode node)
     {
         GameObject btn = Instantiate(techNodePrefab, nodesParent);
@@ -160,6 +156,7 @@ public class TechTreeUI : MonoBehaviour
         RectTransform rt = btn.GetComponent<RectTransform>();
         rt.anchoredPosition = node.position;
 
+        // Affichage icône
         Transform iconTransform = btn.transform.Find("Icon");
         if (iconTransform != null)
         {
@@ -168,6 +165,7 @@ public class TechTreeUI : MonoBehaviour
                 iconImage.sprite = node.data.icon;
         }
 
+        // Affichage coût
         Transform costTransform = btn.transform.Find("Cost");
         if (costTransform != null)
         {
@@ -176,6 +174,7 @@ public class TechTreeUI : MonoBehaviour
                 costText.text = $"{node.data.cost}";
         }
 
+        // Affichage nom
         Transform nameTransform = btn.transform.Find("Name");
         if (nameTransform != null)
         {
@@ -184,16 +183,18 @@ public class TechTreeUI : MonoBehaviour
                 nameText.text = node.data.displayName;
         }
 
+        // Ajout du clic
         btn.GetComponent<Button>().onClick.AddListener(() => TryUnlock(node.data.id));
         nodeButtons[node.data.id] = btn;
     }
 
+    // Crée une flèche entre deux nœuds
     void DrawArrow(GameObject fromBtn, GameObject toBtn)
     {
         if (arrowPrefab == null)
         {
             Debug.LogError("ArrowPrefab n'est pas assigné !");
-            CreateSimpleArrow(fromBtn, toBtn); // fallback
+            CreateSimpleArrow(fromBtn, toBtn);
             return;
         }
 
@@ -212,14 +213,10 @@ public class TechTreeUI : MonoBehaviour
         Vector2 fromPos = fromRT.anchoredPosition;
         Vector2 toPos = toRT.anchoredPosition;
 
-        // === AJUSTEMENT VERTICAL ===
-        float verticalOffset = -200f; // décale les flèches un peu vers le bas
-        fromPos.y += verticalOffset;
-        toPos.y += verticalOffset;
-
-        float horizontalOffsset = 150f; // décale les flèches un peu vers le bas
-        fromPos.x += horizontalOffsset;
-        toPos.x += horizontalOffsset;
+        fromPos.y += -200f;
+        toPos.y += -200f;
+        fromPos.x += 150f;
+        toPos.x += 150f;
 
         Vector2 direction = toPos - fromPos;
         float distance = direction.magnitude;
@@ -246,8 +243,7 @@ public class TechTreeUI : MonoBehaviour
         arrow.transform.SetAsLastSibling();
     }
 
-
-
+    // Crée une flèche simple si le prefab n’est pas assigné
     void CreateSimpleArrow(GameObject fromBtn, GameObject toBtn)
     {
         GameObject arrow = new GameObject("SimpleArrow", typeof(RectTransform));
@@ -275,8 +271,7 @@ public class TechTreeUI : MonoBehaviour
         arrowRect.rotation = Quaternion.Euler(0, 0, angle);
     }
 
-
-    // --- LOGIQUE DES NOEUDS (identique à la tienne) ---
+    // Construit le graphe logique des dépendances
     Dictionary<string, TreeNode> BuildTreeGraph()
     {
         Dictionary<string, TreeNode> allNodes = new();
@@ -299,6 +294,7 @@ public class TechTreeUI : MonoBehaviour
         return allNodes;
     }
 
+    // Calcule la position logique d’un arbre récursivement
     float LayoutTree(TreeNode node, float x = -50)
     {
         if (node.children.Count == 0)
@@ -319,7 +315,7 @@ public class TechTreeUI : MonoBehaviour
         return currentX;
     }
 
-    // --- LOGIQUE DE DEBLOCAGE ---
+    // Gère le clic sur un nœud pour débloquer la tech
     void TryUnlock(string nodeId)
     {
         var node = techTreeData.techNodes.Find(n => n.id == nodeId);
@@ -336,6 +332,7 @@ public class TechTreeUI : MonoBehaviour
             UpdateNodeVisual(nodeButtons[n.id], n);
     }
 
+    // Met à jour l’apparence visuelle du bouton selon son état
     void UpdateNodeVisual(GameObject button, TechNode node)
     {
         var image = button.GetComponent<Image>();
@@ -358,6 +355,7 @@ public class TechTreeUI : MonoBehaviour
         }
     }
 
+    // Vérifie si les prérequis sont remplis pour une tech
     bool ArePrerequisitesMet(TechNode node)
     {
         if (node.prerequisiteIds == null || node.prerequisiteIds.Count == 0)
@@ -366,116 +364,40 @@ public class TechTreeUI : MonoBehaviour
             techTreeData.techNodes.Find(n => n.id == id)?.unlocked == true);
     }
 
+    // Applique l’effet d’une technologie (débloque des bâtiments ou des âges)
     void ApplyTechEffect(string techId)
     {
         switch (techId)
         {
-            case "0":
-                BuildingManager.UnlockBuilding("Puit");
-                buildingBarUI.RefreshBar(AgeManager.Instance.GetCurrentAge());
-                break;
-            case "3":
-                BuildingManager.UnlockBuilding("Ferme de Baie");
-                buildingBarUI.RefreshBar(AgeManager.Instance.GetCurrentAge());
-                break;
-            case "4":
-                BuildingManager.UnlockBuilding("Zone de bois");
-                buildingBarUI.RefreshBar(AgeManager.Instance.GetCurrentAge());
-                break;
-            case "6":
-                BuildingManager.UnlockBuilding("Mine de Pierre");
-                buildingBarUI.RefreshBar(AgeManager.Instance.GetCurrentAge());
-                break;
-            case "7":
-                BuildingManager.UnlockBuilding("Port");
-                buildingBarUI.RefreshBar(AgeManager.Instance.GetCurrentAge());
-                break;
-            case "10":
-                AgeManager.Instance.AdvanceToNextAge();
-                break;
-            case "11":
-                BuildingManager.UnlockBuilding("Maison Pour 4");
-                buildingBarUI.RefreshBar(AgeManager.Instance.GetCurrentAge());
-                break;
-            case "12":
-                BuildingManager.UnlockBuilding("Ferme de blé");
-                buildingBarUI.RefreshBar(AgeManager.Instance.GetCurrentAge());
-                break;
-            case "13":
-                BuildingManager.UnlockBuilding("Peche");
-                buildingBarUI.RefreshBar(AgeManager.Instance.GetCurrentAge());
-                break;
-            case "14":
-                BuildingManager.UnlockBuilding("Etable");
-                buildingBarUI.RefreshBar(AgeManager.Instance.GetCurrentAge());
-                break;
-            case "15":
-                BuildingManager.UnlockBuilding("Scierie");
-                buildingBarUI.RefreshBar(AgeManager.Instance.GetCurrentAge());
-                break;
-            case "16":
-                BuildingManager.UnlockBuilding("Eglise");
-                buildingBarUI.RefreshBar(AgeManager.Instance.GetCurrentAge());
-                break;
-            case "20":
-                AgeManager.Instance.AdvanceToNextAge();
-                break;
-            case "21":
-                BuildingManager.UnlockBuilding("Maison Pour 6");
-                buildingBarUI.RefreshBar(AgeManager.Instance.GetCurrentAge());
-                break;
-            case "22":
-                BuildingManager.UnlockBuilding("Bar");
-                buildingBarUI.RefreshBar(AgeManager.Instance.GetCurrentAge());
-                break;
-            case "23":
-                BuildingManager.UnlockBuilding("Forge");
-                buildingBarUI.RefreshBar(AgeManager.Instance.GetCurrentAge());
-                break;
-            case "24":
-                BuildingManager.UnlockBuilding("Mine de fer");
-                buildingBarUI.RefreshBar(AgeManager.Instance.GetCurrentAge());
-                break;
-            case "25":
-                BuildingManager.UnlockBuilding("Stockage Avance");
-                buildingBarUI.RefreshBar(AgeManager.Instance.GetCurrentAge());
-                break;
-            case "26":
-                BuildingManager.UnlockBuilding("Bibliotheque");
-                buildingBarUI.RefreshBar(AgeManager.Instance.GetCurrentAge());
-                break;
-            case "30":
-                AgeManager.Instance.AdvanceToNextAge();
-                break;
-            case "31":
-                BuildingManager.UnlockBuilding("Immeuble");
-                buildingBarUI.RefreshBar(AgeManager.Instance.GetCurrentAge());
-                break;
-            case "32":
-                BuildingManager.UnlockBuilding("Mine d'or");
-                buildingBarUI.RefreshBar(AgeManager.Instance.GetCurrentAge());
-                break;
-            case "33":
-                BuildingManager.UnlockBuilding("Boulangerie industrielle");
-                buildingBarUI.RefreshBar(AgeManager.Instance.GetCurrentAge());
-                break;
-            case "34":
-                BuildingManager.UnlockBuilding("Usine d'outil");
-                buildingBarUI.RefreshBar(AgeManager.Instance.GetCurrentAge());
-                break;
-            case "35":
-                BuildingManager.UnlockBuilding("Entrepot");
-                buildingBarUI.RefreshBar(AgeManager.Instance.GetCurrentAge());
-                break;
-            case "36":
-                BuildingManager.UnlockBuilding("Grand port");
-                buildingBarUI.RefreshBar(AgeManager.Instance.GetCurrentAge());
-                break;
-            case "37":
-                BuildingManager.UnlockBuilding("Laboratoire");
-                buildingBarUI.RefreshBar(AgeManager.Instance.GetCurrentAge());
-                break;
+            case "0": BuildingManager.UnlockBuilding("Puit"); break;
+            case "3": BuildingManager.UnlockBuilding("Ferme de Baie"); break;
+            case "4": BuildingManager.UnlockBuilding("Zone de bois"); break;
+            case "6": BuildingManager.UnlockBuilding("Mine de Pierre"); break;
+            case "7": BuildingManager.UnlockBuilding("Port"); break;
+            case "10": AgeManager.Instance.AdvanceToNextAge(); break;
+            case "11": BuildingManager.UnlockBuilding("Maison Pour 4"); break;
+            case "12": BuildingManager.UnlockBuilding("Ferme de blé"); break;
+            case "13": BuildingManager.UnlockBuilding("Peche"); break;
+            case "14": BuildingManager.UnlockBuilding("Etable"); break;
+            case "15": BuildingManager.UnlockBuilding("Scierie"); break;
+            case "16": BuildingManager.UnlockBuilding("Eglise"); break;
+            case "20": AgeManager.Instance.AdvanceToNextAge(); break;
+            case "21": BuildingManager.UnlockBuilding("Maison Pour 6"); break;
+            case "22": BuildingManager.UnlockBuilding("Bar"); break;
+            case "23": BuildingManager.UnlockBuilding("Forge"); break;
+            case "24": BuildingManager.UnlockBuilding("Mine de fer"); break;
+            case "25": BuildingManager.UnlockBuilding("Stockage Avance"); break;
+            case "26": BuildingManager.UnlockBuilding("Bibliotheque"); break;
+            case "30": AgeManager.Instance.AdvanceToNextAge(); break;
+            case "31": BuildingManager.UnlockBuilding("Immeuble"); break;
+            case "32": BuildingManager.UnlockBuilding("Mine d'or"); break;
+            case "33": BuildingManager.UnlockBuilding("Boulangerie industrielle"); break;
+            case "34": BuildingManager.UnlockBuilding("Usine d'outil"); break;
+            case "35": BuildingManager.UnlockBuilding("Entrepot"); break;
+            case "36": BuildingManager.UnlockBuilding("Grand port"); break;
+            case "37": BuildingManager.UnlockBuilding("Laboratoire"); break;
         }
-    }
 
+        buildingBarUI.RefreshBar(AgeManager.Instance.GetCurrentAge());
+    }
 }

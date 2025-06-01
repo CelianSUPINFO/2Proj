@@ -303,6 +303,19 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
@@ -1859,7 +1872,77 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      player sprite sheet left_0: 4361360429567182706
+      player sprite sheet left_1: 9181119767310803711
+      player sprite sheet left_10: -4788121991951174123
+      player sprite sheet left_11: 8182896823941577567
+      player sprite sheet left_12: -5349956160713319853
+      player sprite sheet left_13: 7049916256839954853
+      player sprite sheet left_14: 5077460200989493860
+      player sprite sheet left_15: -1317741985494217410
+      player sprite sheet left_16: 5429909981095697725
+      player sprite sheet left_17: 9019684697024694099
+      player sprite sheet left_18: 1136258134300274518
+      player sprite sheet left_19: -2421094846999124409
+      player sprite sheet left_2: 6714674215323751778
+      player sprite sheet left_20: 8224332266728113486
+      player sprite sheet left_21: 882082553298865209
+      player sprite sheet left_22: 4388646213288655882
+      player sprite sheet left_23: 4805264924481717061
+      player sprite sheet left_24: -2515145341091052979
+      player sprite sheet left_25: 2136361131619009685
+      player sprite sheet left_26: -7014374609297858073
+      player sprite sheet left_27: 8982515115018383235
+      player sprite sheet left_28: -1057712803463828238
+      player sprite sheet left_29: 5438606958354718983
+      player sprite sheet left_3: -4025394454649308236
+      player sprite sheet left_30: 1125172796843283154
+      player sprite sheet left_31: -4860900895663320650
+      player sprite sheet left_32: -8361335066236009392
+      player sprite sheet left_33: 5095856368743528015
+      player sprite sheet left_34: 4314180842207831172
+      player sprite sheet left_35: 5296520774461634218
+      player sprite sheet left_36: -5236532497681567478
+      player sprite sheet left_37: -1249530783735330131
+      player sprite sheet left_38: 255322531788241519
+      player sprite sheet left_39: 3180788853969335863
+      player sprite sheet left_4: 7287442617686288033
+      player sprite sheet left_40: 4621028458175466632
+      player sprite sheet left_41: 7833761852402580351
+      player sprite sheet left_42: -81049263724605792
+      player sprite sheet left_43: 5922909575786274608
+      player sprite sheet left_44: -3556751478342305719
+      player sprite sheet left_45: 3011591200339799063
+      player sprite sheet left_46: -2038516405401705884
+      player sprite sheet left_47: -1863627144234621708
+      player sprite sheet left_48: -509823087912413066
+      player sprite sheet left_49: -3081194849257372471
+      player sprite sheet left_5: 344095053099134552
+      player sprite sheet left_50: 2099745191253846600
+      player sprite sheet left_51: -796672569750582963
+      player sprite sheet left_52: 5452273033317696385
+      player sprite sheet left_53: -2541497254839338135
+      player sprite sheet left_54: 2007404955119257471
+      player sprite sheet left_55: 3556346419481661292
+      player sprite sheet left_56: -8219748391845963524
+      player sprite sheet left_57: -6736495772064050179
+      player sprite sheet left_58: -8114841239602967988
+      player sprite sheet left_59: 8690226719014918776
+      player sprite sheet left_6: 4564529553566315298
+      player sprite sheet left_60: 7656237692920961048
+      player sprite sheet left_61: 5662343342946280403
+      player sprite sheet left_62: -9069820364750390263
+      player sprite sheet left_63: 2181881557108421671
+      player sprite sheet left_64: 3302814549470799186
+      player sprite sheet left_65: 7620877848492703106
+      player sprite sheet left_66: 4755970248603440607
+      player sprite sheet left_67: 5811527028968765756
+      player sprite sheet left_68: -5809191292698403157
+      player sprite sheet left_69: 5877879459850880676
+      player sprite sheet left_7: 2225727301605124054
+      player sprite sheet left_8: 5497597627615570905
+      player sprite sheet left_9: 2126199482832318849
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -2,30 +2,32 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
+// Ce script permet de faire apparaître automatiquement des personnages autour d’une maison.
+// Il gère aussi le respawn s’ils meurent.
+
 public class HouseSpawner : MonoBehaviour
 {
     [Header("Configuration de spawn")]
-    private bool estActif = false;
-
-    public GameObject personnagePrefab;
-    public int nombrePersonnagesMax = 2;
-    public float delaiRespawn = 30f;
+    private bool estActif = false; // Est-ce que le système de spawn est activé ?
+    public GameObject personnagePrefab; // Le prefab du personnage à instancier
+    public int nombrePersonnagesMax = 2; // Nombre max de personnages autour de la maison
+    public float delaiRespawn = 30f; // Temps avant de respawn un personnage mort
 
     [Header("Zone de spawn")]
-    public float rayonSpawn = 1.5f;
-    public LayerMask layerSol;
+    public float rayonSpawn = 1.5f; // Rayon dans lequel les personnages vont apparaître
+    public LayerMask layerSol; // Le sol sur lequel ils doivent apparaître
 
     [Header("Debug")]
-    public bool afficherDebug = true;
+    public bool afficherDebug = true; // Pour afficher des messages dans la console
 
-    private List<PersonnageData> personnagesVivants = new List<PersonnageData>();
-    private List<Coroutine> coroutinesRespawn = new List<Coroutine>();
+    private List<PersonnageData> personnagesVivants = new(); // Liste des personnages vivants
+    private List<Coroutine> coroutinesRespawn = new(); // Liste des coroutines de respawn actives
 
-    private bool spawnDejaLance = false;
+    private bool spawnDejaLance = false; // Pour ne pas lancer plusieurs fois le spawn initial
 
     void Start()
     {
-        if (!estActif) return;
+        if (!estActif) return; // Si désactivé, on ne fait rien
 
         if (personnagePrefab == null)
         {
@@ -33,14 +35,16 @@ public class HouseSpawner : MonoBehaviour
             return;
         }
 
+        // Si aucun layerSol n'est défini, on utilise le layer "Ground"
         if (layerSol == 0)
         {
             layerSol = LayerMask.GetMask("Ground");
         }
 
-        StartCoroutine(SpawnPersonnagesInitiaux());
+        StartCoroutine(SpawnPersonnagesInitiaux()); // On lance le spawn initial
     }
 
+    // Méthode appelée pour activer le spawner manuellement
     public void Activer()
     {
         if (estActif) return;
@@ -49,24 +53,26 @@ public class HouseSpawner : MonoBehaviour
         StartCoroutine(SpawnPersonnagesInitiaux());
     }
 
+    // Coroutine pour faire apparaître les personnages au démarrage
     private IEnumerator SpawnPersonnagesInitiaux()
     {
         if (spawnDejaLance) yield break;
         spawnDejaLance = true;
 
-        yield return new WaitForSeconds(0.1f);
+        yield return new WaitForSeconds(0.1f); // Petite pause avant de commencer
 
         for (int i = 0; i < nombrePersonnagesMax; i++)
         {
-            SpawnPersonnage();
-            ResourceManager.Instance.Add(ResourceType.Search, 1);
-            yield return new WaitForSeconds(0.1f);
+            SpawnPersonnage(); // On en fait apparaître un
+            ResourceManager.Instance.Add(ResourceType.Search, 1); // Bonus de recherche
+            yield return new WaitForSeconds(0.1f); // Pause entre chaque spawn
         }
 
         if (afficherDebug)
             Debug.Log($"[HouseSpawner] {name} : {nombrePersonnagesMax} personnages spawnés initialement");
     }
 
+    // Fonction qui crée un nouveau personnage autour de la maison
     private void SpawnPersonnage()
     {
         Vector3 positionSpawn = TrouverPositionSpawnValide();
@@ -82,11 +88,8 @@ public class HouseSpawner : MonoBehaviour
 
         if (personnageData != null)
         {
-            personnagesVivants.Add(personnageData);
-            StartCoroutine(SurveillerPersonnage(personnageData));
-            // MetierAssignmentManager.Instance.TrouverDuJob(personnageData);
-
-
+            personnagesVivants.Add(personnageData); // On l’ajoute à la liste des vivants
+            StartCoroutine(SurveillerPersonnage(personnageData)); // On surveille s’il meurt
 
             if (afficherDebug)
                 Debug.Log($"[HouseSpawner] {name} : Nouveau personnage spawné - {personnageData.name}");
@@ -94,10 +97,11 @@ public class HouseSpawner : MonoBehaviour
         else
         {
             Debug.LogError($"[HouseSpawner] Le prefab {personnagePrefab.name} n'a pas de composant PersonnageData !");
-            Destroy(nouveauPersonnage);
+            Destroy(nouveauPersonnage); // On supprime si pas le bon script
         }
     }
 
+    // Coroutine qui attend que le personnage meurt
     private IEnumerator SurveillerPersonnage(PersonnageData personnage)
     {
         string nomMemo = personnage != null ? personnage.name : "Unknown";
@@ -107,12 +111,13 @@ public class HouseSpawner : MonoBehaviour
             yield return new WaitForSeconds(0.5f);
         }
 
-        OnPersonnageMort(nomMemo);
+        OnPersonnageMort(nomMemo); // Quand il disparaît, on lance la suite
     }
 
+    // Quand un personnage meurt, on prévoit son respawn
     private void OnPersonnageMort(string nomPersonnage)
     {
-        personnagesVivants.RemoveAll(p => p == null);
+        personnagesVivants.RemoveAll(p => p == null); // Nettoyage de la liste
 
         if (afficherDebug)
             Debug.Log($"[HouseSpawner] {name} : Personnage mort détecté - {nomPersonnage}. Respawn dans {delaiRespawn}s");
@@ -121,6 +126,7 @@ public class HouseSpawner : MonoBehaviour
         coroutinesRespawn.Add(coroutine);
     }
 
+    // Coroutine qui attend X secondes avant de respawn un personnage
     private IEnumerator CoroutineRespawn()
     {
         yield return new WaitForSeconds(delaiRespawn);
@@ -136,6 +142,7 @@ public class HouseSpawner : MonoBehaviour
         coroutinesRespawn.RemoveAll(c => c == null);
     }
 
+    // Cherche une position valide autour de la maison pour faire apparaître un personnage
     private Vector3 TrouverPositionSpawnValide()
     {
         int tentatives = 50;
@@ -149,6 +156,7 @@ public class HouseSpawner : MonoBehaviour
             Vector3 positionTest = centreSpawn + (Vector3)(directionAleatoire * distanceAleatoire);
             positionTest.z = 0f;
 
+            // Vérifie si la position est sur le sol et sans obstacle
             if (Physics2D.OverlapCircle(positionTest, 0.1f, layerSol))
             {
                 Collider2D obstacle = Physics2D.OverlapCircle(positionTest, 0.3f, ~layerSol);
@@ -159,10 +167,12 @@ public class HouseSpawner : MonoBehaviour
             }
         }
 
+        // Si rien trouvé, on utilise le centre de la maison
         Debug.LogWarning($"[HouseSpawner] {name} : Aucune position de spawn trouvée, utilisation de la position de la maison");
         return centreSpawn;
     }
 
+    // Permet de forcer l'apparition d’un personnage (ex : debug)
     public void ForcerRespawn()
     {
         if (personnagesVivants.Count < nombrePersonnagesMax)
@@ -175,6 +185,7 @@ public class HouseSpawner : MonoBehaviour
         }
     }
 
+    // Nettoie toutes les coroutines en cours quand le bâtiment est détruit
     private void OnDestroy()
     {
         foreach (Coroutine coroutine in coroutinesRespawn)
@@ -185,12 +196,14 @@ public class HouseSpawner : MonoBehaviour
         coroutinesRespawn.Clear();
     }
 
+    // Affiche dans l'éditeur Unity un cercle jaune pour voir la zone de spawn
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, rayonSpawn);
     }
 
+    // Méthode pour afficher les infos du spawner dans la console (utile pour le debug)
     public void AfficherInfos()
     {
         Debug.Log($"[HouseSpawner] {name} :");

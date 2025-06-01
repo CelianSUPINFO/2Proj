@@ -1,13 +1,14 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 
+// Script qui permet de placer des chemins dans le monde (clic souris)
 public class PathPlacementManager : MonoBehaviour
 {
-    public GameObject previewPath;
-    public GameObject pathPrefab;
-    public LayerMask placementObstaclesLayer;
-    public LayerMask groundLayer;
-    public int pathCost = 5;
+    public GameObject previewPath;       // Objet temporaire pour l’aperçu
+    public GameObject pathPrefab;        // Préfab du chemin à instancier
+    public LayerMask placementObstaclesLayer; // Empêche de construire sur certains objets
+    public LayerMask groundLayer;        // Le chemin doit être placé sur du sol
+    public int pathCost = 5;             // Coût (non utilisé ici)
 
     private bool isPlacing = false;
 
@@ -17,6 +18,8 @@ public class PathPlacementManager : MonoBehaviour
 
         pathPrefab = prefab;
         previewPath = Instantiate(pathPrefab);
+
+        // On désactive le collider du preview pour ne pas bloquer la pose
         Collider2D col = previewPath.GetComponent<Collider2D>();
         if (col != null) col.enabled = false;
 
@@ -34,9 +37,11 @@ public class PathPlacementManager : MonoBehaviour
     {
         if (!isPlacing || previewPath == null) return;
 
+        // Le preview suit la souris en s’alignant à la grille
         Vector2 worldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         previewPath.transform.position = SnapToGrid(worldPos);
 
+        // Clique gauche → on essaie de placer
         if (Input.GetMouseButtonDown(0) && CanPlace())
         {
             PlacePath();
@@ -50,6 +55,7 @@ public class PathPlacementManager : MonoBehaviour
 
     bool CanPlace()
     {
+        // Empêche si on clique sur un élément de l'UI
         if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
             return false;
 
@@ -57,23 +63,23 @@ public class PathPlacementManager : MonoBehaviour
         Vector2 boxCenter = new Vector2(centerPos.x, centerPos.y - 0.5f);
         Vector2 boxSize = new Vector2(1f, 1f);
 
-        Collider2D obstacleHit = Physics2D.OverlapBox(boxCenter, boxSize, 0f, placementObstaclesLayer);
-        if (obstacleHit != null) return false;
+        // Vérifie qu’il n’y a pas d’obstacle
+        if (Physics2D.OverlapBox(boxCenter, boxSize, 0f, placementObstaclesLayer)) return false;
 
-        Collider2D groundHit = Physics2D.OverlapBox(boxCenter, boxSize, 0f, groundLayer);
-        if (groundHit == null) return false;
+        // Vérifie qu’on est bien sur du sol
+        if (!Physics2D.OverlapBox(boxCenter, boxSize, 0f, groundLayer)) return false;
 
         return true;
     }
 
     void PlacePath()
     {
-
-
+        // Instancie le chemin à l’endroit validé
         GameObject placed = Instantiate(pathPrefab, previewPath.transform.position, Quaternion.identity);
         Collider2D col = placed.GetComponent<Collider2D>();
         if (col != null) col.enabled = true;
 
+        // On place sur le layer "Path"
         placed.layer = LayerMask.NameToLayer("Path");
 
         Destroy(previewPath);

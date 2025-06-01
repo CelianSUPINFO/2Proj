@@ -1,8 +1,8 @@
 using System.Collections.Generic;
-using UnityEngine;
 
+// liste des ressources nécessaires pour construire un bâtiment
 [System.Serializable]
 public class BuildingCost
 {
-    public List<ResourceAmount> resourceCosts;
+    public List<ResourceAmount> resourceCosts; // Liste de ressources avec leur quantité
 }

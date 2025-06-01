@@ -3,35 +3,51 @@ using System.Collections.Generic;
 using System.Collections;
 using System.Linq;
 
-
+// Énumération pour les différents types de besoins que peut satisfaire un bâtiment
 public enum TypeBesoin { Aucun, Fatigue, Faim, Soif }
 
+// Le bâtiment doit avoir un Collider2D pour détecter les personnages
 [RequireComponent(typeof(Collider2D))]
 public class BatimentInteractif : MonoBehaviour
 {
+    // Layer pour détecter les autres bâtiments
     private LayerMask layerBatiment;
 
-    [Header("Capacité")] public int capaciteMax = 2;
-    [Header("Régénération")] public bool regenereBesoin = false; public TypeBesoin typeBesoin = TypeBesoin.Fatigue;
-    [Header("Stockage")] public bool estUnStockage = false;
+    // SECTION CONFIGURATION DU BÂTIMENT
+    [Header("Capacité")] 
+    public int capaciteMax = 2; // Nombre max de personnages dans le bâtiment
+    
+    [Header("Régénération")] 
+    public bool regenereBesoin = false; // Est-ce que ce bâtiment régénère un besoin ?
+    public TypeBesoin typeBesoin = TypeBesoin.Fatigue; // Quel besoin il régénère
+    
+    [Header("Stockage")] 
+    public bool estUnStockage = false; // Est-ce un entrepôt ?
+    
+    // Dictionnaire pour suivre le temps de production de chaque personnage
     private Dictionary<PersonnageData, float> timerProduction = new Dictionary<PersonnageData, float>();
+    
+    // Layer pour détecter le sol (pour placement des personnages)
     [SerializeField] private LayerMask layerSol;
 
-
+    // CLASSE POUR DÉFINIR LES PRODUCTIONS PAR MÉTIER
     [System.Serializable]
     public class MetierProductionInfo
     {
-        public JobType metier;
-        public string ressourceProduite;
-        public float dureeProduction;
-        public bool transformation;
-        public string ressourceRequise;
-        public int quantiteRequise;
-        public int quantiteProduite;
+        public JobType metier; // Quel métier peut utiliser ce bâtiment
+        public string ressourceProduite; // Qu'est-ce qu'il produit
+        public float dureeProduction; // Combien de temps ça prend
+        public bool transformation; // Est-ce qu'il transforme des ressources ?
+        public string ressourceRequise; // Ressource nécessaire pour transformer
+        public int quantiteRequise; // Combien il faut de ressource
+        public int quantiteProduite; // Combien on obtient à la fin
     }
 
+    // LISTE DE TOUTES LES PRODUCTIONS POSSIBLES
+    // Chaque métier a ses propres règles de production
     public List<MetierProductionInfo> metierProductions = new List<MetierProductionInfo>()
     {
+        // Productions de base (extraction)
         new MetierProductionInfo { metier = JobType.Bucheron, ressourceProduite = "Bois", dureeProduction = 20f, quantiteProduite = 5 },
         new MetierProductionInfo { metier = JobType.CarrierPierre, ressourceProduite = "Pierre", dureeProduction = 20f, quantiteProduite = 5 },
         new MetierProductionInfo { metier = JobType.CarrierFer, ressourceProduite = "Fer", dureeProduction = 30f, quantiteProduite = 5 },
@@ -39,24 +55,25 @@ public class BatimentInteractif : MonoBehaviour
         new MetierProductionInfo { metier = JobType.FermierAnimaux, ressourceProduite = "Viande", dureeProduction = 20f, quantiteProduite = 5 },
         new MetierProductionInfo { metier = JobType.FermierBle, ressourceProduite = "Ble", dureeProduction = 30f, quantiteProduite = 5 },
         new MetierProductionInfo { metier = JobType.Chercheur, ressourceProduite = "Recherche", dureeProduction = 30f, quantiteProduite = 5 },
+        new MetierProductionInfo { metier = JobType.Pecheur, ressourceProduite = "Poisson", dureeProduction = 20f, quantiteProduite = 5 },
+        
+        // Productions avec transformation (besoin de ressources)
         new MetierProductionInfo { metier = JobType.Boulanger, ressourceProduite = "Pain", dureeProduction = 30f, transformation = true, ressourceRequise = "Ble", quantiteRequise = 5, quantiteProduite = 5 },
         new MetierProductionInfo { metier = JobType.Scieur, ressourceProduite = "Planche", dureeProduction = 30f, transformation = true, ressourceRequise = "Bois", quantiteRequise = 5, quantiteProduite = 5 },
-        new MetierProductionInfo { metier = JobType.Pecheur, ressourceProduite = "Poisson", dureeProduction = 20f, quantiteProduite = 5 },
         new MetierProductionInfo { metier = JobType.Forgeron, ressourceProduite = "Outil", dureeProduction = 30f, transformation = true, ressourceRequise = "fer", quantiteRequise = 5, quantiteProduite = 5 },
     };
 
+    // Données du bâtiment (âge de déblocage, etc.)
     public BuildingData data;
 
-
-
-
-
+    // CLASSE POUR GÉRER LE STOCKAGE DES RESSOURCES
     [System.Serializable]
     public class RessourceStockee
     {
-        public string nom;
-        public int quantite;
+        public string nom; // Nom de la ressource (ex: "Bois")
+        public int quantite; // Combien on en a
 
+        // Constructeur pour créer une nouvelle ressource stockée
         public RessourceStockee(string nom, int quantite)
         {
             this.nom = nom;
@@ -64,46 +81,44 @@ public class BatimentInteractif : MonoBehaviour
         }
     }
 
-    public List<RessourceStockee> stock = new List<RessourceStockee>();
-    public int maxTypes = 4;
-    public int maxParType = 20;
+    // VARIABLES DE STOCKAGE
+    public List<RessourceStockee> stock = new List<RessourceStockee>(); // Liste des ressources stockées
+    public int maxTypes = 4; // Nombre max de types de ressources différentes
+    public int maxParType = 20; // Quantité max par type de ressource
 
+    // LISTES POUR GÉRER LES PERSONNAGES
+    private List<PersonnageData> occupants = new List<PersonnageData>(); // Qui est dans le bâtiment
+    private Dictionary<PersonnageData, float> tempsRestant = new Dictionary<PersonnageData, float>(); // Temps restant pour régénération
+    private Dictionary<PersonnageData, float> timerRegen = new Dictionary<PersonnageData, float>(); // Timer pour régénération
 
-
-    private List<PersonnageData> occupants = new List<PersonnageData>();
-    private Dictionary<PersonnageData, float> tempsRestant = new Dictionary<PersonnageData, float>();
-    private Dictionary<PersonnageData, float> timerRegen = new Dictionary<PersonnageData, float>();
-
+    // SECTION PORT (pour transport entre îles)
     [Header("Port")]
-    public bool estUnPort = false;
-    public BatimentInteractif portCible;
-    public float delaiTraversée = 10f;
+    public bool estUnPort = false; // Est-ce un port ?
+    public BatimentInteractif portCible; // Vers quel port on va
+    public float delaiTraversée = 10f; // Durée du voyage
 
     [Header("Animation bateau")]
-    public GameObject bateauPrefab;
-    public Transform pointDepartBateau;
-    public Transform pointArriveeBateau;
+    public GameObject bateauPrefab; // Prefab du bateau
+    public Transform pointDepartBateau; // D'où part le bateau
+    public Transform pointArriveeBateau; // Où arrive le bateau
 
-
-
-
+    // SECTION MÉTIER (pour assigner des travailleurs)
     [Header("Métier associé")]
-    public JobType metierAssocie;
-    private List<PersonnageData> travailleursActuels = new List<PersonnageData>();
+    public JobType metierAssocie; // Quel métier travaille ici
+    private List<PersonnageData> travailleursActuels = new List<PersonnageData>(); // Qui travaille ici
 
-    private bool dejaInitialise = false;
-    private bool pointsInitialises = false;
+    // Variables de contrôle
+    private bool dejaInitialise = false; // Pour éviter double initialisation
+    private bool pointsInitialises = false; // Points bateau initialisés ?
+    public bool estPlace = false; // Le bâtiment est-il placé ?
 
-    public bool estPlace = false;
-
-
-
-
+    // MÉTHODE APPELÉE AU DÉMARRAGE
     private void Start()
     {
+        // Initialise le layer pour détecter les bâtiments
         layerBatiment = LayerMask.GetMask("Buildings");
 
-
+        // Si ce bâtiment a un métier associé, on essaie d'assigner des travailleurs
         if (metierAssocie != JobType.Aucun)
         {
             Debug.Log($"[Batiment {name}] Initialisation et tentative d'assignation de métier.");
@@ -111,82 +126,97 @@ public class BatimentInteractif : MonoBehaviour
         }
     }
 
-
-
+    // COROUTINE POUR ASSIGNER DES TRAVAILLEURS AU DÉMARRAGE
     private IEnumerator AssignerTravailleursInitiaux()
     {
+        // Nettoie la liste des travailleurs (enlève les null)
         travailleursActuels.RemoveAll(p => p == null);
+        
+        // Si on n'est pas à capacité max et qu'on a un métier
         if (travailleursActuels.Count < capaciteMax && metierAssocie != JobType.Aucun)
         {
+            // Pour chaque place libre
             for (int i = travailleursActuels.Count; i < capaciteMax; i++)
             {
+                // Cherche un personnage sans métier et sans bâtiment
                 PersonnageData candidat = MetierAssignmentManager.Instance.TrouverPersonnageSansMetierEtSansBatiment();
                 Debug.Log($"[Batiment {name}] Tentative d'assignation, trouvé: {(candidat != null ? candidat.name : "aucun")}");
+                
                 if (candidat != null)
                 {
+                    // Assigne le candidat à ce bâtiment
                     candidatsAssignerAuBatiment(candidat);
                 }
                 else
                 {
                     Debug.Log($"[Batiment {name}] Aucun candidat dispo. Attente...");
                 }
-                yield return new WaitForSeconds(0.1f); // court délai, évite bug assignation en masse
+                
+                // Petit délai pour éviter les bugs d'assignation en masse
+                yield return new WaitForSeconds(0.1f);
             }
         }
     }
 
+    // MÉTHODE POUR ASSIGNER UN CANDIDAT AU BÂTIMENT
     public void candidatsAssignerAuBatiment(PersonnageData candidat)
     {
-        if (travailleursActuels.Count >= capaciteMax) return;
-        if (candidat == null) return;
-        // Sécurité : évite d'assigner plusieurs fois
-        if (travailleursActuels.Contains(candidat)) return;
-        if (candidat.metier != JobType.Aucun) return;
-        if (candidat.batimentAssigné != null) return;
+        // Vérifications de sécurité
+        if (travailleursActuels.Count >= capaciteMax) return; // Déjà plein
+        if (candidat == null) return; // Pas de candidat
+        if (travailleursActuels.Contains(candidat)) return; // Déjà assigné
+        if (candidat.metier != JobType.Aucun) return; // A déjà un métier
+        if (candidat.batimentAssigné != null) return; // A déjà un bâtiment
 
+        // Assigne le personnage au bâtiment et lui donne le métier
         candidat.AssignerAuBatiment(this, metierAssocie);
         travailleursActuels.Add(candidat);
         Debug.Log($"[Batiment {name}] Ajout de {candidat.name} ({metierAssocie})");
     }
 
-
+    // MÉTHODE APPELÉE QUAND UN TRAVAILLEUR MEURT
     public void GererMortTravailleur(PersonnageData mort)
     {
         Debug.Log($"mort et gestion {mort.name}");
 
-
+        // Seulement pour les bâtiments de production (pas régénération/stockage)
         if (!regenereBesoin && !estUnStockage)
         {
             Debug.Log("mort et gestion       ok");
+            // Nettoie la liste et relance l'assignation
             travailleursActuels.RemoveAll(p => p == null);
             Debug.Log($"[Batiment {name}] Travailleur {mort.name} mort, lancement réassignation");
             StartCoroutine(AssignerTravailleursInitiaux());
         }
     }
 
-
-
+    // VÉRIFIE SI LE BÂTIMENT A DE LA PLACE
     public bool EstDisponible()
     {
         return occupants.Count < capaciteMax;
     }
 
+    // MÉTHODE APPELÉE QUAND UN PERSONNAGE ENTRE DANS LE BÂTIMENT
     private void OnTriggerEnter2D(Collider2D other)
     {     
-
+        // Vérifie si c'est un personnage
         if (!other.TryGetComponent(out PersonnageData perso)) return;
+        // Vérifie s'il n'est pas déjà dedans et s'il y a de la place
         if (occupants.Contains(perso) || !EstDisponible()) return;
 
-
+        // Ajoute le personnage à la liste des occupants
         occupants.Add(perso);
         perso.cibleObjet = gameObject;
 
-        // --- NE PAS réinitialiser si un timer existe déjà pour ce perso ---
+        // GESTION DE LA PRODUCTION
+        // Ne réinitialise pas si un timer existe déjà pour éviter les bugs
         if (!timerProduction.ContainsKey(perso))
         {
+            // Cherche les infos de production pour ce métier
             MetierProductionInfo info = metierProductions.Find(i => i.metier == perso.metier);
             if (info != null)
             {
+                // Si c'est une transformation, vérifie qu'on a les ressources
                 if (info.transformation)
                 {
                     int retiré = RetirerRessource(info.ressourceRequise, info.quantiteRequise);
@@ -197,95 +227,95 @@ public class BatimentInteractif : MonoBehaviour
                     }
                 }
 
+                // Calcule la durée (avec bonus d'âge et d'outil)
                 float duree = AppliquerBonusAge(info.dureeProduction);
-                if (perso.aOutil) duree /= 2f;
+                if (perso.aOutil) duree /= 2f; // Les outils divisent le temps par 2
                 timerProduction[perso] = duree;
 
                 Debug.Log($"[PROD] {perso.name} commence la production de {info.ressourceProduite} ({info.dureeProduction}s)");
             }
         }
 
-        // Si c'est un port, initier traversée
+        // GESTION DES PORTS
         if (estUnPort && portCible != null)
         {
             StartCoroutine(TraverserAvecBateau(perso));
-            
         }
 
-
-
-        // 🔁 Régénération, si activée
+        // GESTION DE LA RÉGÉNÉRATION
         if (regenereBesoin)
         {
+            // Initialise les timers de régénération
             tempsRestant[perso] = GetTempsTotal(typeBesoin);
-            timerRegen[perso] = 1f;
+            timerRegen[perso] = 1f; // Régénère chaque seconde
             perso.enRegeneration = true;
         }
 
-
-
-        // Si c'est un bâtiment de stockage
+        // GESTION DU STOCKAGE
         if (estUnStockage && perso.sacADos.quantite > 0)
         {
-            StockerDepuis(perso);
+            StockerDepuis(perso); // Transfert le contenu du sac vers le stockage
         }
     }
 
+    // MÉTHODE APPELÉE QUAND UN PERSONNAGE SORT DU BÂTIMENT
     private void OnTriggerExit2D(Collider2D other)
     {
         if (!other.TryGetComponent(out PersonnageData perso)) return;
 
-
-
-
+        // Nettoie toutes les données liées à ce personnage
         occupants.Remove(perso);
         tempsRestant.Remove(perso);
         timerRegen.Remove(perso);
-        timerProduction.Remove(perso); // <-- Ajoute cette ligne !
+        timerProduction.Remove(perso); // Important : arrête la production
         perso.enRegeneration = false;
-
-        
     }
 
+    // VÉRIFIE SI CE PORT EST DÉJÀ LA CIBLE D'UN AUTRE PORT
     public bool EstDejaCible()
     {
         return FindObjectsOfType<BatimentInteractif>()
             .Any(p => p != this && p.estUnPort && p.portCible == this);
     }
 
+    // MÉTHODE UPDATE - APPELÉE À CHAQUE FRAME
     private void Update()
     {
-
+        // GESTION DES PORTS
+        // Si c'est un port et qu'il n'a pas de cible valide, en cherche une
         if (estUnPort && (portCible == null || portCible.EstDejaCible()))
         {
             portCible = TrouverPortLePlusPropreEtLibre();
         }
 
-
+        // Initialise les points bateau si nécessaire
         if (estUnPort && portCible != null && !pointsInitialises)
         {
             InitialiserPointsBateau();
             pointsInitialises = true;
         }
 
-
+        // Nettoie la liste des occupants (enlève les personnages détruits)
         occupants.RemoveAll(p => p == null);
 
-
+        // Listes pour gérer les personnages qui ont fini
         List<PersonnageData> finis = new();
-        List<PersonnageData> occupantsSnapshot = new(occupants); // éviter modification pendant boucle
+        List<PersonnageData> occupantsSnapshot = new(occupants); // Copie pour éviter modifications pendant boucle
 
-        // 🔁 1. Régénération
+        // 1. GESTION DE LA RÉGÉNÉRATION
         if (regenereBesoin)
         {
             foreach (PersonnageData perso in occupantsSnapshot)
             {
                 if (!tempsRestant.ContainsKey(perso)) continue;
 
+                // Décompte le timer de régénération
                 timerRegen[perso] -= Time.deltaTime;
 
+                // Si une seconde s'est écoulée
                 if (timerRegen[perso] <= 0f)
                 {
+                    // Calcule le gain selon le type de besoin
                     int gain = GetGainParTick(typeBesoin);
                     switch (typeBesoin)
                     {
@@ -300,9 +330,11 @@ public class BatimentInteractif : MonoBehaviour
                             break;
                     }
 
+                    // Réduit le temps restant et remet le timer à 1 seconde
                     tempsRestant[perso] -= 1f;
                     timerRegen[perso] = 1f;
 
+                    // Si la régénération est terminée
                     if (tempsRestant[perso] <= 0f)
                     {
                         finis.Add(perso);
@@ -311,39 +343,49 @@ public class BatimentInteractif : MonoBehaviour
             }
         }
 
-        // 🔁 2. Production (séparé de la régénération)
+        // 2. GESTION DE LA PRODUCTION
         List<PersonnageData> producteurs = new(timerProduction.Keys);
-        producteurs.RemoveAll(p => p == null);
+        producteurs.RemoveAll(p => p == null); // Nettoie les producteurs null
+        
+        // Nettoie aussi le dictionnaire des timers
         foreach (var key in new List<PersonnageData>(timerProduction.Keys))
         {
             if (key == null)
                 timerProduction.Remove(key);
         }
 
-
+        // Dictionnaire pour stocker les productions à relancer
         Dictionary<PersonnageData, MetierProductionInfo> aRelancer = new();
 
+        // Pour chaque producteur
         foreach (var producteur in producteurs)
         {
+            // Décompte le timer de production
             timerProduction[producteur] -= Time.deltaTime;
 
+            // Si la production est terminée
             if (timerProduction[producteur] <= 0f)
             {
+                // Récupère les infos de production
                 MetierProductionInfo info = metierProductions.Find(i => i.metier == producteur.metier);
                 if (info != null)
                 {
+                    // Essaie d'ajouter la ressource produite au sac
                     bool ajouté = producteur.sacADos.Ajouter(info.ressourceProduite, info.quantiteProduite);
                     if (ajouté)
                     {
                         Debug.Log($"[{name}] {producteur.name} a produit {info.quantiteProduite} {info.ressourceProduite} (dans son sac)");
+                        
+                        // GESTION SPÉCIALE DES OUTILS
                         if (info.ressourceProduite == "Outil")
                         {
                             int outilsDistribues = 0;
+                            // Distribue les outils aux personnages qui n'en ont pas
                             for (int i = 0; i < info.quantiteProduite; i++)
                             {
                                 var sansOutil = FindObjectsOfType<PersonnageData>()
                                     .Where(p => !p.aOutil)
-                                    .OrderBy(_ => UnityEngine.Random.value)
+                                    .OrderBy(_ => UnityEngine.Random.value) // Ordre aléatoire
                                     .FirstOrDefault();
 
                                 if (sansOutil != null)
@@ -360,10 +402,12 @@ public class BatimentInteractif : MonoBehaviour
                             }
                         }
 
+                        // Marque cette production pour relance
                         aRelancer[producteur] = info;
                     }
                     else
                     {
+                        // Sac plein - envoie vers un stockage
                         Debug.LogWarning($"[{name}] {producteur.name} n'a pas pu stocker {info.ressourceProduite} (sac plein)");
 
                         GameObject stockage = producteur.TrouverPlusProcheParTag("Stockage");
@@ -371,90 +415,91 @@ public class BatimentInteractif : MonoBehaviour
                         {
                             producteur.cibleObjet = stockage;
                             producteur.DeplacerVers(stockage.transform.position);
-                            
-                            // Assure-toi que le personnage passera en mode AllerStockage
                         }
 
-                        // ❌ Pas de relance du timer ici pour éviter production infinie quand sac est plein
+                        // Pas de relance du timer pour éviter production infinie
                     }
                 }
             }
         }
 
-        // 🔁 3. Redémarrer les timers de production
+        // 3. REDÉMARRE LES TIMERS DE PRODUCTION
         foreach (var kvp in aRelancer)
         {
             float duree = kvp.Value.dureeProduction;
-            if (kvp.Key.aOutil) duree /= 2f;
+            if (kvp.Key.aOutil) duree /= 2f; // Bonus outil
             timerProduction[kvp.Key] = duree;
-
         }
 
-        // 🔁 4. Terminer les régénérations
+        // 4. TERMINE LES RÉGÉNÉRATIONS
         foreach (var p in finis)
         {
             occupants.Remove(p);
             tempsRestant.Remove(p);
             timerRegen.Remove(p);
-            p.TerminerRegeneration(); // ✅ Utilise la nouvelle méthode
+            p.TerminerRegeneration(); // Méthode pour finir proprement
         }
-
     }
 
-
-
+    // CALCULE LE GAIN PAR SECONDE SELON LE TYPE DE BESOIN
     private int GetGainParTick(TypeBesoin besoin)
     {
         switch (besoin)
         {
-            case TypeBesoin.Fatigue: return 5;
-            case TypeBesoin.Faim: return 10;
-            case TypeBesoin.Soif: return 10;
+            case TypeBesoin.Fatigue: return 5; // Récupère 5 points de fatigue par seconde
+            case TypeBesoin.Faim: return 10; // Récupère 10 points de faim par seconde
+            case TypeBesoin.Soif: return 10; // Récupère 10 points de soif par seconde
             default: return 0;
         }
     }
 
+    // CALCULE LE TEMPS TOTAL DE RÉGÉNÉRATION
     private float GetTempsTotal(TypeBesoin besoin)
     {
         switch (besoin)
         {
-            case TypeBesoin.Fatigue: return 20f;
-            case TypeBesoin.Faim: return 10f;
-            case TypeBesoin.Soif: return 10f;
+            case TypeBesoin.Fatigue: return 20f; // 20 secondes pour se reposer
+            case TypeBesoin.Faim: return 10f; // 10 secondes pour manger
+            case TypeBesoin.Soif: return 10f; // 10 secondes pour boire
             default: return 0f;
         }
     }
 
+    // TRANSFERT LES RESSOURCES DU SAC DU PERSONNAGE VERS LE STOCKAGE
     private void StockerDepuis(PersonnageData perso)
     {
         string type = perso.sacADos.ressourceActuelle;
         int quantite = perso.sacADos.quantite;
 
-        if (string.IsNullOrEmpty(type)) return;
+        if (string.IsNullOrEmpty(type)) return; // Pas de ressource à stocker
 
         int quantiteAvant = ObtenirQuantite(type);
 
+        // Cherche si on a déjà ce type de ressource
         RessourceStockee existante = stock.Find(r => r.nom == type);
 
         if (existante != null)
         {
+            // On a déjà ce type - ajoute ce qu'on peut
             int ajoutPossible = Mathf.Min(maxParType - existante.quantite, quantite);
             existante.quantite += ajoutPossible;
             perso.sacADos.quantite -= ajoutPossible;
         }
         else if (stock.Count < maxTypes)
         {
+            // Nouveau type de ressource - crée une nouvelle entrée
             int ajout = Mathf.Min(maxParType, quantite);
             stock.Add(new RessourceStockee(type, ajout));
             perso.sacADos.quantite -= ajout;
         }
 
+        // Si le sac est vide, le nettoie
         if (perso.sacADos.quantite <= 0)
         {
             perso.sacADos.Vider();
         }
 
-        // 🔥 NOUVEAU : Notifier le ResourceManager des changements
+        // Notifie le gestionnaire de ressources des changements
         int quantiteApres = ObtenirQuantite(type);
         if (quantiteAvant != quantiteApres)
         {
@@ -468,32 +513,37 @@ public class BatimentInteractif : MonoBehaviour
         Debug.Log($"[Stockage {name}] Contenu : " + string.Join(", ", stock.ConvertAll(r => $"{r.nom}:{r.quantite}")));
     }
 
+    // RETOURNE LA QUANTITÉ D'UNE RESSOURCE STOCKÉE
     public int ObtenirQuantite(string ressource)
     {
         var r = stock.Find(r => r.nom == ressource);
         return r != null ? r.quantite : 0;
     }
 
+    // RETOURNE TOUTES LES RESSOURCES STOCKÉES (COPIE)
     public List<RessourceStockee> GetAllStockedResources()
     {
         return new List<RessourceStockee>(stock);
     }
 
+    // RETIRE UNE QUANTITÉ D'UNE RESSOURCE DU STOCKAGE
     public int RetirerRessource(string nom, int quantiteVoulu)
     {
+        // Cherche la ressource (ignore la casse)
         var r = stock.Find(s => s.nom.Equals(nom, System.StringComparison.OrdinalIgnoreCase));
-        if (r == null || r.quantite <= 0) return 0;
+        if (r == null || r.quantite <= 0) return 0; // Pas trouvé ou vide
 
         int quantiteAvant = r.quantite;
-        int aRetirer = Mathf.Min(quantiteVoulu, r.quantite);
+        int aRetirer = Mathf.Min(quantiteVoulu, r.quantite); // Prend ce qu'on peut
         r.quantite -= aRetirer;
 
+        // Si la ressource est épuisée, la supprime de la liste
         if (r.quantite <= 0)
         {
             stock.Remove(r);
         }
 
-        // 🔥 NOUVEAU : Notifier le ResourceManager des changements
+        // Notifie le gestionnaire de ressources
         if (aRetirer > 0)
         {
             Debug.Log($"[Stockage {name}] Retiré {aRetirer} x {nom} ({quantiteAvant} → {r?.quantite ?? 0})");
@@ -506,10 +556,8 @@ public class BatimentInteractif : MonoBehaviour
         return aRetirer;
     }
 
-    /// <summary>
-    /// 🔥 NOUVELLE MÉTHODE : Ajouter directement des ressources au stockage
-    /// Utile pour la production de bâtiments ou les récompenses
-    /// </summary>
+    // AJOUTE DIRECTEMENT DES RESSOURCES AU STOCKAGE
+    // Utile pour la production de bâtiments ou les récompenses
     public bool AjouterRessource(string nom, int quantite)
     {
         if (string.IsNullOrEmpty(nom) || quantite <= 0) return false;
@@ -519,6 +567,7 @@ public class BatimentInteractif : MonoBehaviour
 
         if (existante != null)
         {
+            // Type existant - ajoute ce qu'on peut
             int ajoutPossible = Mathf.Min(maxParType - existante.quantite, quantite);
             if (ajoutPossible > 0)
             {
@@ -534,6 +583,7 @@ public class BatimentInteractif : MonoBehaviour
         }
         else if (stock.Count < maxTypes)
         {
+            // Nouveau type
             int ajout = Mathf.Min(maxParType, quantite);
             stock.Add(new RessourceStockee(nom, ajout));
 
@@ -548,43 +598,42 @@ public class BatimentInteractif : MonoBehaviour
         return false; // Stockage plein
     }
 
-    /// <summary>
-    /// 🔥 NOUVELLE MÉTHODE : Obtenir l'espace libre pour un type de ressource
-    /// </summary>
+    // RETOURNE L'ESPACE LIBRE POUR UN TYPE DE RESSOURCE
     public int GetEspaceLibre(string nom)
     {
         RessourceStockee existante = stock.Find(r => r.nom == nom);
         if (existante != null)
         {
+            // Type existant - espace restant
             return maxParType - existante.quantite;
         }
         else if (stock.Count < maxTypes)
         {
+            // Nouveau type possible - espace max
             return maxParType;
         }
-        return 0;
+        return 0; // Pas d'espace
     }
 
-    /// <summary>
-    /// 🔥 NOUVELLE MÉTHODE : Vérifier si le stockage peut accepter une certaine quantité
-    /// </summary>
+    // VÉRIFIE SI LE STOCKAGE PEUT ACCEPTER UNE CERTAINE QUANTITÉ
     public bool PeutAccepter(string nom, int quantite)
     {
         return GetEspaceLibre(nom) >= quantite;
     }
 
+    // COROUTINE POUR GÉRER LA TRAVERSÉE EN BATEAU
     private IEnumerator TraverserAvecBateau(PersonnageData perso)
     {
         Debug.Log($"[PORT] {perso.name} embarque sur le bateau...");
 
-        // 🔐 Vérification de sécurité
+        // Vérifications de sécurité
         if (portCible == null || portCible == this)
         {
             Debug.LogWarning($"[PORT] {name} → portCible invalide !");
             yield break;
         }
 
-        // 🔄 Initialisation des points
+        // Initialise les points de départ et d'arrivée
         InitialiserPointsBateau();
         portCible.InitialiserPointsBateau();
 
@@ -597,18 +646,18 @@ public class BatimentInteractif : MonoBehaviour
         Vector3 start = pointDepartBateau.position;
         Vector3 end = portCible.pointDepartBateau.position;
 
-        // 🔄 Stop si distance trop courte
+        //  Stop si distance trop courte
         if (Vector3.Distance(start, end) < 0.1f)
         {
             Debug.LogWarning($"[PORT] {name} → Points trop proches");
             yield break;
         }
 
-        // 🔄 Cacher le personnage
+        //  Cacher le personnage
         occupants.Remove(perso);
         perso.gameObject.SetActive(false);
 
-        // 🛶 Créer le bateau
+        //  Créer le bateau
         GameObject bateau = Instantiate(bateauPrefab, start, Quaternion.identity);
         if (bateau == null)
         {
@@ -619,7 +668,7 @@ public class BatimentInteractif : MonoBehaviour
         float duration = delaiTraversée;
         float speed = Vector3.Distance(start, end) / duration;
 
-        // 🌊 Mouvement du bateau
+        // Mouvement du bateau
         while (bateau != null && Vector3.Distance(bateau.transform.position, end) > 0.05f)
         {
             bateau.transform.position = Vector3.MoveTowards(bateau.transform.position, end, speed * Time.deltaTime);
@@ -628,7 +677,7 @@ public class BatimentInteractif : MonoBehaviour
 
         Destroy(bateau);
 
-        // 📍 Trouver une position de sol libre
+        // Trouver une position de sol libre
         Vector3 debarquement = portCible.TrouverSolLePlusProche();
         perso.transform.position = debarquement;
 
@@ -648,45 +697,28 @@ public class BatimentInteractif : MonoBehaviour
 
 
 
-    private BatimentInteractif TrouverPortLePlusProche()
-    {
-        float minDist = float.MaxValue;
-        BatimentInteractif plusProche = null;
 
-        foreach (var b in FindObjectsOfType<BatimentInteractif>())
-        {
-            if (b == this || !b.estUnPort) continue;
 
-            float dist = Vector3.Distance(transform.position, b.transform.position);
-            if (dist < minDist)
-            {
-                minDist = dist;
-                plusProche = b;
-            }
-        }
-
-        return plusProche;
-    }
-
+   // Initialise les points de départ et d'arrivée pour le transport par bateau
     private void InitialiserPointsBateau()
     {
         if (dejaInitialise) return;
         dejaInitialise = true;
 
-        // 🔹 Création du point de départ
+        // Crée un point de départ si non défini
         if (pointDepartBateau == null)
         {
             GameObject depart = new GameObject($"PointDepart_{name}");
             depart.transform.position = transform.position + new Vector3(-1f, -0.5f, 0);
-            depart.transform.SetParent(GameObject.Find("GameScene")?.transform); // pour ne pas détruire avec le port
+            depart.transform.SetParent(GameObject.Find("GameScene")?.transform); // Pour éviter qu’il soit détruit avec le bâtiment
             pointDepartBateau = depart.transform;
             Debug.Log($"[PORT INIT] {name} → PointDépart créé");
         }
 
-        // 🔹 Création automatique du point d'arrivée si portCible existe
+        // Définit automatiquement le point d’arrivée en fonction du port cible
         if (portCible != null && portCible != this)
         {
-            portCible.InitialiserPointsBateau(); // Sécurisé avec dejaInitialise
+            portCible.InitialiserPointsBateau(); // Sécurisé grâce à dejaInitialise
             if (portCible.pointDepartBateau != null)
             {
                 pointArriveeBateau = portCible.pointDepartBateau;
@@ -699,9 +731,8 @@ public class BatimentInteractif : MonoBehaviour
         }
     }
 
-
-  
-    Vector3 TrouverSolLePlusProche()
+    // Recherche une position au sol libre autour du bâtiment (ex : pour débarquement)
+    private Vector3 TrouverSolLePlusProche()
     {
         float rayon = 2f;
         int essais = 100;
@@ -712,22 +743,19 @@ public class BatimentInteractif : MonoBehaviour
             Vector2 direction = UnityEngine.Random.insideUnitCircle.normalized;
             Vector3 testPos = transform.position + (Vector3)(direction * rayon);
 
-            // Vérifie s'il y a du sol
             bool solTrouve = Physics2D.OverlapCircle(testPos, rayonDetection, layerSol);
-
-            // Vérifie s'il y a un bâtiment
-            bool batimentPresent = Physics2D.OverlapCircle(testPos, rayonDetection, layerBatiment); // nouveau layer pour bâtiments
+            bool batimentPresent = Physics2D.OverlapCircle(testPos, rayonDetection, layerBatiment);
 
             if (solTrouve && !batimentPresent)
                 return testPos;
 
-            rayon += 0.1f;
+            rayon += 0.1f; // élargit progressivement la zone de recherche
         }
 
-        return transform.position;
+        return transform.position; // Retour par défaut si aucun sol libre trouvé
     }
 
-
+    // Applique un bonus de vitesse de production en fonction de l'âge technologique du bâtiment
     private float AppliquerBonusAge(float baseDuree)
     {
         if (data == null) return baseDuree;
@@ -741,11 +769,11 @@ public class BatimentInteractif : MonoBehaviour
             case GameAge.IndustrialAge:
                 return baseDuree * 0.5f;
             default:
-                return baseDuree; // StoneAge ou non défini
+                return baseDuree;
         }
     }
 
-
+    // Cherche un autre port disponible (non ciblé) le plus proche pour établir une traversée
     private BatimentInteractif TrouverPortLePlusPropreEtLibre()
     {
         float minDist = float.MaxValue;

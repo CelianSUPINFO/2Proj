@@ -30,14 +30,14 @@ public class GestionDesArbres : MonoBehaviour
             // Instancie la souche à la position et rotation de l'arbre
             GameObject souche = Instantiate(prefabSouche, arbre.position, arbre.rotation, transform);
 
-            // 🔥 Correction : change le Sorting Layer de la souche
+            // Correction : change le Sorting Layer de la souche
             SpriteRenderer sr = souche.GetComponent<SpriteRenderer>();
             if (sr != null)
             {
                 sr.sortingLayerName = "Terrain"; // Remplace "Terrain" par le nom exact de ton Sorting Layer
             }
 
-            // 🔥 Si la souche a des enfants (par ex : plusieurs sprites), change le Sorting Layer sur tous
+            // Si la souche a des enfants (par ex : plusieurs sprites), change le Sorting Layer sur tous
             foreach (SpriteRenderer childSr in souche.GetComponentsInChildren<SpriteRenderer>())
             {
                 childSr.sortingLayerName = "Terrain";

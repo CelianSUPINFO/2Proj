@@ -1,9 +1,11 @@
 using UnityEngine;
 
+// Script attaché à chaque morceau de chemin pour donner un bonus de vitesse
 public class PathTile : MonoBehaviour
 {
-    public GameAge cheminAge = GameAge.StoneAge;
+    public GameAge cheminAge = GameAge.StoneAge; // Niveau d’âge du chemin (plus l’âge est avancé, plus c’est rapide)
 
+    // Retourne le multiplicateur de vitesse selon l’âge du chemin
     public float GetSpeedMultiplier()
     {
         return cheminAge switch

@@ -1,29 +1,36 @@
 using TMPro;
 using UnityEngine;
 
+// Ce script permet d'afficher une ressource spécifique à l'écran (ex : Bois : 15)
 public class ResourceDisplay : MonoBehaviour
 {
-    public ResourceType resourceType;
-    public TMP_Text targetText;
+    public ResourceType resourceType;       // Le type de ressource à afficher (bois, pierre, etc.)
+    public TMP_Text targetText;             // Référence vers le champ texte dans l’UI
 
     void Start()
     {
+        // On s'abonne à l'événement pour être prévenu quand une ressource change
         ResourceManager.Instance.onResourceChanged += UpdateDisplay;
-        UpdateDisplay(); 
+
+        // Mise à jour immédiate à l'ouverture (au cas où la valeur a déjà changé)
+        UpdateDisplay();
     }
 
     void OnDestroy()
     {
+        // On se désabonne pour éviter les erreurs si l'objet est détruit
         ResourceManager.Instance.onResourceChanged -= UpdateDisplay;
     }
 
+    // Cette méthode met à jour le texte affiché à l’écran
     void UpdateDisplay()
     {
-        int amount = ResourceManager.Instance.Get(resourceType);
-        string name = GetDisplayName(resourceType);
-        targetText.text = $"{name} : {amount}";
+        int amount = ResourceManager.Instance.Get(resourceType);     // On récupère la quantité actuelle
+        string name = GetDisplayName(resourceType);                  // On traduit le nom en français
+        targetText.text = $"{name} : {amount}";                      // Exemple affiché : "Bois : 30"
     }
 
+    // Traduit le nom d’un type de ressource en français pour l’interface utilisateur
     private string GetDisplayName(ResourceType type)
     {
         return type switch
@@ -47,7 +54,7 @@ public class ResourceDisplay : MonoBehaviour
             ResourceType.Gold => "Or",
             ResourceType.Population => "Population",
             ResourceType.Search => "Recherche",
-            _ => type.ToString()
+            _ => type.ToString() // Par défaut, on garde le nom brut si pas prévu
         };
     }
 }
