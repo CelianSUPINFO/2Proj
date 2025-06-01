@@ -51,6 +51,9 @@ TagManager:
   - name: Terrain
     uniqueID: 531665513
     locked: 0
+  - name: Animals
+    uniqueID: 524482003
+    locked: 0
   - name: cloud
     uniqueID: 738502427
     locked: 0
