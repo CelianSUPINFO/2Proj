@@ -371,15 +371,7 @@ public class TechTreeUI : MonoBehaviour
         switch (techId)
         {
             case "0":
-                Bonus.woodBonus += 1f;
-                Debug.Log("Bonus Bois débloqué");
-                break;
-            case "1":
                 BuildingManager.UnlockBuilding("Puit");
-                buildingBarUI.RefreshBar(AgeManager.Instance.GetCurrentAge());
-                break;
-            case "2":
-                BuildingManager.UnlockBuilding("Cabane en pierre");
                 buildingBarUI.RefreshBar(AgeManager.Instance.GetCurrentAge());
                 break;
             case "3":
@@ -389,9 +381,6 @@ public class TechTreeUI : MonoBehaviour
             case "4":
                 BuildingManager.UnlockBuilding("Zone de bois");
                 buildingBarUI.RefreshBar(AgeManager.Instance.GetCurrentAge());
-                break;
-            case "5":
-                // Sac +
                 break;
             case "6":
                 BuildingManager.UnlockBuilding("Mine de Pierre");

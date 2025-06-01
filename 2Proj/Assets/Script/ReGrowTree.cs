@@ -5,7 +5,7 @@ using System.Collections.Generic;
 public class GestionDesArbres : MonoBehaviour
 {
     public GameObject prefabSouche; 
-    public float tempsRepousse = 30f;
+    public float tempsRepousse = 120f;
     private Dictionary<Transform, bool> arbresEtats = new Dictionary<Transform, bool>();
     private Dictionary<Transform, GameObject> souches = new Dictionary<Transform, GameObject>();
 

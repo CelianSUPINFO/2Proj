@@ -5,7 +5,7 @@ using System.Collections.Generic;
 public class GestionDesRochers : MonoBehaviour
 {
     public GameObject prefabSouchePierre; // Prefab de souche (ou "pierre vide")
-    public float tempsRepousse = 45f; // Temps avant repousse
+    public float tempsRepousse = 120f; // Temps avant repousse
 
     private Dictionary<Transform, bool> rochersEtats = new Dictionary<Transform, bool>();
     private Dictionary<Transform, GameObject> souchesPierres = new Dictionary<Transform, GameObject>();

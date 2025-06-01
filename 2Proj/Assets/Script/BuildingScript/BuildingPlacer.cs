@@ -166,6 +166,14 @@ public class SimpleBuildingPlacer : MonoBehaviour
         Vector2 boxSize = new Vector2(3f, 3f);
 
 
+        // Si c'est un port, on applique une règle spéciale
+        BatimentInteractif portTest = previewBuilding.GetComponent<BatimentInteractif>();
+        if (portTest != null && portTest.estUnPort)
+        {
+            return EstPlacementValidePort(boxCenter, boxSize);
+        }
+
+
         // 3. Vérifie s'il y a un obstacle (eau, falaise, etc.)
         Collider2D obstacleHit = Physics2D.OverlapBox(boxCenter, boxSize, 0f, placementObstaclesLayer);
         if (obstacleHit != null)
@@ -176,13 +184,7 @@ public class SimpleBuildingPlacer : MonoBehaviour
             Debug.Log("❌ Le bâtiment n’est pas entièrement sur le sol !");
             return false;
         }
-        // Si c'est un port, on applique une règle spéciale
-        BatimentInteractif portTest = previewBuilding.GetComponent<BatimentInteractif>();
-        if (portTest != null && portTest.estUnPort)
-        {
-            return EstPlacementValidePort(boxCenter, boxSize);
-        }
-
+        
      
         if (ContientDesPersonnagesSousBâtiment())
         {

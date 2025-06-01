@@ -9,6 +9,7 @@ TagManager:
   - Pierre
   - Stockage
   - Port
+  - Personnage
   layers:
   - Default
   - TransparentFX

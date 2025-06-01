@@ -150,7 +150,7 @@ public class PersonnageData : MonoBehaviour
     private Vector3 cible; private float timer; public GameObject cibleObjet; public static event Action<PersonnageData> OnPersonnageMort;
     private Vector3 directionContournement = Vector3.zero; private float timerContournement = 0f; private bool enContournement = false;
 
-    private enum EtatPerso { Normal, Collecte, AttenteCollecte, AllerStockage, DeposerRessource }
+    private enum EtatPerso { Normal, Collecte, AttenteCollecte, AllerStockage, DeposerRessource, AllerPort }
     private EtatPerso etatActuel = EtatPerso.Normal;
     private GameObject cibleRessource;
     private float timerCollecte;
@@ -281,16 +281,36 @@ public class PersonnageData : MonoBehaviour
                     GameObject batiment = TrouverBatimentDeMetier();
                     if (batiment != null)
                     {
-                        // On vérifie si le batiment associé est une transformation
                         BatimentInteractif batimentInteractif = batiment.GetComponent<BatimentInteractif>();
+
                         if (batimentInteractif != null && batimentInteractif.metierAssocie == metier)
                         {
-                            var prodInfo = batimentInteractif.metierProductions.Find(p => p.metier == metier && p.transformation);
+                            // 🔄 Nouvelle vérification ici
+                            var prodInfo = batimentInteractif.metierProductions.Find(p => p.metier == metier);
+
                             if (prodInfo != null)
                             {
-                                // S'il lui faut une ressource, on vérifie si le sac est vide ou s'il n'a pas la bonne ressource
-                                if (sacADos.EstVide() || sacADos.ressourceActuelle != prodInfo.ressourceRequise || sacADos.quantite < prodInfo.quantiteRequise)
+                                bool estTransformation = prodInfo.transformation;
 
+                                // Si ce n'est pas une transformation et que le sac contient une ressource différente → on va stocker
+                                if (!estTransformation &&
+                                    !sacADos.EstVide() &&
+                                    sacADos.ressourceActuelle != prodInfo.ressourceProduite)
+                                {
+                                    GameObject stockage = TrouverPlusProcheParTag("Stockage");
+                                    if (stockage != null)
+                                    {
+                                        cibleObjet = stockage;
+                                        DeplacerVers(stockage.transform.position);
+                                        etatActuel = EtatPerso.AllerStockage;
+                                        Debug.Log($"{name} a une ressource non liée à son bâtiment de production. Il va la stocker.");
+                                        return;
+                                    }
+                                }
+
+                                // Si transformation mais sac vide ou ressource inadaptée → aller chercher la bonne ressource
+                                if (estTransformation &&
+                                    (sacADos.EstVide() || sacADos.ressourceActuelle != prodInfo.ressourceRequise || sacADos.quantite < prodInfo.quantiteRequise))
                                 {
                                     GameObject stockageAvecRessource = TrouverStockageAvecRessource(prodInfo.ressourceRequise, prodInfo.quantiteRequise);
                                     if (stockageAvecRessource != null)
@@ -299,20 +319,19 @@ public class PersonnageData : MonoBehaviour
                                         DeplacerVers(stockageAvecRessource.transform.position);
                                         etatActuel = EtatPerso.AllerStockage;
                                         Debug.Log($"{name} va chercher {prodInfo.ressourceRequise} dans le stockage avant d'aller au bâtiment de transformation {batimentInteractif.name}");
-                                        return; // On sort pour ne pas enchaîner tout de suite sur le batiment
+                                        return;
                                     }
                                     else
                                     {
                                         Debug.Log($"{name} n'a pas trouvé de stockage avec {prodInfo.ressourceRequise} disponible !");
-                                        // Il pourrait errer ou attendre, ou aller au batiment pour rien...
                                     }
                                 }
                             }
-                        }
-                        // Comportement normal : aller au batiment de métier
-                        cibleObjet = batiment;
-                        DeplacerVers(batiment.transform.position);
 
+                            // Aller au bâtiment (cas normal ou transformation avec bonne ressource en sac)
+                            cibleObjet = batiment;
+                            DeplacerVers(batiment.transform.position);
+                        }
                     }
                 }
                 break;
@@ -339,6 +358,7 @@ public class PersonnageData : MonoBehaviour
                 break;
         }
     }
+
 
 
     /// <summary>
@@ -496,20 +516,51 @@ public class PersonnageData : MonoBehaviour
 
     public void DeplacerVers(Vector3 destination)
     {
-        // 1. Cherche un chemin près de la position actuelle
-        Collider2D cheminDepart = Physics2D.OverlapCircle(transform.position, 2f, LayerMask.GetMask("Path"));
+        float distance = Vector3.Distance(transform.position, destination);
 
-        // 2. Cherche un chemin près de la destination
+        // 👉 Si la distance est trop grande OU si pas de sol entre ici et la cible
+        bool tropLoin = distance > 20f;
+        bool cheminBloqué = !CheminPossible(destination);
+
+        if (tropLoin || cheminBloqué)
+        {
+            GameObject portProche = TrouverPlusProcheParTag("Port");
+            if (portProche != null)
+            {
+                cibleObjet = portProche;
+                etatActuel = EtatPerso.AllerPort;
+                destination = portProche.transform.position;
+                Debug.Log($"{name} change de destination pour aller au port : {portProche.name}");
+            }
+        }
+        else if (cheminBloqué)
+        {
+            // 👉 Tenter de trouver un point sur le sol en direction de la destination (mais légèrement décalé)
+            Vector3 rive = TrouverDirectionRive(destination);
+
+            if (rive != Vector3.zero)
+            {
+                cible = rive;
+                Debug.Log($"{name} longe la rive vers {rive}");
+            }
+            else
+            {
+                Debug.LogWarning($"{name} ne trouve pas de rive praticable !");
+                cible = transform.position; // reste sur place
+            }
+        }
+
+
+        // 1. Chemins
+        Collider2D cheminDepart = Physics2D.OverlapCircle(transform.position, 2f, LayerMask.GetMask("Path"));
         Collider2D cheminArrivee = Physics2D.OverlapCircle(destination, 2f, LayerMask.GetMask("Path"));
 
         if (cheminDepart != null && cheminArrivee != null)
         {
-            // Si les deux points sont proches d'un chemin, on fait une transition douce :
             cible = cheminArrivee.transform.position;
         }
         else
         {
-            // Sinon on y va normalement
             cible = destination;
         }
 
@@ -517,6 +568,37 @@ public class PersonnageData : MonoBehaviour
         enContournement = false;
         timerContournement = 0f;
     }
+
+    private bool CheminPossible(Vector3 destination)
+    {
+        Vector3 direction = (destination - transform.position).normalized;
+        float distance = Vector3.Distance(transform.position, destination);
+
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, direction, distance, layerSol);
+
+        return hit.collider != null;
+    }
+
+    private Vector3 TrouverDirectionRive(Vector3 destination)
+    {
+        Vector3 direction = (destination - transform.position).normalized;
+        float angleStep = 15f;
+        float rayon = 1.5f;
+
+        for (float angle = -90f; angle <= 90f; angle += angleStep)
+        {
+            Vector3 directionTest = Quaternion.Euler(0, 0, angle) * direction;
+            Vector3 pointTest = transform.position + directionTest * rayon;
+
+            if (Physics2D.OverlapCircle(pointTest, 0.2f, layerSol))
+            {
+                return pointTest;
+            }
+        }
+
+        return Vector3.zero; // rien trouvé
+    }
+
 
 
     void ChoisirNouvelleCible()
@@ -608,6 +690,7 @@ public class PersonnageData : MonoBehaviour
                         DeplacerVers(stockage.transform.position);
                         etatActuel = EtatPerso.AllerStockage;
                     }
+
                 }
                 else
                 {
@@ -632,14 +715,7 @@ public class PersonnageData : MonoBehaviour
                         DeplacerVers(cibleRessource.transform.position);
                         etatActuel = EtatPerso.Collecte;
                     }
-                    GameObject port = TrouverPlusProcheParTag("Port");
-                    if (port != null)
-                    {
-                        cibleObjet = port;
-                        DeplacerVers(port.transform.position);
-                        // état spécial si besoin
-                        return;
-                    }
+
                 }
                 break;
 
@@ -655,7 +731,7 @@ public class PersonnageData : MonoBehaviour
                 break;
 
             case EtatPerso.AttenteCollecte:
-            timerCollecte -= Time.deltaTime;
+                timerCollecte -= Time.deltaTime;
                 if (timerCollecte <= 0f)
                 {
                     string type = cibleRessource.tag == "Arbre" ? "Bois" : "Pierre";
@@ -719,8 +795,45 @@ public class PersonnageData : MonoBehaviour
             case EtatPerso.DeposerRessource:
                 Debug.Log($"{name} a déposé : {sacADos.ressourceActuelle} x{sacADos.quantite}");
                 sacADos.Vider();
-                etatActuel = EtatPerso.Normal;
+                GameObject port = TrouverPlusProcheParTag("Port");
+                if (port != null && UnityEngine.Random.Range(0, 20) == 0)
+                {
+                    Debug.Log("port");
+                    cibleObjet = port;
+                    DeplacerVers(port.transform.position);
+                    etatActuel = EtatPerso.AllerPort; // 🔥 ou un nouvel état si tu préfères
+                }
+                else
+                {
+                    etatActuel = EtatPerso.Normal;
+                }
                 break;
+            
+            case EtatPerso.AllerPort:
+                if (cibleObjet == null)
+                {
+                    Debug.Log("bah nan");
+                    etatActuel = EtatPerso.Normal;
+                    return;
+                }
+
+                float distance1 = Vector3.Distance(transform.position, cibleObjet.transform.position);
+                if (distance1 < 0.5f)
+                {
+                    if (cibleObjet.CompareTag("Port"))
+                    {
+                        Debug.Log($"{name} est arrivé au port");
+                        // Déclenchement d'une animation ou logique ici ?
+                        etatActuel = EtatPerso.Normal;
+                    }
+                    else
+                    {
+                        etatActuel = EtatPerso.DeposerRessource;
+                    }
+                }
+                break;
+
+
         }
     }
 
@@ -793,6 +906,14 @@ public class PersonnageData : MonoBehaviour
                             }
                         }
                     }
+                    else{
+                        float dist = Vector3.Distance(transform.position, obj.transform.position);
+                        if (dist < distanceMin)
+                        {
+                            distanceMin = dist;
+                            plusProche = obj;
+                        }
+                        }
                 }
                 else
                 {
@@ -861,6 +982,7 @@ public class PersonnageData : MonoBehaviour
         cibleObjet = null;
         cibleRessource = null;
         enRegeneration = false;
+
         etatActuel = EtatPerso.Normal;
 
         if (!EvaluerBesoinsUrgents())
